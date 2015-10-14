@@ -1,0 +1,30 @@
+{
+  "name": "photo-engine-web",
+  "version": "1.0.0",
+  "description": "Photo engine webinterface",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/edge-is/photo-engine-web.git"
+  },
+  "keywords": [
+    "photo-engine",
+    "web",
+    "photo"
+  ],
+  "author": "Ágúst Ingi Kjartansson",
+  "license": "GPL-v2",
+  "bugs": {
+    "url": "https://github.com/edge-is/photo-engine-web/issues"
+  },
+  "homepage": "https://github.com/edge-is/photo-engine-web",
+  "devDependencies": {
+    "grunt-contrib-concat": "^0.5.1",
+    "grunt-contrib-copy": "^0.8.1",
+    "grunt-contrib-uglify": "^0.9.2",
+    "grunt-contrib-watch": "^0.6.1"
+  }
+}
