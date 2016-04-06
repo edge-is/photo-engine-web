@@ -17,7 +17,7 @@ search.service('_search',
         var limit = options.limit || 30;
         var offset = options.offset || 0;
         var deferred = $q.defer();
-        var url = 'http://localhost:3000/api/v1/search/main?';
+        var url = [config.api,'/v1/search/main?'].join('');
         url += 'limit=' + limit;
         url += '&offset=' + offset;
         url += '&query=' + query;
