@@ -1,0 +1,223 @@
+.twitter-typeahead .tt-query,
+.twitter-typeahead .tt-hint {
+	margin-bottom: 0;
+}
+.tt-hint {
+	display: block;
+	width: 100%;
+	height: 38px;
+	padding: 8px 12px;
+	font-size: 14px;
+	line-height: 1.428571429;
+	color: #999;
+	vertical-align: middle;
+	background-color: #ffffff;
+	border: 1px solid #cccccc;
+	border-radius: 4px;
+	-webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+	      box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+	-webkit-transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;
+	      transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;
+}
+.tt-menu {
+	min-width: 160px;
+	margin-top: 2px;
+	padding: 5px 0;
+	background-color: #ffffff;
+	border: 1px solid #cccccc;
+	border: 1px solid rgba(0, 0, 0, 0.15);
+	border-radius: 4px;
+	-webkit-box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175);
+	      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175);
+	background-clip: padding-box;
+
+ /* Set it to full width of parent*/
+  width: 100%;
+}
+.tt-suggestion {
+  text-transform: none;
+  color : #333;
+	display: block;
+	padding: 3px 20px;
+}
+.tt-suggestion:hover {
+	color: #fff;
+	background-color: #428bca;
+}
+.tt-suggestion.tt-is-under-cursor a {
+	color: #fff;
+}
+.tt-suggestion p {
+	margin: 0;
+}
+
+.twitter-typeahead .tt-input {
+  height: 39px;
+}
+
+.a-nograyscale {
+	transition: none;
+	color: #333 !important;
+	text-transform: none;
+}
+
+.search-result-content {padding-top: 70px}
+
+
+.gallery .thumbnail {
+	 background-color: transparent;
+ 	 border: none;
+}
+
+
+.lazy-img.lazy-img-landscape img {
+	width: 100%;
+	height: 100%;
+		max-height: 633px;
+}
+.lazy-img.lazy-img-portrait img {
+	overflow: hidden;
+	max-height: 633px;
+}
+
+
+.lazy-img.thumbnail {
+	margin-bottom: 0px;
+}
+
+.image-map{
+	height: 260px;
+	width:100%
+}
+
+.modal h1, h2, h3, h4, h5, h6 {
+    text-transform: none;
+}
+
+/*.gallery .thumbnail img { max-height: 100px; }*/
+
+/*.lazy-img .low-resolution-image{
+	height : 600px;
+}*/
+
+
+/*.lazy-img img {
+	height: 600px;
+}*/
+.intro-back {
+	position : fixed;
+}
+.nav-lowercase {
+	text-transform: none;
+}
+
+.navbar-form .form-group {
+    display: inline-block;
+    margin-bottom: 0;
+    vertical-align: middle;
+
+}
+
+.background-thumbnail {
+	height:300px;
+	background:center;
+	background-size:cover;
+}
+
+  @media (max-width: 768px) {
+		.navbar-form {
+			  padding: 0px 0px;
+				margin-top: 4px;
+				margin-bottom: 0px;
+				-webkit-box-shadow: none;
+    		box-shadow: none;
+		}
+	}
+/* Small devices (tablets, 768px and up) */
+	@media (min-width: 300px) {
+		/*.navbar-main-search { width: 680px; }*/
+		.nav-search { width: 300px !important; }
+	}
+  @media (min-width: 768px) {
+		 .navbar-main-search { width: 540px; }
+		 .nav-search { width: 210px !important; }
+		 .gallery .thumbnail img { max-height: 300px; }
+	}
+
+  @media (min-width: 992px) {
+		.navbar-main-search { width: 780px; }
+		.nav-search { width: 450px !important }
+		.gallery .thumbnail img {
+			max-height: 300px;
+		}
+	}
+
+  @media (min-width: 1200px) {
+		.navbar-main-search { width: 960px; }
+		.nav-search { width: 600px !important; }
+		.gallery .thumbnail img {
+			max-height: 236px;
+		}
+		.modal-lg {
+				width: 1100px;
+		}
+	}
+
+	@media (min-width: 1400px) {
+		.gallery .thumbnail img {
+			max-height: 280px;
+		}
+		.modal-lg {
+				width: 1300px;
+		}
+	}
+
+	@media (min-width: 1600px) {
+		.gallery .thumbnail img {
+			max-height: 324px;
+		}
+		.modal-lg {
+				width: 1500px;
+		}
+	}
+	@media (min-width: 1800px) {
+		.gallery .thumbnail img {
+			max-height: 370px;
+		}
+		.modal-lg {
+				width: 1700px;
+		}
+	}
+	@media (min-width: 1900px) {
+		.gallery .thumbnail img {
+			max-height: 395px;
+		}
+		.modal-lg {
+				width: 1800px;
+		}
+	}
+
+
+	#preview_carousel:-webkit-full-screen	{
+		width: 100%;
+	}
+	#preview_carousel:-moz-full-screen		{
+		width: 100%;
+	}
+	#preview_carousel:-ms-full-screen		{
+		width: 100%;
+	}
+	#preview_carousel:-o-full-screen		{
+		width: 100%;
+	}
+	#preview_carousel:full-screen			{
+		width: 100%;
+	}
+	.fullscreen .thumbnail {
+		border: none;
+		background-color: #000000;
+	}
+
+	.fullscreen .thumbnail img {
+		max-height: 100%;
+	}

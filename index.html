@@ -9,30 +9,27 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>Grayscale - Start Bootstrap Theme</title>
+    <title>Photo Engine</title>
 
     <!-- Bootstrap Core CSS -->
     <link href="lib/css/bootstrap.min.css" rel="stylesheet">
 
+
     <!-- Custom CSS -->
-    <link href="lib/css/grayscale.css" rel="stylesheet">
-    <link rel="stylesheet" href="dist/css/application.css" media="screen" title="no title" charset="utf-8">
+    <link href="dist/css/grayscale.min.css" rel="stylesheet">
+
+
+    <link href="lib/css/leaflet.css" rel="stylesheet">
+    <link href="lib/css/select.min.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="dist/css/application.min.css" media="screen" title="no title" charset="utf-8">
+
 
     <!-- Custom Fonts -->
     <link href="lib/css/font-awesome.min.css" rel="stylesheet" type="text/css">
     <link href="http://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic" rel="stylesheet" type="text/css">
     <link href="http://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet" type="text/css">
 
-    <style media="screen">
-    /* Small devices (tablets, 768px and up) */
-      @media (min-width: 768px) { .nav-search { width: 200px !important; }}
-
-      /* Medium devices (desktops, 992px and up) */
-      @media (min-width: 992px) { .nav-search { width: 400px !important } }
-
-      /* Large devices (large desktops, 1200px and up) */
-      @media (min-width: 1200px) { .nav-search { width: 600px !important; } }
-    </style>
 
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -40,6 +37,8 @@
         <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
         <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
     <![endif]-->
+
+
 
 </head>
 
@@ -49,63 +48,77 @@
     <nav class="navbar navbar-custom navbar-fixed-top" role="navigation" ng-class="(MainSearchHidden) ? '' : 'top-nav-collapse'">
         <div class="container">
             <div class="navbar-header">
-                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-main-collapse">
+                <!-- <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-main-collapse">
                     <i class="fa fa-bars"></i>
-                </button>
+                </button> -->
                 <a class="navbar-brand page-scroll" href="#page-top">
-                    <i class="fa fa-play-circle"></i>  [[logo]]
+                    <i class="fa fa-play-circle"></i>[[logo]]
                 </a>
+                <form class="navbar-main-search navbar-form" ng-hide="(MainSearchHidden)" role="search">
+                   <div class="form-group">
+                      <input type="text" ng-focus="false" id="mainsearch"
+                      sf-typeahead options="TypeaheadOptions" datasets="TypeaheadEngineData" ng-model="MainSearch"
+                      class="form-control nav-search typeahead" placeholder="Search">
+
+                  </div>
+                  <button type="submit" class="btn btn-default submit-search" ng-click="submitMainSearch()">Search</button>
+                  <a href="#/advancedsearch.html" type="submit" class="btn btn-default a-nograyscale hidden-xs" ng-click="openAdvancedSearch()">Advanced</a>
+                </form>
             </div>
-            <form class="navbar-main-search navbar-form navbar-left" ng-hide="(MainSearchHidden)" role="search">
-              <div class="form-group">
-                <input type="text" ng-focus="false" id="mainsearch" ng-model="MainSearch"
-                sf-typeahead options="exampleOptions" datasets="numbersDataset" ng-model="typeaheadquery"
-                class="form-control nav-search typeahead" placeholder="Search">
-              </div>
-              <button type="submit" class="btn btn-default">Search</button>
-            </form>
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+              <ul class="nav navbar-nav navbar-right nav-lowercase" ng-hide="MainSearchHidden">
+                <li><a href="#">Found {{searchResultsTotal}} ({{searchTime | ms}})</a></li>
+              </ul>
+            </div><!-- /.navbar-collapse -->
+
             <!-- Collect the nav links, forms, and other content for toggling -->
-            <div class="collapse navbar-collapse navbar-right navbar-main-collapse">
-                <!-- <ul class="nav navbar-nav">
-                    <li class="hidden">
-                        <a href="#page-top"></a>
-                    </li>
-                    <li>
-                        <a class="page-scroll" href="#about">About</a>
-                    </li>
-                    <li>
-                        <a class="page-scroll" href="#download">Download</a>
-                    </li>
-                    <li>
-                        <a class="page-scroll" href="#contact">Contact</a>
-                    </li>
-                </ul> -->
-            </div>
             <!-- /.navbar-collapse -->
         </div>
         <!-- /.container -->
     </nav>
 
     <!-- Intro Header -->
-    <header class="intro" >
+    <header class="intro intro-back">
       <div class="intro-body" ng-hide="(StartSearchHidden)">
         <div class="container">
           <div class="row">
             <div class="col-md-8 col-md-offset-2">
-              <h1 class="brand-heading">Grayscale {{hello}}</h1>
+              <!-- <h3 class="brand-heading">Metadata search</h3> -->
               <div class="input-group-lg">
                 <input id="startsearch" ng-model="StartSearch" type="text" class="form-control" placeholder="Search" aria-describedby="sizing-addon1">
               </div>
-              <p class="intro-text">A free, responsive, one page Bootstrap theme.<br>Created by Start Bootstrap.</p>
-              <a href="#about" class="btn btn-circle page-scroll">
+              <p class="intro-text">Photo metadata search engine</p>
+              <!-- <a href="#about" class="btn btn-circle page-scroll">
                   <i class="fa fa-angle-double-down animated"></i>
-              </a>
+              </a> -->
             </div>
           </div>
         </div>
       </div>
-    </header>
 
+    </header>
+    <div class="search-result-content container-fluid" ng-show="(StartSearchHidden)">
+      <!-- <div class="row gallery">
+        <div  ng-repeat="(index, item) in MainSearchHits">
+          <div class="" ng-class="(landscape(item)) ? ' col-lg-4 col-md-6 col-sm-6' : ' col-lg-2 col-md-3 col-sm-3'">
+            <a href="#" class="thumbnail" ng-click="openImage(index, item, MainSearchHits)" uib-tooltip="{{item._source.Description}}">
+              <img
+              ng-src="{{TMPselectImg(item)}}"
+              alt="{{ item._source.Description}}">
+            </a>
+          </div>
+        </div>
+      </div> -->
+      <div class="row">
+        <div  ng-repeat="(index, image) in MainSearchHits">
+          <div class="col-lg-3 col-md-3 col-sm-4">
+            <a href="#/image/{{image._id}}" class="thumbnail"  ng-click="openImage(index, image, MainSearchHits)"  uib-tooltip="{{item._source.Description}}">
+            <div class="background-thumbnail" style="background-image: url({{image._source.imagesrc[DefaultImage]}})"></div>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
     <!-- About Section
     <section id="about" class="container content-section text-center">
         <div class="row">
@@ -117,26 +130,31 @@
             </div>
         </div>
     </section>
-
+z
   -->
 
     <!-- Footer -->
-    <footer>
+    <!-- <footer>
         <div class="container text-center">
-            <p>Copyright &copy; Your Website 2014</p>
+
         </div>
-    </footer>
+    </footer> -->
 
     <script src="lib/js/jquery.min.js"></script>
     <script src="lib/js/bootstrap.min.js"></script>
-    <script src="lib/js/jquery.easing.min.js"></script>
-    <!--<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCRngKslUGJTlibkQ3FkfTxj3Xss1UlZDA&sensor=false"></script>
-
-    <script src="lib/js/grayscale.js"></script>    -->
-
+    <script src="lib/js/leaflet.js"></script>
     <script src="lib/js/angular.min.js"></script>
+    <script src="lib/js/angular-route.min.js"></script>
     <script src="lib/js/typeahead.bundle.min.js"></script>
-
+    <script src="lib/js/angular-typeahead.min.js"></script>
+    <script src="lib/js/ui-bootstrap.min.js"></script>
+    <script src="lib/js/ui-bootstrap-tpls.min.js"></script>
+    <script src="lib/js/angular-simple-logger.min.js"></script>
+    <script src="lib/js/angular-leaflet-directive.min.js"></script>
+    <script src="lib/js/hotkeys.min.js"></script>
+    <script src="lib/js/select.min.js"></script>
+    <script src="lib/js/angular-sanitize.min.js"></script>
+    <script src="dist/js/is_IS.min.js"></script>
     <script src="dist/js/application.min.js"></script>
 </body>
 

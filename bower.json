@@ -1,0 +1,33 @@
+{
+  "name": "photo-engine-web",
+  "version": "0.0.0",
+  "homepage": "https://github.com/edge-is/photo-engine-web",
+  "authors": [
+    "Ágúst Ingi Kjartansson <agust.ingi.kjartansson@gmail.com>"
+  ],
+  "description": "",
+  "main": "",
+  "moduleType": [],
+  "license": "GPL-v2",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "bootstrap": "~3.3.5",
+    "typeahead.js": "~0.11.1",
+    "font-awesome": "~4.4.0",
+    "angular": "angularjs#~1.4.7",
+    "angular-typeahead": "~0.2.4",
+    "angular-bootstrap": "~0.14.2",
+    "angular-route": "~1.4.7",
+    "leaflet": "~0.7.5",
+    "angular-leaflet-directive": "~0.9.0",
+    "angular-hotkeys": "chieffancypants/angular-hotkeys#~1.6.0",
+    "ui-select": "angular-ui-select#~0.13.2",
+    "angular-sanitize": "~1.4.7"
+  }
+}

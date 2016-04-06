@@ -1,0 +1,44 @@
+<div class="modal-header">
+    <h3 class="modal-title">Advanced Search</h3>
+
+</div>
+<div class="modal-body">
+  <form>
+    <div class="form-group" ng-repeat="(i, input) in advanced_search_query">
+      <div class="row">
+      <div class="col-md-2 col-sm-2">
+        <select class="form-control" ng-model="advanced_search_query[i].bool" ng-show="i > 0">
+          <option value="AND" selected>Og</option>
+          <option value="OR">Eða</option>
+        </select>
+      </div>
+      <div class="col-md-3 col-sm-3">
+        <ui-select ng-model="advanced_search_query[i].key" theme="bootstrap" ng-disabled="disabled" >
+        <ui-select-match placeholder="Veldu reit">{{$select.selected.name}}</ui-select-match>
+        <ui-select-choices repeat="field in advanced_search_fields | propsFilter: {name: $select.search}">
+          <div ng-bind-html="field.name | highlight: $select.search"></div>
+        </ui-select-choices>
+      </ui-select>
+      </div>
+      <div class="col-md-2 col-sm-2">
+        <select class="form-control" ng-model="advanced_search_query[i].operator">
+          <option value="" selected>==</option>
+          <option value="!">!=</option>
+        </select>
+      </div>
+      <div class="col-md-4 col-sm-4">
+        <input class='form-control'  type="text" value="" placeholder="Search query"  ng-model="advanced_search_query[i].query">
+        <!-- <input class='typeahead form-control' type="text" sf-typeahead options="exampleOptions" datasets="numbersDataset" placeholder="Leitarstrengur" ng-model="input.query"> -->
+      </div>
+      <button type="submit" class="btn btn-danger btn-sm" ng-click="advanced_search_remove(i)"><i class="fa fa-minus"></i></button>
+      </div>
+    </div>
+    <a href="# "type="button" class="btn btn-default" ng-click="advanced_search_add()"><i class="fa fa-plus"></i></a>
+    <a href="# "type="button" class="btn btn-primary" ng-click="search()">Leita</a>
+  </form>
+</div>
+
+</div>
+<div class="modal-footer">
+    <button class="btn btn-primary" type="button" ng-click="close()">Close</button>
+</div>

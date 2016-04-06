@@ -13,17 +13,22 @@ module.exports = function (grunt) {
             mangle: true,
             sourceMap: true
         },
-        target: {
+        application: {
             src: 'dist/js/application.js',
             dest: 'dist/js/application.min.js'
+        },
+        lang: {
+            src: 'lang/is_IS.js',
+            dest: 'dist/js/is_IS.min.js'
         }
       },
       copy: {
         main: {
           files: [
             // Angularjs
-            {expand: true, flatten:true, src: ['bower_components/angular/angular.min.js'], dest: 'lib/js/', filter: 'isFile'},
+            {expand: true, flatten:true, src: ['bower_components/angular/angular.min.*'], dest: 'lib/js/', filter: 'isFile'},
 
+            {expand: true, flatten:true, src: ['bower_components/angular-route/angular-route.min.*'], dest: 'lib/js/', filter: 'isFile'},
             // ui-bootstrap
             {expand: true, flatten:true, src: [
               'bower_components/angular-bootstrap/ui-bootstrap.min.js',
@@ -61,9 +66,55 @@ module.exports = function (grunt) {
               'bower_components/jquery/dist/jquery.min.*'
             ], dest: 'lib/js/', filter: 'isFile'},
 
-            // Typeahead
+            // Twitter Typeahead
             {expand: true, flatten:true, src: [
               'bower_components/typeahead.js/dist/typeahead.bundle.min.js'
+            ], dest: 'lib/js/', filter: 'isFile'},
+
+            // Angular Typeahead
+            {expand: true, flatten:true, src: [
+              'bower_components/angular-typeahead/angular-typeahead.min.js'
+            ], dest: 'lib/js/', filter: 'isFile'},
+
+            // Angular Leaflet
+            {expand: true, flatten:true, src: [
+              'bower_components/angular-leaflet-directive/dist/*.min.js'
+            ], dest: 'lib/js/', filter: 'isFile'},
+
+            // Leaflet
+            {expand: true, flatten:true, src: [
+              'bower_components/leaflet/dist/leaflet.js'
+            ], dest: 'lib/js/', filter: 'isFile'},
+
+            // Leaflet
+            {expand: true, flatten:true, src: [
+              'bower_components/leaflet/dist/*.css'
+            ], dest: 'lib/css/', filter: 'isFile'},
+
+
+            // Leaflet
+            {expand: true, flatten:true, src: [
+              'bower_components/angular-simple-logger/dist/angular-simple-logger.min.js'
+            ], dest: 'lib/js/', filter: 'isFile'},
+
+            // Angular Hotkeys
+            {expand: true, flatten:true, src: [
+              'bower_components/angular-hotkeys/build/hotkeys.min.js'
+            ], dest: 'lib/js/', filter: 'isFile'},
+
+            // UI Select
+            {expand: true, flatten:true, src: [
+              'bower_components/ui-select/dist/*.min.js'
+            ], dest: 'lib/js/', filter: 'isFile'},
+
+            // UI Select
+            {expand: true, flatten:true, src: [
+              'bower_components/ui-select/dist/*.min.css'
+            ], dest: 'lib/css/', filter: 'isFile'},
+
+            // Angular Santitize
+            {expand: true, flatten:true, src: [
+              'bower_components/angular-sanitize/angular-sanitize.min.js'
             ], dest: 'lib/js/', filter: 'isFile'},
 
 
@@ -78,8 +129,8 @@ module.exports = function (grunt) {
       },
       watch : {
         js : {
-          files : ['js/app.*'],
-          tasks : ['concat', 'uglify']
+          files : ['lang/*.js','js/app.*', 'css/*.*'],
+          tasks : ['concat', 'uglify', 'cssmin']
         }
       },
       auto_install: {
@@ -88,8 +139,18 @@ module.exports = function (grunt) {
             npm : false
           }
         }
-
       },
+      cssmin: {
+        target: {
+          files: [{
+            expand: true,
+            cwd: 'css',
+            src: ['*.css', '!*.min.css'],
+            dest: 'dist/css',
+            ext: '.min.css'
+          }]
+        }
+      }
     //  clean: ["bower_components"],
   });
 
@@ -97,12 +158,13 @@ module.exports = function (grunt) {
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-copy');
+  grunt.loadNpmTasks('grunt-contrib-cssmin');
   //grunt.loadNpmTasks('grunt-contrib-clean');
   // grunt.loadNpmTasks('grunt-auto-install');
 
   //grunt.loadNpmTasks('grunt-rpm');
 
-  grunt.registerTask('default', ['concat', 'uglify', 'copy']);
+  grunt.registerTask('default', ['concat', 'uglify', 'copy', 'cssmin']);
 
   //grunt.registerTask('build', ['concat', 'uglify', 'auto_install','copy', 'clean']);
   // grunt.registerTask('pack', ['concat', 'uglify', 'auto_install','copy', 'rpm']);
