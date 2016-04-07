@@ -122,11 +122,11 @@ search.controller('main',
 
     function RightImg(width){
       if (width < 400){
-        return 's';
+        return 'small';
       }else if(width >= 600 && width <= 900){
-        return 'm';
+        return 'medium';
       }else if(width >= 900){
-        return 'l';
+        return 'large';
       }
     };
 
@@ -154,9 +154,9 @@ search.controller('main',
       angular.element('body')[0].scrollTop = 0;
 
       _search.query($scope.MainSearchQuery, {}).then( function (response){
-        var hits = response.data.hits.map(function (value, key){
-          return TMPIMAGEOBJECT(value);
-        });
+        // var hits = response.data.hits.map(function (value, key){
+        //   return TMPIMAGEOBJECT(value);
+        // });
 
         $scope.searchTime = response.data._took;
         $scope.searchResultsTotal = response.data._total;
