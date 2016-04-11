@@ -110,18 +110,18 @@
         </div>
       </div> -->
 
-      <img src="https://static.myndahlada.is/thumbnails//2/f7/1998_47_EÖ_00005.large.tif" alt="" type="image/tiff" class="col-md-3"/>
-      <!-- <div class="row">
-        <div  ng-repeat="(index, image) in MainSearchHits">
+      <div class="row">
+        <div  ng-repeat="(index, image) in mainSearchHits">
           <div class="col-lg-3 col-md-3 col-sm-4">
             <a href="#/image/{{image._id}}" class="thumbnail"  ng-click="openImage(index, image, MainSearchHits)"  uib-tooltip="{{item._source.Description}}">
             <div class="background-thumbnail" style="background-image: url({{image._source.cdn1[DefaultImage]}})"></div>
             </a>
           </div>
-        </div>
-      </div> -->
-    </div>
 
+        </div>
+      </div>
+    </div>
+    <div angular-scroll="load_more_data" disabled="{{scrollDisabled}}" px="1000" ></div>
 
     <!-- About Section
     <section id="about" class="container content-section text-center">
@@ -155,6 +155,7 @@ z
     <script src="lib/js/ui-bootstrap-tpls.min.js"></script>
     <script src="lib/js/angular-simple-logger.min.js"></script>
     <script src="lib/js/angular-leaflet-directive.min.js"></script>
+    <script src="lib/js/angular-scroll.min.js"></script>
     <script src="lib/js/hotkeys.min.js"></script>
     <script src="lib/js/select.min.js"></script>
     <script src="lib/js/angular-sanitize.min.js"></script>

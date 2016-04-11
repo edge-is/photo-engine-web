@@ -29,6 +29,7 @@
     "angular-hotkeys": "chieffancypants/angular-hotkeys#~1.6.0",
     "ui-select": "angular-ui-select#~0.13.2",
     "angular-sanitize": "~1.4.7",
-    "angular-simple-logger": "^0.1.7"
+    "angular-simple-logger": "^0.1.7",
+    "angular-endless-scroll": "angular-infinite-scroll-xs#*"
   }
 }

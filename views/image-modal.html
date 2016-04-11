@@ -12,8 +12,8 @@
             <div class="lazy-img thumbnail"
             ng-class="(landscape(image)) ? 'lazy-img-landscape' : 'lazy-img-portrait' "
             lazyimg
-            lowres="{{image._source.imagesrc.l}}"
-            highres="{{image._source.imagesrc.xl}}" >
+            lowres="{{image._source.cdn1['large']}}"
+            highres="{{image._source.cdn1['x-large']}}" >
              </div>
              <div
              ng-show="(isFullscreen)"

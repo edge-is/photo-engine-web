@@ -13,16 +13,13 @@ search.controller('main',
     $scope.typeaheadquery = '';
     $scope.searchTime = 0;
     $scope.searchResultsTotal = 0;
-    $scope.MainSearchHits =  [
-      // { id : '2', landscape : false, orentation : 'portrait', src : 'img/scaled/medium_uf-2.jpg' },
-      // { id : '1', landscape : true, orentation : 'landscape', src : 'img/scaled/medium_uf-1.jpg' },
-      // { id : '3', landscape : false, orentation : 'portrait', src : 'img/scaled/medium_uf-2.jpg' },
-      // { id : '5', landscape : true, orentation : 'landscape', src : 'img/scaled/medium_uf-1.jpg' },
-      // { id : '4', landscape : false, orentation : 'portrait', src : 'img/scaled/medium_uf-2.jpg' },
-      // { id : '6', landscape : false, orentation : 'portrait', src : 'img/scaled/medium_uf-2.jpg' },
-      // { id : '7', landscape : true, orentation : 'landscape', src : 'img/scaled/medium_uf-1.jpg' },
-      // { id : '8', landscape : true, orentation : 'landscape', src : 'img/scaled/medium_uf-1.jpg' }
-    ];
+    $scope.mainSearchHits =  [];
+
+    $scope.scrollDisabled = false;
+    $scope.mainSearchOptions = {
+      limit : 30,
+      offset : 0
+    };
 
     var TypeaheadEngine = new Bloodhound({
       datumTokenizer: function(d) { return Bloodhound.tokenizers.whitespace(d.num); },
@@ -50,18 +47,18 @@ search.controller('main',
       highlight: true
     };
 
-    $scope.MainSearchQuery = $location.search().query || '';
-    $scope.MainSearchFilter = $location.search().filter || '';
+    $scope.mainSearchQuery = $location.search().query || '';
+    $scope.mainSearchFilter = $location.search().filter || '';
 
     // $scope.MainSearchHidden=false;
     // $scope.StartSearchHidden=true;
 
-    if($scope.MainSearchQuery !== '' || $scope.MainSearchFilter !== ''){
+    if($scope.mainSearchQuery !== '' || $scope.mainSearchFilter !== ''){
       //Fore some reson need to set input value async..
       setTimeout(function (){
-        $scope.MainSearch = $scope.MainSearchQuery;
+        $scope.MainSearch = $scope.mainSearchQuery;
       }, 100)
-      MainSearch($scope.MainSearchQuery);
+      MainSearch($scope.mainSearchQuery);
     }
 
     $scope.$watch('StartSearch', function (_new, _old){
@@ -77,34 +74,34 @@ search.controller('main',
 
     $scope.submitMainSearch = function (){
       if($scope.MainSearch.hit){
-        $scope.MainSearchQuery = $scope.MainSearch.hit;
+        $scope.mainSearchQuery = $scope.MainSearch.hit;
       }else{
-        $scope.MainSearchQuery = $scope.MainSearch;
+        $scope.mainSearchQuery = $scope.MainSearch;
       }
 
       $scope.setURI();
-      MainSearch($scope.MainSearchQuery);
+      MainSearch($scope.mainSearchQuery);
     };
 
     $scope.setURI = function (){
       var url = {};
-      if($scope.MainSearchQuery !== ''){
-        url.query = $scope.MainSearchQuery;
+      if($scope.mainSearchQuery !== ''){
+        url.query = $scope.mainSearchQuery;
       }
-      if($scope.MainSearchFilter !== ''){
-        url.filter = $scope.MainSearchFilter;
+      if($scope.mainSearchFilter !== ''){
+        url.filter = $scope.mainSearchFilter;
       }
       $location.search(url);
     };
 
     $scope.$on('typeahead:selected', function (object, suggestion, dataset){
       if($scope.MainSearch.hit){
-        $scope.MainSearchQuery = $scope.MainSearch.hit;
+        $scope.mainSearchQuery = $scope.MainSearch.hit;
       }else{
-        $scope.MainSearchQuery = $scope.MainSearch;
+        $scope.mainSearchQuery = $scope.MainSearch;
       }
       $scope.setURI();
-      MainSearch($scope.MainSearchQuery);
+      MainSearch($scope.mainSearchQuery);
     });
 
     $scope.landscape = function (img){
@@ -130,21 +127,7 @@ search.controller('main',
       }
     };
 
-    function TMPIMAGEOBJECT (src){
-        var path = '_uf-1.jpg';
-        if (!$scope.landscape(src)){
-          path = '_uf-2.jpg';
-        }
-        src._source.imagesrc = {
-          'xs'  : window.location.origin+'/img/scaled/xx-small'+path,
-          's'   : window.location.origin+'/img/scaled/small'+path,
-          'm'   : window.location.origin+'/img/scaled/medium'+path,
-          'l'   : window.location.origin+'/img/scaled/large'+path,
-          'xl'  : window.location.origin+'/img/scaled/x-large'+path,
-          'xxl' : window.location.origin+'/img/scaled/xx-large'+path
-        };
-        return src;
-    }
+
 
     function MainSearch(query, filter){
       angular.element('#mainsearch').focus();
@@ -153,18 +136,58 @@ search.controller('main',
 
       angular.element('body')[0].scrollTop = 0;
 
-      _search.query($scope.MainSearchQuery, {}).then( function (response){
-        // var hits = response.data.hits.map(function (value, key){
-        //   return TMPIMAGEOBJECT(value);
-        // });
-
+      _search.query($scope.mainSearchQuery, $scope.mainSearchOptions).then( function (response){
         $scope.searchTime = response.data._took;
         $scope.searchResultsTotal = response.data._total;
-        $scope.MainSearchHits = response.data.hits;
+        $scope.mainSearchHits = response.data.hits;
+
+        $scope.submittedQuery = $scope.mainSearchQuery;
+
+
+        //return console.log(response.data);
+        $scope.mainSearchSize = response.data.hits.length;
+
+
+        console.log($scope.mainSearchSize);
       });
 
       $scope.lastSearchURI = $location.$$url;
     }
+
+
+    $scope.load_more_data = function (callback){
+      if ($scope.mainSearchSize < 1){
+        return;
+      }
+      var options = {
+        limit : $scope.mainSearchOptions.limit,
+        offset : $scope.mainSearchSize
+      };
+      _search.query($scope.submittedQuery, options).then( function (response){
+        if (!response) return;
+
+        if (response.data.hits.length < 1){
+          return;
+        }
+        $scope.searchTime = response.data._took;
+        $scope.searchResultsTotal = response.data._total;
+
+        // $scope.mainSearchHits.concat(response.data.hits);
+        response.data.hits.forEach(function (item){
+          $scope.mainSearchHits.push(item);
+        });
+
+        //$scope.$apply();
+
+
+        //return console.log(response.data);
+        $scope.mainSearchSize += response.data.hits.length;
+
+
+        callback();
+      });
+      console.log('fuck')
+    };
 
 
     $scope.openImage = function (index, image, results) {

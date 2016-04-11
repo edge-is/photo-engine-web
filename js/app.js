@@ -6,7 +6,8 @@ var search = angular.module('search', [
   'leaflet-directive',
   'cfp.hotkeys',
   'ui.select',
-  'ngSanitize'
+  'ngSanitize',
+  'angularScroll'
 ]);
 
 search.config([

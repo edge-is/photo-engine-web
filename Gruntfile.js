@@ -117,6 +117,10 @@ module.exports = function (grunt) {
               'bower_components/angular-sanitize/angular-sanitize.min.js'
             ], dest: 'lib/js/', filter: 'isFile'},
 
+            // Angular infinite scroll xs
+            {expand: true, flatten:true, src: [
+              'bower_components/angular-endless-scroll/dist/*.min.js'
+            ], dest: 'lib/js/', filter: 'isFile'},
 
             // animate.css
             {expand: true, flatten:true, src: ['bower_components/animate.css/animate.min.css'], dest: 'lib/css/', filter: 'isFile'}
