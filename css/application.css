@@ -145,7 +145,7 @@
 	}
 
   @media (min-width: 992px) {
-		.navbar-main-search { width: 780px; }
+		.navbar-main-search { width: 760px; }
 		.nav-search { width: 450px !important }
 		.gallery .thumbnail img {
 			max-height: 300px;
