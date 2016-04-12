@@ -30,11 +30,11 @@
         <input class='form-control'  type="text" value="" placeholder="Search query"  ng-model="advanced_search_query[i].query">
         <!-- <input class='typeahead form-control' type="text" sf-typeahead options="exampleOptions" datasets="numbersDataset" placeholder="Leitarstrengur" ng-model="input.query"> -->
       </div>
-      <button type="submit" class="btn btn-danger btn-sm" ng-click="advanced_search_remove(i)"><i class="fa fa-minus"></i></button>
+      <a class="btn btn-danger btn-sm" ng-click="advanced_search_remove(i)"><i class="fa fa-minus"></i></a>
       </div>
     </div>
     <a href="# "type="button" class="btn btn-default" ng-click="advanced_search_add()"><i class="fa fa-plus"></i></a>
-    <a href="# "type="button" class="btn btn-primary" ng-click="search()">Leita</a>
+    <button href="# "type="submit" class="btn btn-primary" ng-click="search()">Leita</button>
   </form>
 </div>
 

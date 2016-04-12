@@ -36,84 +36,84 @@
       </div>
       <a href="#" class="btn btn-default" ng-click="fullscreen()"> fullscreen</a>
       <div class="panel panel-default">
-        <div class="panel-heading hidden-xs"><h3 class="panel-title">Mynda texti</h3></div>
+        <div class="panel-heading hidden-xs"><h3 class="panel-title">Myndatexti</h3></div>
         <div class="panel-body">
           {{ image._source.Description }}
         </div>
       </div>
     </div>
     <div class="col-md-3">
-      <ul id="image_info_tab" class="nav nav-tabs">
-        <li class="active"><a href="#basic_info" data-toggle="tab">Upplýsingar</a></li>
-        <li class=""><a href="#advanced_info" data-toggle="tab">Ítarupplýsingar</a></li>
-    </ul>
-      <div id="myTabContent" class="tab-content">
-      <div class="tab-pane fade active in" id="basic_info">
-          <table class="table">
-            <tr>
-                <th>Lykilorð</th>
-                <td>
-                </td>
-            </tr>
-            <tr>
-                <th>Ljósmyndari</th>
-                <td><a href="?filter=Ljósmyndari:{{image._source.Credit}}">{{image._source.Credit}}</a></td>
-            </tr>
-            <tr>
-                <th>Tegund myndar</th>
-                <td><a href="?filter=Source:{{image._source.Source}}">{{image._source.Source}}</a></td>
-            </tr>
-            <tr>
-                <th>Flokkur</th>
-                <td><a href="?filter=Flokkur:{{image._source.Category}}">{{image._source.Category}}</a></td>
-            </tr>
-            <tr>
-                <th>Undirflokkur</th>
-                <td>
-                </td>
-            </tr>
-            <tr>
-                <th>Land</th>
-                <td><a href="?filter=Land:{{image._source.Country}}"><span id="country">{{image._source.Country}}</span></a></td>
-            </tr>
-            <tr>
-                <th>Sýsla</th>
-                <td><a href="?filter=Sýsla:{{image._source.State}}"><span id="state">{{image._source.State}}</span></a></td>
-            </tr>
-            <tr>
-                <th>Bær</th>
-                <td><a href="?filter=Bær:{{image._source.City}}"><span id="city">{{image._source.City}}</span></a></td>
-            </tr>
-        </table>
-        <leaflet center="center" ng-show="MapLoaded" markers="mapmarker" class="image-map" ng-init="Map(image)"></leaflet>
-      </div>
-      <div class="tab-pane fade" id="advanced_info">
-         <table class="table">
-            <tr>
-                <th>Rétthafi</th>
-                <td><a href="?filter=Rights:{{image._source.Rights}}">{{image._source.Rights}}</a></td>
-            </tr>
-            <tr>
-                <th>Skrásetjari</th>
-                <td><a href="?filter=Skrásetjari:{{image._source.CaptionWriter}}">{{image._source.CaptionWriter}}</a></td>
-            </tr>
-            <tr>
-                <th>Skráningardagur</th>
-                <td>{{image._source.ReleaseDate}}</td>
-            </tr>
-            <tr>
-                <th>Ítarupplýsingar</th>
-                <td>{{image._source.LocalCaption}}</td>
-            </tr>
-            <tr>
-                <th>Heimild</th>
-                <td>{{image._source.UserDefined3}}</td>
-            </tr>
+        <ul id="image_info_tab" class="nav nav-tabs">
+          <li class="active"><a href="#basic_info" data-toggle="tab">Upplýsingar</a></li>
+          <li class=""><a href="#advanced_info" data-toggle="tab">Ítarupplýsingar</a></li>
+      </ul>
+        <div id="myTabContent" class="tab-content">
+        <div class="tab-pane fade active in" id="basic_info">
+            <table class="table">
+              <tr>
+                  <th>Lykilorð</th>
+                  <td>
+                  </td>
+              </tr>
+              <tr>
+                  <th>Ljósmyndari</th>
+                  <td><a href="?filter=Ljósmyndari:{{image._source.Credit}}">{{image._source.Credit}}</a></td>
+              </tr>
+              <tr>
+                  <th>Tegund myndar</th>
+                  <td><a href="?filter=Source:{{image._source.Source}}">{{image._source.Source}}</a></td>
+              </tr>
+              <tr>
+                  <th>Flokkur</th>
+                  <td><a href="?filter=Flokkur:{{image._source.Category}}">{{image._source.Category}}</a></td>
+              </tr>
+              <tr>
+                  <th>Undirflokkur</th>
+                  <td>
+                  </td>
+              </tr>
+              <tr>
+                  <th>Land</th>
+                  <td><a href="?filter=Land:{{image._source.Country}}"><span id="country">{{image._source.Country}}</span></a></td>
+              </tr>
+              <tr>
+                  <th>Sýsla</th>
+                  <td><a href="?filter=Sýsla:{{image._source.State}}"><span id="state">{{image._source.State}}</span></a></td>
+              </tr>
+              <tr>
+                  <th>Bær</th>
+                  <td><a href="?filter=Bær:{{image._source.City}}"><span id="city">{{image._source.City}}</span></a></td>
+              </tr>
+          </table>
+          <leaflet center="center" ng-show="MapLoaded" markers="mapmarker" class="image-map" ng-init="Map(image)"></leaflet>
+        </div>
+        <div class="tab-pane fade" id="advanced_info">
+           <table class="table">
+              <tr>
+                  <th>Rétthafi</th>
+                  <td><a href="?filter=Rights:{{image._source.Rights}}">{{image._source.Rights}}</a></td>
+              </tr>
+              <tr>
+                  <th>Skrásetjari</th>
+                  <td><a href="?filter=Skrásetjari:{{image._source.CaptionWriter}}">{{image._source.CaptionWriter}}</a></td>
+              </tr>
+              <tr>
+                  <th>Skráningardagur</th>
+                  <td>{{image._source.ReleaseDate}}</td>
+              </tr>
+              <tr>
+                  <th>Ítarupplýsingar</th>
+                  <td>{{image._source.LocalCaption}}</td>
+              </tr>
+              <tr>
+                  <th>Heimild</th>
+                  <td>{{image._source.UserDefined3}}</td>
+              </tr>
 
-        </table>
-      </div>
-      </div>
-      </div>
+          </table>
+        </div>
+        </div>
+        </div>
       </div>
     </div>
   </div>

@@ -146,6 +146,18 @@ var settings = {
   }
 };
 
+search.directive('backgroundImage', [ function (){
+  return {
+    restrict : 'ACE',
+    link : function(scope, element, attrs){
+      var url = [ 'url(', attrs.backgroundImage, ')'].join('');
+      element.css({
+          'background-image': url
+      });
+    }
+  };
+}]);
+
 search.controller('AdvancedSearchController', [
   '$scope',
   '$modalInstance',
@@ -181,7 +193,7 @@ search.controller('AdvancedSearchController', [
 
     $scope.search = function (){
       console.log($scope.advanced_search_query);
-      //$modalInstance.close({ the:'query'});
+      $modalInstance.close({ query:$scope.advanced_search_query});
     };
 
     $scope.close = function () {
@@ -200,189 +212,171 @@ search.controller('ImageController', [
   'map',
   'hotkeys',
   function ($scope, $location, $modalInstance, data, map, hotkeys) {
+    $scope.index = data.index;
+    $scope.images = data.results
+    $scope.image = data.image;
+    $scope.isFullscreen = false;
+    $scope.fullscreenClass="no-fullscreen";
+    $scope.close = function () {
+      $modalInstance.dismiss();
+    };
+    $scope.nextImg = $scope.images[$scope.index + 1];
+    $scope.prevImg = $scope.images[$scope.index - 1];
 
-  $scope.index = data.index;
-  $scope.images = data.results
-  $scope.image = data.image;
-  $scope.isFullscreen = false;
-  $scope.fullscreenClass="no-fullscreen";
-  $scope.close = function () {
-    $modalInstance.dismiss();
-  };
-  $scope.nextImg = $scope.images[$scope.index + 1];
-  $scope.prevImg = $scope.images[$scope.index - 1];
-
-  $scope.next = function (){
-    if(($scope.index + 1) < $scope.images.length ){
-      $scope.StopLazy();
-      $scope.index = $scope.index + 1;
-      $scope.image = $scope.images[$scope.index];
-      $scope.nextImg = $scope.images[$scope.index];
-    }
-  };
-
-  $scope.prev = function (){
-    if($scope.index > 0){
-      $scope.StopLazy();
-      $scope.index = $scope.index - 1;
-      $scope.image = $scope.images[$scope.index];
-      $scope.prevImg = $scope.images[$scope.index];
-    }
-  };
-
-  $scope.nextURL = function (){
-    if( $scope.nextImg ){
-      return '/image/' + $scope.nextImg._id;
-    }
-  };
-
-  $scope.prevURL = function (){
-    if($scope.prevImg){
-      return '/image/' + $scope.prevImg._id;
-    }
-  };
-
-  $scope.isNext = function (){
-    var len = $scope.images.length;
-    if(($scope.index + 1) >= len) {
-      return false;
-    }else{
-      return true;
-    }
-  };
-
-  $scope.isPrev = function (){
-    if($scope.index == 0) {
-      return false;
-    }else{
-      return true;
-    }
-  };
-
-  $scope.landscape = function (img){
-    if(img._source.ImageWidth < img._source.ImageHeight){
-      return false;
-    }else{
-      return true;
-    }
-  };
-
-  $scope.TMPselectImg = function(img, res){
-    var prefix = '';
-    if (res == 'low'){
-      prefix = 'medium';
-    }else if ( res == 'high'){
-      prefix = 'xx-large';
-    }else {
-      prefix = 'medium';
-    }
-    if(img._source.ImageWidth < img._source.ImageHeight){
-      return 'img/scaled/'+prefix+'_uf-2.jpg';
-    }else{
-      return 'img/scaled/'+prefix+'_uf-1.jpg';
-    }
-  };
-
-  $scope.StopLazy = function (){
-    $('.high-resolution-image').unbind('load');
-  };
-
-  var fullscreens = 'webkitfullscreenchange mozfullscreenchange fullscreenchange MSFullscreenChange';
-  $(document).on(fullscreens, exitHandler);
-  $scope.fullscreen = function (){
-    var i = document.getElementById("preview_carousel");
-    if (i.requestFullscreen) {
-    	i.requestFullscreen();
-      //listenForFullScreenChange();
-    } else if (i.webkitRequestFullscreen) {
-    	i.webkitRequestFullscreen();
-      //listenForFullScreenChange();
-    } else if (i.mozRequestFullScreen) {
-    	i.mozRequestFullScreen();
-      //listenForFullScreenChange();
-    } else if (i.msRequestFullscreen) {
-    	i.msRequestFullscreen();
-      //listenForFullScreenChange();
-    }
-    $scope.fullscreenClass = 'fullscreen';
-    $scope.isFullscreen = true;
-  };
-
-  function exitHandler(event){
-    if ( document.webkitIsFullScreen === false
-      || document.mozFullScreen === false
-      || document.msFullscreenElement === null) {
-        $scope.isFullscreen = false;
-        $scope.fullscreenClass = 'no-fullscreen';
+    $scope.next = function (){
+      if(($scope.index + 1) < $scope.images.length ){
+        $scope.StopLazy();
+        $scope.index = $scope.index + 1;
+        $scope.image = $scope.images[$scope.index];
+        $scope.nextImg = $scope.images[$scope.index];
       }
-  }
+    };
+
+    $scope.prev = function (){
+      if($scope.index > 0){
+        $scope.StopLazy();
+        $scope.index = $scope.index - 1;
+        $scope.image = $scope.images[$scope.index];
+        $scope.prevImg = $scope.images[$scope.index];
+      }
+    };
+
+    $scope.nextURL = function (){
+      if( $scope.nextImg ){
+        return '/image/' + $scope.nextImg._id;
+      }
+    };
+
+    $scope.prevURL = function (){
+      if($scope.prevImg){
+        return '/image/' + $scope.prevImg._id;
+      }
+    };
+
+    $scope.isNext = function (){
+      var len = $scope.images.length;
+      if(($scope.index + 1) >= len) {
+        return false;
+      }else{
+        return true;
+      }
+    };
+
+    $scope.isPrev = function (){
+      if($scope.index == 0) {
+        return false;
+      }else{
+        return true;
+      }
+    };
+
+    $scope.landscape = function (img){
+      if(img._source.ImageWidth < img._source.ImageHeight){
+        return false;
+      }else{
+        return true;
+      }
+    };
+
+    $scope.StopLazy = function (){
+      $('.high-resolution-image').unbind('load');
+    };
+
+    var fullscreens = 'webkitfullscreenchange mozfullscreenchange fullscreenchange MSFullscreenChange';
+
+    $(document).on(fullscreens, exitHandler);
+
+    $scope.fullscreen = function (){
+      var i = document.getElementById("preview_carousel");
+      if (i.requestFullscreen) {
+      	i.requestFullscreen();
+        //listenForFullScreenChange();
+      } else if (i.webkitRequestFullscreen) {
+      	i.webkitRequestFullscreen();
+        //listenForFullScreenChange();
+      } else if (i.mozRequestFullScreen) {
+      	i.mozRequestFullScreen();
+        //listenForFullScreenChange();
+      } else if (i.msRequestFullscreen) {
+      	i.msRequestFullscreen();
+        //listenForFullScreenChange();
+      }
+      $scope.fullscreenClass = 'fullscreen';
+      $scope.isFullscreen = true;
+    };
+
+    function exitHandler(event){
+      if (
+           document.webkitIsFullScreen === false
+        || document.mozFullScreen === false
+        || document.msFullscreenElement === null ) {
+          $scope.isFullscreen = false;
+          $scope.fullscreenClass = 'no-fullscreen';
+        }
+    }
 
 
   hotkeys.bindTo($scope)
-  .add({
-    combo: 'right',
-    description: 'Select next image.',
-    callback: function() {
-      $scope.next();
-    }
-  })
-  .add({
-    combo: 'left',
-    description: 'Select prev image',
-    callback: function() {
-      $scope.prev();
-    }
-  })
-
-  $scope.center = {};
-
-  $scope.defaults = { scrollWheelZoom: false };
-  $scope.mapmarker = {};
-
-  $scope.Map = function (){
-    $scope.MapLoaded = false;
-    var osmParams = {};
-    var SearchOSM=false;
-    if ('City' in $scope.image._source){
-      SearchOSM=true;
-      osmParams.city = $scope.image._source.City;
-    }else if('State' in $scope.image._source){
-      SearchOSM=true;
-      osmParams.state = $scope.image._source.State;
-    }
-    if('Country' in $scope.image._source){
-      if($scope.image._source.Country.split(' ').length <= 2){
-        osmParams.Country = $scope.image._source.Country;
+    .add({
+      combo: 'right',
+      description: 'Select next image.',
+      callback: function() {
+        $scope.next();
       }
-    }
-    if(SearchOSM == true){
-      map.osm(osmParams).then(function (d){
-        if(d.length > 0){
-          $scope.MapLoaded = true;
-          //angular.extend($scope, )
-          $scope.center = {
-            lat : +d[0].lat,
-            lng : +d[0].lon,
-            zoom : 4
-          };
-          $scope.mapmarker = {
-            m1 : {
+    })
+    .add({
+      combo: 'left',
+      description: 'Select prev image',
+      callback: function() {
+        $scope.prev();
+      }
+    })
+
+    $scope.center = {};
+
+    $scope.defaults = { scrollWheelZoom: false };
+    $scope.mapmarker = {};
+
+    $scope.Map = function (){
+      $scope.MapLoaded = false;
+      var osmParams = {};
+      var SearchOSM=false;
+      if ('City' in $scope.image._source){
+        SearchOSM=true;
+        osmParams.city = $scope.image._source.City;
+      }else if('State' in $scope.image._source){
+        SearchOSM=true;
+        osmParams.state = $scope.image._source.State;
+      }
+      if('Country' in $scope.image._source){
+        if($scope.image._source.Country.split(' ').length <= 2){
+          osmParams.Country = $scope.image._source.Country;
+        }
+      }
+
+      /** FIXME: Move to special controller **/
+      if(SearchOSM == true){
+        map.osm(osmParams).then(function (d){
+          if(d.length > 0){
+            $scope.MapLoaded = true;
+            //angular.extend($scope, )
+            $scope.center = {
               lat : +d[0].lat,
               lng : +d[0].lon,
-              message : 'Wazzuuup?',
-              icon: 'img/map-marker.png'
-            }
-          };
-        }
-      });
-    };
-
+              zoom : 4
+            };
+            $scope.mapmarker = {
+              m1 : {
+                lat : +d[0].lat,
+                lng : +d[0].lon,
+                message : 'Wazzuuup?',
+                icon: 'img/map-marker.png'
+              }
+            };
+          }
+        });
+      };
   }
-
-
-
-
-
 }]);
 
 search.controller('main',
@@ -445,7 +439,7 @@ search.controller('main',
       setTimeout(function (){
         $scope.MainSearch = $scope.mainSearchQuery;
       }, 100)
-      MainSearch($scope.mainSearchQuery);
+      mainSearch($scope.mainSearchQuery);
     }
 
     $scope.$watch('StartSearch', function (_new, _old){
@@ -467,7 +461,7 @@ search.controller('main',
       }
 
       $scope.setURI();
-      MainSearch($scope.mainSearchQuery);
+      mainSearch($scope.mainSearchQuery);
     };
 
     $scope.setURI = function (){
@@ -488,7 +482,7 @@ search.controller('main',
         $scope.mainSearchQuery = $scope.MainSearch;
       }
       $scope.setURI();
-      MainSearch($scope.mainSearchQuery);
+      mainSearch($scope.mainSearchQuery);
     });
 
     $scope.landscape = function (img){
@@ -502,9 +496,9 @@ search.controller('main',
     var w = angular.element($window);
     $scope.windowWidth = w.width();
 
-    $scope.DefaultImage = RightImg($scope.windowWidth);
+    $scope.DefaultImage = rightImg($scope.windowWidth);
 
-    function RightImg(width){
+    function rightImg(width){
       if (width < 400){
         return 'small';
       }else if(width >= 600 && width <= 900){
@@ -516,7 +510,12 @@ search.controller('main',
 
 
 
-    function MainSearch(query, filter){
+    function mainSearch(query, type, filter){
+
+      type = type || 'query';
+
+      // Allow for a advanced search also
+
       angular.element('#mainsearch').focus();
       $scope.MainSearchHidden=false;
       $scope.StartSearchHidden=true;
@@ -573,7 +572,6 @@ search.controller('main',
 
         callback();
       });
-      console.log('fuck')
     };
 
 
@@ -609,6 +607,12 @@ search.controller('main',
           }
         });
         modalInstance.result.then(function (data) {
+          var request = _search.advancedSearch(data, {});
+
+          request.success(function (response){
+            console.log(response);
+          })
+
           // Do query
         }, function () {
           // dismiss ?
@@ -622,7 +626,6 @@ search.directive('lazyimg', function (){
   return {
     restrict: 'ACE',
     template : function (element, attr){
-      console.log(attr.lowres);
       return '<img class="low-resolution-image" ng-src="' + attr.lowres + '"></img><img class="hidden high-resolution-image" ng-src="' + attr.highres + '"></img>';
     },
     link : function (scope, element, attr){
@@ -682,12 +685,32 @@ search.service('_search',
   '$http',
   '$q',
   function ($http, $q){
+  function post(url, data){
+    return $http.post(url, data);
+  };
+  function get(url){
+    return $http.get(url);
+  };
+
   return {
       typeahead : function (query){
 
       },
       filter : function (filter){
 
+      },
+      advancedSearch : function (queryObject, options){
+        if(!options){
+          options = {};
+        }
+        var limit = options.limit || 30;
+        var offset = options.offset || 0;
+        var deferred = $q.defer();
+        var url = [config.api,'/search/advanced?'].join('');
+        url += 'limit=' + limit;
+        url += '&offset=' + offset;
+
+        return post(url, queryObject);
       },
       query : function (query, options){
         if(!options){

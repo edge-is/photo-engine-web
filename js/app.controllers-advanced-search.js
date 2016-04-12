@@ -33,7 +33,7 @@ search.controller('AdvancedSearchController', [
 
     $scope.search = function (){
       console.log($scope.advanced_search_query);
-      //$modalInstance.close({ the:'query'});
+      $modalInstance.close({ query:$scope.advanced_search_query});
     };
 
     $scope.close = function () {

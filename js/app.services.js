@@ -3,12 +3,32 @@ search.service('_search',
   '$http',
   '$q',
   function ($http, $q){
+  function post(url, data){
+    return $http.post(url, data);
+  };
+  function get(url){
+    return $http.get(url);
+  };
+
   return {
       typeahead : function (query){
 
       },
       filter : function (filter){
 
+      },
+      advancedSearch : function (queryObject, options){
+        if(!options){
+          options = {};
+        }
+        var limit = options.limit || 30;
+        var offset = options.offset || 0;
+        var deferred = $q.defer();
+        var url = [config.api,'/search/advanced?'].join('');
+        url += 'limit=' + limit;
+        url += '&offset=' + offset;
+
+        return post(url, queryObject);
       },
       query : function (query, options){
         if(!options){

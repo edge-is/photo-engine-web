@@ -58,7 +58,7 @@ search.controller('main',
       setTimeout(function (){
         $scope.MainSearch = $scope.mainSearchQuery;
       }, 100)
-      MainSearch($scope.mainSearchQuery);
+      mainSearch($scope.mainSearchQuery);
     }
 
     $scope.$watch('StartSearch', function (_new, _old){
@@ -80,7 +80,7 @@ search.controller('main',
       }
 
       $scope.setURI();
-      MainSearch($scope.mainSearchQuery);
+      mainSearch($scope.mainSearchQuery);
     };
 
     $scope.setURI = function (){
@@ -101,7 +101,7 @@ search.controller('main',
         $scope.mainSearchQuery = $scope.MainSearch;
       }
       $scope.setURI();
-      MainSearch($scope.mainSearchQuery);
+      mainSearch($scope.mainSearchQuery);
     });
 
     $scope.landscape = function (img){
@@ -115,9 +115,9 @@ search.controller('main',
     var w = angular.element($window);
     $scope.windowWidth = w.width();
 
-    $scope.DefaultImage = RightImg($scope.windowWidth);
+    $scope.DefaultImage = rightImg($scope.windowWidth);
 
-    function RightImg(width){
+    function rightImg(width){
       if (width < 400){
         return 'small';
       }else if(width >= 600 && width <= 900){
@@ -129,7 +129,12 @@ search.controller('main',
 
 
 
-    function MainSearch(query, filter){
+    function mainSearch(query, type, filter){
+
+      type = type || 'query';
+
+      // Allow for a advanced search also
+
       angular.element('#mainsearch').focus();
       $scope.MainSearchHidden=false;
       $scope.StartSearchHidden=true;
@@ -186,7 +191,6 @@ search.controller('main',
 
         callback();
       });
-      console.log('fuck')
     };
 
 
@@ -222,6 +226,12 @@ search.controller('main',
           }
         });
         modalInstance.result.then(function (data) {
+          var request = _search.advancedSearch(data, {});
+
+          request.success(function (response){
+            console.log(response);
+          })
+
           // Do query
         }, function () {
           // dismiss ?

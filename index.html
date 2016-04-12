@@ -113,8 +113,8 @@
       <div class="row">
         <div  ng-repeat="(index, image) in mainSearchHits">
           <div class="col-lg-3 col-md-3 col-sm-4">
-            <a href="#/image/{{image._id}}" class="thumbnail"  ng-click="openImage(index, image, MainSearchHits)"  uib-tooltip="{{item._source.Description}}">
-            <div class="background-thumbnail" style="background-image: url({{image._source.cdn1[DefaultImage]}})"></div>
+            <a href="#/image/{{image._id}}" class="thumbnail"  ng-click="openImage(index, image, mainSearchHits)"  uib-tooltip="{{item._source.Description}}">
+            <div class="background-thumbnail" background-image="{{image._source.cdn1[DefaultImage]}}"></div>
             </a>
           </div>
 
