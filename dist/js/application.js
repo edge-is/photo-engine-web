@@ -406,7 +406,7 @@ search.controller('main',
       datumTokenizer: function(d) { return Bloodhound.tokenizers.whitespace(d.num); },
       queryTokenizer:  Bloodhound.tokenizers.whitespace,
       remote : {
-        url : 'http://localhost:3000/api/search/typeahead?query={query}*',
+        url : config.api + '/search/typeahead?query={query}*',
         wildcard: '{query}',
         filter: function (data) {
            return data.data.hits;
