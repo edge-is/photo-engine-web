@@ -10,20 +10,21 @@ var search = angular.module('search', [
   'angularScroll'
 ]);
 
-search.config([
-  '$routeProvider',
-  '$locationProvider',
-  'uiSelectConfig',
-  function ($routeProvider, $locationProvider,uiSelectConfig) {
+search.run( ['$rootScope', '$location', function ($rootScope, $location) {
 
-  uiSelectConfig.theme = 'bootstrap';
-  $locationProvider
-    .html5Mode({
-      enabled: true,
-      requireBase: false
+    $rootScope.history = [];
+    $rootScope.$on('$routeChangeSuccess', function() {
+        $rootScope.history.push($location.$$path);
     });
 }]);
 
+function parseJSON(string){
+  try {
+    return JSON.parse(string);
+  } catch (e) {
+    return false;
+  }
+}
 
 var settings = {
   search: {

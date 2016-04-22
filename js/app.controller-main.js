@@ -6,7 +6,14 @@ search.controller('main',
   '$uibModal',
   '$log',
   '$location',
- function ($scope, $window, _search, $uibModal, $log, $location){
+  'imageCache',
+ function ($scope, $window, _search, $uibModal, $log, $location, imageCache){
+   console.log(
+     'what the fuck',
+     angular.element('#mainsearch').attr("sf-typeahead")
+    )
+    //
+    // document.getElementById("mainsearch")[0]
     $scope.MainSearchHidden = true;
     $scope.MainSearch='';
     $scope.StartSearch='';
@@ -15,11 +22,15 @@ search.controller('main',
     $scope.searchResultsTotal = 0;
     $scope.mainSearchHits =  [];
 
+    $scope.displayResultCount = false;
+
     $scope.scrollDisabled = false;
     $scope.mainSearchOptions = {
       limit : 30,
       offset : 0
     };
+
+    //sf-typeahead
 
     var TypeaheadEngine = new Bloodhound({
       datumTokenizer: function(d) { return Bloodhound.tokenizers.whitespace(d.num); },
@@ -50,18 +61,18 @@ search.controller('main',
     $scope.mainSearchQuery = $location.search().query || '';
     $scope.mainSearchFilter = $location.search().filter || '';
 
-    // $scope.MainSearchHidden=false;
-    // $scope.StartSearchHidden=true;
-
     if($scope.mainSearchQuery !== '' || $scope.mainSearchFilter !== ''){
       //Fore some reson need to set input value async..
       setTimeout(function (){
         $scope.MainSearch = $scope.mainSearchQuery;
+        $scope.$apply();
       }, 100)
       mainSearch($scope.mainSearchQuery);
     }
 
     $scope.$watch('StartSearch', function (_new, _old){
+
+      console.log(_new, _old);
       if($scope.StartSearch.length > 0){
         angular.element('#mainsearch').focus();
         $scope.MainSearchHidden=false;
@@ -115,19 +126,7 @@ search.controller('main',
     var w = angular.element($window);
     $scope.windowWidth = w.width();
 
-    $scope.DefaultImage = rightImg($scope.windowWidth);
-
-    function rightImg(width){
-      if (width < 400){
-        return 'small';
-      }else if(width >= 600 && width <= 900){
-        return 'medium';
-      }else if(width >= 900){
-        return 'large';
-      }
-    };
-
-
+    $scope.DefaultImage = "x-small";
 
     function mainSearch(query, type, filter){
 
@@ -142,6 +141,7 @@ search.controller('main',
       angular.element('body')[0].scrollTop = 0;
 
       _search.query($scope.mainSearchQuery, $scope.mainSearchOptions).then( function (response){
+        $scope.displayResultCount = true;
         $scope.searchTime = response.data._took;
         $scope.searchResultsTotal = response.data._total;
         $scope.mainSearchHits = response.data.hits;
@@ -151,9 +151,6 @@ search.controller('main',
 
         //return console.log(response.data);
         $scope.mainSearchSize = response.data.hits.length;
-
-
-        console.log($scope.mainSearchSize);
       });
 
       $scope.lastSearchURI = $location.$$url;
@@ -181,38 +178,17 @@ search.controller('main',
         response.data.hits.forEach(function (item){
           $scope.mainSearchHits.push(item);
         });
-
-        //$scope.$apply();
-
-
-        //return console.log(response.data);
         $scope.mainSearchSize += response.data.hits.length;
-
-
         callback();
       });
     };
 
 
     $scope.openImage = function (index, image, results) {
-       var modalInstance = $uibModal.open({
-         templateUrl: 'views/image-modal.html',
-         controller: 'ImageController',
-         size: 'lg',
-         resolve: {
-           data : function () {
-             return {
-               index : index,
-               image : image,
-               results : results
-             }
-           }
-         }
-       });
-       modalInstance.result.then(function (data) {
-       }, function () {
-         $location.url($scope.lastSearchURI);
-       });
+      imageCache.image = image;
+      imageCache.index = index;
+      imageCache.images = results;
+
      };
      $scope.openAdvancedSearch = function (index, image, results) {
         var modalInstance = $uibModal.open({

@@ -1,6 +1,6 @@
 
 
-search.controller('ImageController', [
+search.controller('imageModalController', [
   '$scope',
   '$location',
   '$modalInstance',
@@ -13,9 +13,18 @@ search.controller('ImageController', [
     $scope.image = data.image;
     $scope.isFullscreen = false;
     $scope.fullscreenClass="no-fullscreen";
+    $scope.root = data.root;
+
+    $scope.currentLocation = $location.$$url;
+    // console.log($location)
     $scope.close = function () {
+      $modalInstance.close();
+    };
+
+    $scope.dismiss = function () {
       $modalInstance.dismiss();
     };
+
     $scope.nextImg = $scope.images[$scope.index + 1];
     $scope.prevImg = $scope.images[$scope.index - 1];
 
@@ -39,13 +48,13 @@ search.controller('ImageController', [
 
     $scope.nextURL = function (){
       if( $scope.nextImg ){
-        return '/image/' + $scope.nextImg._id;
+        return '#/image/' + $scope.nextImg._id;
       }
     };
 
     $scope.prevURL = function (){
       if($scope.prevImg){
-        return '/image/' + $scope.prevImg._id;
+        return '#/image/' + $scope.prevImg._id;
       }
     };
 
@@ -99,6 +108,8 @@ search.controller('ImageController', [
       }
       $scope.fullscreenClass = 'fullscreen';
       $scope.isFullscreen = true;
+
+      // $scope.$apply();
     };
 
     function exitHandler(event){
@@ -108,6 +119,7 @@ search.controller('ImageController', [
         || document.msFullscreenElement === null ) {
           $scope.isFullscreen = false;
           $scope.fullscreenClass = 'no-fullscreen';
+          console.log('EXIT?')
         }
     }
 

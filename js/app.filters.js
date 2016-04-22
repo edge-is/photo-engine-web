@@ -2,6 +2,8 @@ search.filter('ms', [function (){
   return function (ms){
     var seconds = ms / 1000;
 
+    if (isNaN(seconds)) return "";
+
     return seconds + 's';
   };
 }]);

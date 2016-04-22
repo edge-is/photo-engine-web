@@ -1,4 +1,7 @@
-search.directive('lazyimg', function (){
+search.directive('lazyimg', ['$timeout', directiveLazyImage]);
+
+
+function directiveLazyImage($timeout){
   return {
     restrict: 'ACE',
     template : function (element, attr){
@@ -8,9 +11,15 @@ search.directive('lazyimg', function (){
       $('.high-resolution-image').bind('load', function (){
 
         $('.low-resolution-image').addClass('hidden');
-        $('.high-resolution-image')
-           .removeClass('hidden').unbind('load');
+        scope.$apply();
+        $timeout(function (){
+          $('.high-resolution-image')
+             .removeClass('hidden').unbind('load');
+        }, 10)
+
+
+        $('.low-resolution-image').remove();
       });
     }
   };
-});
+}

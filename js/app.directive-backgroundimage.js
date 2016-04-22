@@ -1,4 +1,7 @@
-search.directive('backgroundImage', [ function (){
+search.directive('backgroundImage', [directiveBackgroundImage]);
+
+
+function directiveBackgroundImage(){
   return {
     restrict : 'ACE',
     link : function(scope, element, attrs){
@@ -8,4 +11,4 @@ search.directive('backgroundImage', [ function (){
       });
     }
   };
-}]);
+}
