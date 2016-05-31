@@ -4,6 +4,8 @@ search.controller('archive', [ '$scope', '$route', '$http', 'imageCache', '$wind
 function controllerArchive($scope, $route, $http, imageCache, $window, $timeout, $location, utils){
 
   var archive_id = $route.current.params.archiveID;
+
+
   $scope.limit = 30;
   $scope.offset= 0;
   $scope.DefaultImage = 'small';
@@ -16,11 +18,36 @@ function controllerArchive($scope, $route, $http, imageCache, $window, $timeout,
   $scope.displayResultCount = false;
   $scope.navSearch = "";
 
+  $scope.archive = "";
+
   $scope.root = $window.location.hash.replace(/\#/g, '');
 
   // Set initial filter
   $scope.filters.archive_id = archive_id;
   $scope.searchTime = 0;
+
+
+  var thisArchiveAggregateInfo = utils.createURI([ config.api, '/aggregates/archive'].join(''), {
+    filter : 'archive_id:' + archive_id
+  });
+  // "http://localhost:3000/api/aggregates/archive?filter=archive_id:68b2ae89e6dc2807aec8008e20ba132c";
+
+  console.log(thisArchiveAggregateInfo)
+  $http.get(thisArchiveAggregateInfo).then(function (response){
+    console.log('HEY', response.data);
+
+    var results = response.data.data.results_raw;
+
+    if (results.length > 0){
+
+      $scope.archive = results[0].name ;
+    }
+
+
+
+
+  })
+
 
   $scope.requestQuery = function (limit, offset, newSearch, callback){
 

@@ -70,9 +70,9 @@ span.twitter-typeahead {
 	text-transform: none;
 }
 
-.search-result-content {padding-top: 70px; }
+/*.search-result-content {padding-top: 70px; }
 
-.all-archives-content {padding-top: 70px; }
+.all-archives-content {padding-top: 70px; }*/
 
 .padding-top-90px {
 	padding-top: 90px;
@@ -173,6 +173,9 @@ span.twitter-typeahead {
 	background-size:cover;
 }
 
+#page-content-wrapper{
+	padding-top:70px;
+}
 
 
   @media (max-width: 768px) {

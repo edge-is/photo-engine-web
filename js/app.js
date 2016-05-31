@@ -11,11 +11,27 @@ var search = angular.module('search', [
 ]);
 
 search.run( ['$rootScope', '$location', function ($rootScope, $location) {
+  var allowModalsInControllers = ['imageLinked'];
 
-    $rootScope.history = [];
-    $rootScope.$on('$routeChangeSuccess', function() {
-        $rootScope.history.push($location.$$path);
-    });
+  $rootScope.history = [];
+  $rootScope.$on('$routeChangeSuccess', function(ev, data) {
+
+    if (data.$$route){
+
+      if (allowModalsInControllers.indexOf(data.$$route.controller) === -1){
+
+        var d = {};
+        d.modal = angular.element('.modal'),
+        d.nodalBackdrop = angular.element('.modal-backdrop');
+        for (var key in d){
+          if (d[key].length > 0){
+           d[key].remove();
+          }
+        }
+      }
+    }
+    $rootScope.history.push($location.$$path);
+  });
 }]);
 
 function parseJSON(string){

@@ -12,9 +12,8 @@
 
             </div>
 
-            <a class="navbar-brand page-scroll  hidden-sm hidden-xs" href="#page-top">
-
-                <i class="fa fa-play-circle"></i>[[logo]]
+            <a class="navbar-brand page-scroll  hidden-sm hidden-xs" href="#">
+                [[logo]]
             </a>
             <form class="navbar-main-search navbar-form" role="search" ng-submit="submitNavSearch()">
               <div class="form-group">
@@ -68,8 +67,18 @@
 
        <!-- Page Content -->
        <div id="page-content-wrapper">
+          <div class="container-fluid">
+            <div class="row">
+              <div class="col-lg-10">
+
+                <h3><a href="#/">Forsíða</a>/<a href="#/archives">Söfn</a>/<a href>{{archive}} </a></h3>
+              </div>
+
+            </div>
+          </div>
+
            <div class="container-fluid">
-             <div class="search-result-content container-fluid">
+             <div class="container-fluid">
                <div class="row">
                  <div  ng-repeat="(index, image) in archiveImages">
                    <div class="col-lg-3 col-md-3 col-sm-4">

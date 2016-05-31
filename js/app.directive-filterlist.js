@@ -10,7 +10,7 @@ function directiveFilterList ($http, utils){
 
       var credit_raw = "'" + attrs.filterKey + "'";
 
-      return '<li ng-repeat="photographer in photographers"><a href ng-click="addToFilter('+credit_raw+', photographer.name)"><input ng-checked="filters['+credit_raw+'] === photographer.name" type="checkbox"> {{photographer.name}} <span class="pull-right">{{photographer.count}}</span></a></li>';
+      return '<li ng-repeat="item in ' + attrs.dataset + '"><a href ng-click="addToFilter('+credit_raw+', item.name)"><input ng-checked="filters['+credit_raw+'] === item.name" type="checkbox"> {{item.name}} <span class="pull-right">{{item.count}}</span></a></li>';
     },
     link : function ($scope, element, attrs, ngModel){
       var api = attrs.api;
@@ -23,13 +23,6 @@ function directiveFilterList ($http, utils){
       function getFilter(){
         return $scope[attrs.filter];
       }
-
-
-
-      var x = utils.createURI(api, {
-        query : 'foo-barbars',
-        filter : 'barasdf<zza1,aa4,a4asd'
-      });
 
 
       if (attrs.filter){
@@ -62,7 +55,7 @@ function directiveFilterList ($http, utils){
         $http.get(uri).then(function (response){
           console.log(response.data);
 
-          $scope[attrs.dataset] = response.data.data.results;
+          $scope[attrs.dataset] = response.data.data.results_raw;
         })
 
       }
