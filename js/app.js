@@ -15,18 +15,10 @@ search.run( ['$rootScope', '$location', function ($rootScope, $location) {
 
   $rootScope.history = [];
   $rootScope.$on('$routeChangeSuccess', function(ev, data) {
-
     if (data.$$route){
-
       if (allowModalsInControllers.indexOf(data.$$route.controller) === -1){
-
-        var d = {};
-        d.modal = angular.element('.modal'),
-        d.nodalBackdrop = angular.element('.modal-backdrop');
-        for (var key in d){
-          if (d[key].length > 0){
-           d[key].remove();
-          }
+        if($rootScope.modalInstance) {
+          $rootScope.modalInstance.close();
         }
       }
     }

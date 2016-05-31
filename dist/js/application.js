@@ -15,18 +15,10 @@ search.run( ['$rootScope', '$location', function ($rootScope, $location) {
 
   $rootScope.history = [];
   $rootScope.$on('$routeChangeSuccess', function(ev, data) {
-
     if (data.$$route){
-
       if (allowModalsInControllers.indexOf(data.$$route.controller) === -1){
-
-        var d = {};
-        d.modal = angular.element('.modal'),
-        d.nodalBackdrop = angular.element('.modal-backdrop');
-        for (var key in d){
-          if (d[key].length > 0){
-           d[key].remove();
-          }
+        if($rootScope.modalInstance) {
+          $rootScope.modalInstance.close();
         }
       }
     }
@@ -241,21 +233,14 @@ function controllerArchive($scope, $route, $http, imageCache, $window, $timeout,
   });
   // "http://localhost:3000/api/aggregates/archive?filter=archive_id:68b2ae89e6dc2807aec8008e20ba132c";
 
-  console.log(thisArchiveAggregateInfo)
   $http.get(thisArchiveAggregateInfo).then(function (response){
-    console.log('HEY', response.data);
-
-    var results = response.data.data.results_raw;
+    var results = response.data.data.results;
 
     if (results.length > 0){
 
       $scope.archive = results[0].name ;
     }
-
-
-
-
-  })
+  });
 
 
   $scope.requestQuery = function (limit, offset, newSearch, callback){
@@ -386,8 +371,7 @@ function archiveController($scope, $http){
 
 
   $http.get(url).success(function (response){
-
-    $scope.archives = response.data.results_raw;
+    $scope.archives = response.data.results;
   });
 }
 
@@ -400,7 +384,8 @@ search.controller('imageModalController', [
   'data',
   'map',
   'hotkeys',
-  function ($scope, $location, $modalInstance, data, map, hotkeys) {
+  '$rootScope',
+  function ($scope, $location, $modalInstance, data, map, hotkeys, $rootScope) {
     $scope.index = data.index;
     $scope.images = data.results
     $scope.image = data.image;
@@ -475,6 +460,10 @@ search.controller('imageModalController', [
         return true;
       }
     };
+
+    $rootScope.$on('$locationChangeStart', function (event, data){
+      console.log(event, data);
+    })
 
     $scope.StopLazy = function (){
       $('.high-resolution-image').unbind('load');
@@ -584,9 +573,6 @@ search.controller('imageLinked', [
   '$scope', '$route', 'imageService', '$uibModal', '$location', 'imageCache', '$window', '$rootScope', '$location',
   function ($scope, $route, imageService, $uibModal, $location, imageCache, $window, $rootScope, $location){
 
-
-
-
     if(imageCache.loaded) return;
 
     var root = $location.search().root || '/';
@@ -610,10 +596,8 @@ search.controller('imageLinked', [
       imageCache.loaded =true;
     }
 
-
-
-
   function openModal(index, image, results) {
+
      var modalInstance = $uibModal.open({
        templateUrl: 'views/image-modal.html',
        controller: 'imageModalController',
@@ -630,6 +614,8 @@ search.controller('imageLinked', [
          }
        }
      });
+
+     $rootScope.modalInstance = modalInstance;
 
      modalInstance.result.then(function (data) {
 
@@ -666,6 +652,9 @@ search.controller('main',
      'what the fuck',
      angular.element('#mainsearch').attr("sf-typeahead")
     )
+    $scope.photographersapi = [config.api, '/aggregates/Credit'].join('');
+
+
     //
     // document.getElementById("mainsearch")[0]
     $scope.MainSearchHidden = true;
@@ -725,8 +714,6 @@ search.controller('main',
     }
 
     $scope.$watch('StartSearch', function (_new, _old){
-
-      console.log(_new, _old);
       if($scope.StartSearch.length > 0){
         angular.element('#mainsearch').focus();
         $scope.MainSearchHidden=false;
@@ -967,15 +954,11 @@ function directiveFilterList ($http, utils){
       if (attrs.query){
 
         $scope.$watch(attrs.query, function (_new, _old){
-          console.log(_new, _old);
           update(getQuery(), getFilter());
         });
       }
 
       function update(query, filter){
-
-        console.log(filter, query);
-
         var queryParams = {};
 
         queryParams.filter = filter || false;
@@ -983,18 +966,14 @@ function directiveFilterList ($http, utils){
         queryParams.query = query || false;
         var uri = utils.createURI(api, queryParams);
 
+        if (uri === '?') return;
 
         $http.get(uri).then(function (response){
-          console.log(response.data);
-
-          $scope[attrs.dataset] = response.data.data.results_raw;
+          $scope[attrs.dataset] = response.data.data.results;
         })
 
       }
-
       update();
-
-
     }
   }
 }

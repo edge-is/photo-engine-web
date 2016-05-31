@@ -35,15 +35,11 @@ function directiveFilterList ($http, utils){
       if (attrs.query){
 
         $scope.$watch(attrs.query, function (_new, _old){
-          console.log(_new, _old);
           update(getQuery(), getFilter());
         });
       }
 
       function update(query, filter){
-
-        console.log(filter, query);
-
         var queryParams = {};
 
         queryParams.filter = filter || false;
@@ -51,18 +47,14 @@ function directiveFilterList ($http, utils){
         queryParams.query = query || false;
         var uri = utils.createURI(api, queryParams);
 
+        if (uri === '?') return;
 
         $http.get(uri).then(function (response){
-          console.log(response.data);
-
-          $scope[attrs.dataset] = response.data.data.results_raw;
+          $scope[attrs.dataset] = response.data.data.results;
         })
 
       }
-
       update();
-
-
     }
   }
 }

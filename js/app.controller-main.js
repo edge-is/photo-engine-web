@@ -12,6 +12,9 @@ search.controller('main',
      'what the fuck',
      angular.element('#mainsearch').attr("sf-typeahead")
     )
+    $scope.photographersapi = [config.api, '/aggregates/Credit'].join('');
+
+
     //
     // document.getElementById("mainsearch")[0]
     $scope.MainSearchHidden = true;
@@ -71,8 +74,6 @@ search.controller('main',
     }
 
     $scope.$watch('StartSearch', function (_new, _old){
-
-      console.log(_new, _old);
       if($scope.StartSearch.length > 0){
         angular.element('#mainsearch').focus();
         $scope.MainSearchHidden=false;

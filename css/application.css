@@ -194,13 +194,13 @@ span.twitter-typeahead {
 	}
 
   @media (min-width: 768px) {
-		 .navbar-main-search { width: 540px; }
+		 .navbar-main-search { width: 680px; }
 		 .nav-search { width: 210px !important; }
 		 .gallery .thumbnail img { max-height: 300px; }
 	}
 
   @media (min-width: 992px) {
-		.navbar-main-search { width: 815px; }
+		.navbar-main-search { width: 950px; }
 		.nav-search { width: 400px !important }
 		.gallery .thumbnail img {
 			max-height: 300px;
@@ -208,7 +208,7 @@ span.twitter-typeahead {
 	}
 
   @media (min-width: 1200px) {
-		.navbar-main-search { width: 960px; }
+		.navbar-main-search { width: 1070px; }
 		.nav-search { width: 600px !important; }
 		.gallery .thumbnail img {
 			max-height: 236px;

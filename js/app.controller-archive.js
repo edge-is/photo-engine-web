@@ -32,21 +32,14 @@ function controllerArchive($scope, $route, $http, imageCache, $window, $timeout,
   });
   // "http://localhost:3000/api/aggregates/archive?filter=archive_id:68b2ae89e6dc2807aec8008e20ba132c";
 
-  console.log(thisArchiveAggregateInfo)
   $http.get(thisArchiveAggregateInfo).then(function (response){
-    console.log('HEY', response.data);
-
-    var results = response.data.data.results_raw;
+    var results = response.data.data.results;
 
     if (results.length > 0){
 
       $scope.archive = results[0].name ;
     }
-
-
-
-
-  })
+  });
 
 
   $scope.requestQuery = function (limit, offset, newSearch, callback){

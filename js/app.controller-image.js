@@ -2,9 +2,6 @@ search.controller('imageLinked', [
   '$scope', '$route', 'imageService', '$uibModal', '$location', 'imageCache', '$window', '$rootScope', '$location',
   function ($scope, $route, imageService, $uibModal, $location, imageCache, $window, $rootScope, $location){
 
-
-
-
     if(imageCache.loaded) return;
 
     var root = $location.search().root || '/';
@@ -28,10 +25,8 @@ search.controller('imageLinked', [
       imageCache.loaded =true;
     }
 
-
-
-
   function openModal(index, image, results) {
+
      var modalInstance = $uibModal.open({
        templateUrl: 'views/image-modal.html',
        controller: 'imageModalController',
@@ -48,6 +43,8 @@ search.controller('imageLinked', [
          }
        }
      });
+
+     $rootScope.modalInstance = modalInstance;
 
      modalInstance.result.then(function (data) {
 

@@ -7,7 +7,8 @@ search.controller('imageModalController', [
   'data',
   'map',
   'hotkeys',
-  function ($scope, $location, $modalInstance, data, map, hotkeys) {
+  '$rootScope',
+  function ($scope, $location, $modalInstance, data, map, hotkeys, $rootScope) {
     $scope.index = data.index;
     $scope.images = data.results
     $scope.image = data.image;
@@ -82,6 +83,10 @@ search.controller('imageModalController', [
         return true;
       }
     };
+
+    $rootScope.$on('$locationChangeStart', function (event, data){
+      console.log(event, data);
+    })
 
     $scope.StopLazy = function (){
       $('.high-resolution-image').unbind('load');
