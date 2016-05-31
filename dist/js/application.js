@@ -234,7 +234,7 @@ function controllerArchive($scope, $route, $http, imageCache, $window, $timeout,
   // "http://localhost:3000/api/aggregates/archive?filter=archive_id:68b2ae89e6dc2807aec8008e20ba132c";
 
   $http.get(thisArchiveAggregateInfo).then(function (response){
-    var results = response.data.data.results;
+    var results = response.data.data.results_raw;
 
     if (results.length > 0){
 
@@ -346,6 +346,7 @@ function controllerArchive($scope, $route, $http, imageCache, $window, $timeout,
     imageCache.index = index;
   }
 
+
   $scope.load_more_data = function (callback){
     $scope.requestQuery($scope.limit, $scope.loadedImages, false, callback);
   }
@@ -371,7 +372,7 @@ function archiveController($scope, $http){
 
 
   $http.get(url).success(function (response){
-    $scope.archives = response.data.results;
+    $scope.archives = response.data.results_raw;
   });
 }
 
@@ -969,7 +970,7 @@ function directiveFilterList ($http, utils){
         if (uri === '?') return;
 
         $http.get(uri).then(function (response){
-          $scope[attrs.dataset] = response.data.data.results;
+          $scope[attrs.dataset] = response.data.data.results_raw;
         })
 
       }

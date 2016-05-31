@@ -7,6 +7,6 @@ function archiveController($scope, $http){
 
 
   $http.get(url).success(function (response){
-    $scope.archives = response.data.results;
+    $scope.archives = response.data.results_raw;
   });
 }
