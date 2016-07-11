@@ -17,7 +17,6 @@ search.controller('imageModalController', [
     $scope.root = data.root;
 
     $scope.currentLocation = $location.$$url;
-    // console.log($location)
     $scope.close = function () {
       $modalInstance.close();
     };
@@ -83,10 +82,6 @@ search.controller('imageModalController', [
         return true;
       }
     };
-
-    $rootScope.$on('$locationChangeStart', function (event, data){
-      console.log(event, data);
-    })
 
     $scope.StopLazy = function (){
       $('.high-resolution-image').unbind('load');

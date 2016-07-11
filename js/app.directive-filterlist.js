@@ -5,17 +5,22 @@ search.directive('filterList', ['$http', 'utils', directiveFilterList]);
 function directiveFilterList ($http, utils){
   return {
     restrict : 'ACE',
+    replace:true,
     template : function (element, attrs){
 
 
       var credit_raw = "'" + attrs.filterKey + "'";
 
-      return '<li ng-repeat="item in ' + attrs.dataset + '"><a href ng-click="addToFilter('+credit_raw+', item.name)"><input ng-checked="filters['+credit_raw+'] === item.name" type="checkbox"> {{item.name}} <span class="pull-right">{{item.count}}</span></a></li>';
+      return '<ul class="sidebar-nav"><li ng-repeat="item in ' + attrs.dataset + '"><a href ng-click="addToFilter('+credit_raw+', item.name)"><input ng-checked="filters['+credit_raw+'] === item.name" type="checkbox"> {{item.name}} <span class="pull-right">{{item.count}}</span></a></li></ul>';
     },
     link : function ($scope, element, attrs, ngModel){
       var api = attrs.api;
 
-      console.log(attrs);
+      var resultKey = "results";
+
+      if (attrs.resultType === 'raw'){
+        var resultKey = "results_raw";
+      }
 
       function getQuery(){
         return $scope[attrs.query];
@@ -50,7 +55,7 @@ function directiveFilterList ($http, utils){
         if (uri === '?') return;
 
         $http.get(uri).then(function (response){
-          $scope[attrs.dataset] = response.data.data.results_raw;
+          $scope[attrs.dataset] = response.data.data[resultKey];
         })
 
       }

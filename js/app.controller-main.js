@@ -13,10 +13,15 @@ search.controller('main',
      angular.element('#mainsearch').attr("sf-typeahead")
     )
     $scope.photographersapi = [config.api, '/aggregates/Credit'].join('');
+    $scope.keywordsApi =      [config.api, '/aggregates/Keywords'].join('');
+
+
 
 
     //
     // document.getElementById("mainsearch")[0]
+    //
+    $scope.filters = {};
     $scope.MainSearchHidden = true;
     $scope.MainSearch='';
     $scope.StartSearch='';

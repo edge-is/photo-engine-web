@@ -395,7 +395,6 @@ search.controller('imageModalController', [
     $scope.root = data.root;
 
     $scope.currentLocation = $location.$$url;
-    // console.log($location)
     $scope.close = function () {
       $modalInstance.close();
     };
@@ -461,10 +460,6 @@ search.controller('imageModalController', [
         return true;
       }
     };
-
-    $rootScope.$on('$locationChangeStart', function (event, data){
-      console.log(event, data);
-    })
 
     $scope.StopLazy = function (){
       $('.high-resolution-image').unbind('load');
@@ -654,10 +649,15 @@ search.controller('main',
      angular.element('#mainsearch').attr("sf-typeahead")
     )
     $scope.photographersapi = [config.api, '/aggregates/Credit'].join('');
+    $scope.keywordsApi =      [config.api, '/aggregates/Keywords'].join('');
+
+
 
 
     //
     // document.getElementById("mainsearch")[0]
+    //
+    $scope.filters = {};
     $scope.MainSearchHidden = true;
     $scope.MainSearch='';
     $scope.StartSearch='';
@@ -925,17 +925,22 @@ search.directive('filterList', ['$http', 'utils', directiveFilterList]);
 function directiveFilterList ($http, utils){
   return {
     restrict : 'ACE',
+    replace:true,
     template : function (element, attrs){
 
 
       var credit_raw = "'" + attrs.filterKey + "'";
 
-      return '<li ng-repeat="item in ' + attrs.dataset + '"><a href ng-click="addToFilter('+credit_raw+', item.name)"><input ng-checked="filters['+credit_raw+'] === item.name" type="checkbox"> {{item.name}} <span class="pull-right">{{item.count}}</span></a></li>';
+      return '<ul class="sidebar-nav"><li ng-repeat="item in ' + attrs.dataset + '"><a href ng-click="addToFilter('+credit_raw+', item.name)"><input ng-checked="filters['+credit_raw+'] === item.name" type="checkbox"> {{item.name}} <span class="pull-right">{{item.count}}</span></a></li></ul>';
     },
     link : function ($scope, element, attrs, ngModel){
       var api = attrs.api;
 
-      console.log(attrs);
+      var resultKey = "results";
+
+      if (attrs.resultType === 'raw'){
+        var resultKey = "results_raw";
+      }
 
       function getQuery(){
         return $scope[attrs.query];
@@ -970,7 +975,7 @@ function directiveFilterList ($http, utils){
         if (uri === '?') return;
 
         $http.get(uri).then(function (response){
-          $scope[attrs.dataset] = response.data.data.results_raw;
+          $scope[attrs.dataset] = response.data.data[resultKey];
         })
 
       }
