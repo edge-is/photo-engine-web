@@ -16,7 +16,7 @@ function directiveFilterList ($http, utils){
     link : function ($scope, element, attrs, ngModel){
       var api = attrs.api;
 
-      var resultKey = "results";
+      var resultKey = "results_raw";
 
       if (attrs.resultType === 'raw'){
         var resultKey = "results_raw";
@@ -55,6 +55,7 @@ function directiveFilterList ($http, utils){
         if (uri === '?') return;
 
         $http.get(uri).then(function (response){
+          console.log(response)
           $scope[attrs.dataset] = response.data.data[resultKey];
         })
 

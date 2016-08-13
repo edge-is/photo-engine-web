@@ -1,10 +1,23 @@
-search.controller('archive', [ '$scope', '$route', '$http', 'imageCache', '$window', '$timeout', '$location', 'utils',  controllerArchive]);
+search.controller('archive', [
+    '$scope',
+    '$route',
+    '$http',
+    '$window',
+    '$timeout',
+    '$location',
+    '$uibModal',
+    '$log',
+    'imageCache',
+    'utils',
+    'notifyDevelopment',
+    controllerArchive
+  ]);
 
 
-function controllerArchive($scope, $route, $http, imageCache, $window, $timeout, $location, utils){
+function controllerArchive($scope, $route, $http, $window, $timeout, $location, $uibModal, $log, imageCache, utils, notifyDevelopment){
 
   var archive_id = $route.current.params.archiveID;
-
+  notifyDevelopment();
 
   $scope.limit = 30;
   $scope.offset= 0;
@@ -143,6 +156,31 @@ function controllerArchive($scope, $route, $http, imageCache, $window, $timeout,
     imageCache.images = $scope.archiveImages;
     imageCache.image = image;
     imageCache.index = index;
+  }
+
+  $scope.openModal = function (index, image){
+    var modalInstance = $uibModal.open({
+      animation: $scope.animationsEnabled,
+      templateUrl: 'views/image-modal.html',
+      controller: 'imageModalController',
+      size: 'lg',
+      resolve: {
+        data: function () {
+          return {
+            index : index,
+            image : image,
+            results : $scope.archiveImages
+          };
+        }
+      }
+    });
+
+    modalInstance.result.then(function (selectedItem) {
+      $scope.selected = selectedItem;
+    }, function () {
+      $log.info('Modal dismissed at: ' + new Date());
+    });
+
   }
 
 

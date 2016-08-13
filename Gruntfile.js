@@ -123,8 +123,14 @@ module.exports = function (grunt) {
             ], dest: 'lib/js/', filter: 'isFile'},
 
             // animate.css
-            {expand: true, flatten:true, src: ['bower_components/animate.css/animate.min.css'], dest: 'lib/css/', filter: 'isFile'}
+            {expand: true, flatten:true, src: ['bower_components/animate.css/animate.min.css'], dest: 'lib/css/', filter: 'isFile'},
 
+
+            // ng-notify
+            {expand: true, flatten:true, src: ['bower_components/ng-notify/dist/ng-notify.min.css'], dest: 'lib/css/', filter: 'isFile'},
+            {expand: true, flatten:true, src: ['bower_components/ng-notify/dist/ng-notify.min.js'], dest: 'lib/js/', filter: 'isFile'},
+
+            {expand: true, flatten:true, src: ['bower_components/angular-cookies/angular-cookies.min.js'], dest: 'lib/js/', filter: 'isFile'}
 
             // Angular Webstorage
             //{expand: true, flatten:true, src: ['bower_components/angular-webstorage/angular-webstorage.min.js'], dest: 'lib/js/', filter: 'isFile'}

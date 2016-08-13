@@ -1,3 +1,16 @@
+
+.random-image-carousel .carousel-caption {
+  background-color: rgba(0, 0, 0, 0.4);
+	right: 0;
+	left: 0;
+}
+
+.archives-random-image {
+	max-height: 240px;
+	margin-right: auto;
+	margin-left: auto;
+}
+
 .twitter-typeahead .tt-query,
 .twitter-typeahead .tt-hint {
 	margin-bottom: 0;
@@ -5,7 +18,7 @@
 .tt-hint {
 	display: block;
 	width: 100%;
-	height: 38px;
+	height: 37px;
 	padding: 8px 12px;
 	font-size: 14px;
 	line-height: 1.428571429;
@@ -100,18 +113,20 @@ span.twitter-typeahead {
 .archives-carousel .carousel-inner{
 	width:100%;
 	max-height: 240px !important;
+	height: 100%;
 }
 
 
 .archives-carousel .carousel-caption {
-    padding-bottom: 0px;
-		bottom: 0px;
-		-webkit-text-stroke-width: 1px;
-		-webkit-text-stroke-color: black;
-
+  padding-bottom: 0px;
+	bottom: 0px;
+	/*-webkit-text-stroke-width: 1px;
+	-webkit-text-stroke-color: black;*/
 }
 
-
+.archives-carousel .item.active {
+	height: 100%;
+}
 
 .gallery .thumbnail {
 	 background-color: transparent;

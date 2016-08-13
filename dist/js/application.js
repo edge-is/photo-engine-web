@@ -7,7 +7,9 @@ var search = angular.module('search', [
   'cfp.hotkeys',
   'ui.select',
   'ngSanitize',
-  'angularScroll'
+  'angularScroll',
+  'ngNotify',
+  'ngCookies'
 ]);
 
 search.run( ['$rootScope', '$location', function ($rootScope, $location) {
@@ -160,7 +162,7 @@ search.config([
   '$routeProvider',
   '$locationProvider',
   'uiSelectConfig',
-  function ($routeProvider, $locationProvider,uiSelectConfig) {
+  function ($routeProvider, $locationProvider, uiSelectConfig) {
 
   uiSelectConfig.theme = 'bootstrap';
 
@@ -199,13 +201,26 @@ search.config([
 
 }]);
 
-search.controller('archive', [ '$scope', '$route', '$http', 'imageCache', '$window', '$timeout', '$location', 'utils',  controllerArchive]);
+search.controller('archive', [
+    '$scope',
+    '$route',
+    '$http',
+    '$window',
+    '$timeout',
+    '$location',
+    '$uibModal',
+    '$log',
+    'imageCache',
+    'utils',
+    'notifyDevelopment',
+    controllerArchive
+  ]);
 
 
-function controllerArchive($scope, $route, $http, imageCache, $window, $timeout, $location, utils){
+function controllerArchive($scope, $route, $http, $window, $timeout, $location, $uibModal, $log, imageCache, utils, notifyDevelopment){
 
   var archive_id = $route.current.params.archiveID;
-
+  notifyDevelopment();
 
   $scope.limit = 30;
   $scope.offset= 0;
@@ -344,6 +359,31 @@ function controllerArchive($scope, $route, $http, imageCache, $window, $timeout,
     imageCache.images = $scope.archiveImages;
     imageCache.image = image;
     imageCache.index = index;
+  }
+
+  $scope.openModal = function (index, image){
+    var modalInstance = $uibModal.open({
+      animation: $scope.animationsEnabled,
+      templateUrl: 'views/image-modal.html',
+      controller: 'imageModalController',
+      size: 'lg',
+      resolve: {
+        data: function () {
+          return {
+            index : index,
+            image : image,
+            results : $scope.archiveImages
+          };
+        }
+      }
+    });
+
+    modalInstance.result.then(function (selectedItem) {
+      $scope.selected = selectedItem;
+    }, function () {
+      $log.info('Modal dismissed at: ' + new Date());
+    });
+
   }
 
 
@@ -497,7 +537,6 @@ search.controller('imageModalController', [
         || document.msFullscreenElement === null ) {
           $scope.isFullscreen = false;
           $scope.fullscreenClass = 'no-fullscreen';
-          console.log('EXIT?')
         }
     }
 
@@ -643,15 +682,15 @@ search.controller('main',
   '$log',
   '$location',
   'imageCache',
- function ($scope, $window, _search, $uibModal, $log, $location, imageCache){
-   console.log(
-     'what the fuck',
-     angular.element('#mainsearch').attr("sf-typeahead")
-    )
+  'notifyDevelopment',
+ function ($scope, $window, _search, $uibModal, $log, $location, imageCache, notifyDevelopment){
+  //  console.log(
+  //    'what the fuck',
+  //    angular.element('#mainsearch').attr("sf-typeahead")
+  //   )
     $scope.photographersapi = [config.api, '/aggregates/Credit'].join('');
     $scope.keywordsApi =      [config.api, '/aggregates/Keywords'].join('');
-
-
+    notifyDevelopment();
 
 
     //
@@ -936,7 +975,7 @@ function directiveFilterList ($http, utils){
     link : function ($scope, element, attrs, ngModel){
       var api = attrs.api;
 
-      var resultKey = "results";
+      var resultKey = "results_raw";
 
       if (attrs.resultType === 'raw'){
         var resultKey = "results_raw";
@@ -975,6 +1014,7 @@ function directiveFilterList ($http, utils){
         if (uri === '?') return;
 
         $http.get(uri).then(function (response){
+          console.log(response)
           $scope[attrs.dataset] = response.data.data[resultKey];
         })
 
@@ -1041,7 +1081,7 @@ function directiveRandomArchiveImage($http, $compile){
   return {
     restrict : 'ACE',
     template : function (elem, attrs){
-      return '<div class="carousel slide archives-carousel" data-ride="carousel"><div class="carousel-inner" role="listbox"><div class="item active"><div class="background-thumbnail"></div><div class="carousel-caption"><h5>{{archive_name}}</h5></div></div></div></div>';
+      return '<div class="carousel slide archives-carousel random-image-carousel" data-ride="carousel"><div class="carousel-inner" role="listbox"><div class="item active"><img class="archives-random-image" ng-src="{{selectedImage}}"><div class="carousel-caption"><h5>{{archive_name}}</h5></div></div></div></div>';
       //return '<div class="background-thumbnail"></div>';
 
     },
@@ -1057,7 +1097,8 @@ function directiveRandomArchiveImage($http, $compile){
 
         $scope.image_name = selected._id;
         $scope.selectedArchiveImage = selected._source.cdn1.small;
-        element.attr('background-image', $scope.selectedArchiveImage);
+        $scope.selectedImage = $scope.selectedArchiveImage;
+        //element.attr('background-image', $scope.selectedArchiveImage);
         $compile(element)($scope);
       });
     },
@@ -1077,7 +1118,6 @@ function directiveTypeaheadSuggest(suggester){
       return '<input type="text" ng-mode="'+ attrs.ngModel +'" class="' + attrs.class + '">';
     },
     link : function ($scope, element, attrs, ngModel){
-      console.log($scope, ngModel, attrs);
 
       var submit = function (){};
 
@@ -1129,7 +1169,6 @@ function directiveTypeaheadSuggest(suggester){
       function elasticsearchSuggester(){
         return function (query, syncCallback, asyncCallback){
           var parts = query.split(' ');
-
           var last = parts.pop();
 
           suggester(last).then(function(response){
@@ -1275,6 +1314,30 @@ search.filter('propsFilter', function() {
 });
 
 
+
+function developmentService($log, $cookies, ngNotify){
+  return function (){
+
+      if (!config.development) return;
+
+      var cookieKey = 'developmentDismiss';
+
+      var dismissed = $cookies.get(cookieKey);
+      if (dismissed) return $log.info('DEVELOPMENT: Already dismissed');
+
+      ngNotify.set('Þessi vefur er í vinnslu.', {
+          html: true,
+          sticky: true,
+          button:true
+      }, function dismissNotify(){
+        $cookies.put(cookieKey, 'true');
+      });
+    }
+}
+
+search.service('notifyDevelopment', ['$log',  '$cookies', 'ngNotify', developmentService]);
+
+
 function serviceImage($http){
   return {
     getImageByID : function (id){
@@ -1292,7 +1355,7 @@ search.service('suggester', ['$http', serviceSuggester]);
 function serviceSuggester($http){
   return function (query, filters, options){
     options = options || {};
-    var apiURL = [config.api, '/search/suggest?'].join('');
+    var apiURL = [config.api, '/search/suggest/phrase?'].join('');
 
     var url = options.url || apiURL;
 

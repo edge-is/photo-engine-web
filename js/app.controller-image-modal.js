@@ -119,7 +119,6 @@ search.controller('imageModalController', [
         || document.msFullscreenElement === null ) {
           $scope.isFullscreen = false;
           $scope.fullscreenClass = 'no-fullscreen';
-          console.log('EXIT?')
         }
     }
 

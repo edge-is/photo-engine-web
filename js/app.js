@@ -7,7 +7,9 @@ var search = angular.module('search', [
   'cfp.hotkeys',
   'ui.select',
   'ngSanitize',
-  'angularScroll'
+  'angularScroll',
+  'ngNotify',
+  'ngCookies'
 ]);
 
 search.run( ['$rootScope', '$location', function ($rootScope, $location) {

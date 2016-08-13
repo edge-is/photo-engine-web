@@ -1,4 +1,20 @@
 
+<!--FIXME: Move me to a special controller-->
+<nav class="navbar navbar-custom navbar-fixed-top top-nav-collapse" role="navigation">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <a class="navbar-brand page-scroll  hidden-sm hidden-xs" href="#">
+                [[logo]]
+            </a>
+        </div>
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container -->
+</nav>
+
+
+
 <!-- Intro Header -->
 <header class="intro intro-back">
   <div class="intro-body" ng-hide="(StartSearchHidden)">
@@ -8,20 +24,8 @@
   </div>
 </header>
 <div class="all-archives-content padding-top-70px container-fluid">
-  <!-- <div class="row gallery">
-    <div  ng-repeat="(index, item) in MainSearchHits">
-      <div class="" ng-class="(landscape(item)) ? ' col-lg-4 col-md-6 col-sm-6' : ' col-lg-2 col-md-3 col-sm-3'">
-        <a href="#" class="thumbnail" ng-click="openImage(index, item, MainSearchHits)" uib-tooltip="{{item._source.Description}}">
-          <img
-          ng-src="{{TMPselectImg(item)}}"
-          alt="{{ item._source.Description}}">
-        </a>
-      </div>
-    </div>
-  </div> -->
-
   <div class="row">
-    <div  ng-repeat="(index, archive) in archives">
+    <div ng-repeat="(index, archive) in archives">
       <div class="col-lg-3 col-md-3 col-sm-4">
         <a href="#/archive/{{archive.archive_id}}" class="thumbnail">
           <random-archive-image archive="{{archive.archive_id}}" archive-name="{{archive.name}}"></random-archive-image>

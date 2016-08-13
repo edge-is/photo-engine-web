@@ -11,7 +11,6 @@ function directiveTypeaheadSuggest(suggester){
       return '<input type="text" ng-mode="'+ attrs.ngModel +'" class="' + attrs.class + '">';
     },
     link : function ($scope, element, attrs, ngModel){
-      console.log($scope, ngModel, attrs);
 
       var submit = function (){};
 
@@ -63,7 +62,6 @@ function directiveTypeaheadSuggest(suggester){
       function elasticsearchSuggester(){
         return function (query, syncCallback, asyncCallback){
           var parts = query.split(' ');
-
           var last = parts.pop();
 
           suggester(last).then(function(response){

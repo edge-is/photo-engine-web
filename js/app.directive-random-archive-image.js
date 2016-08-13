@@ -4,7 +4,7 @@ function directiveRandomArchiveImage($http, $compile){
   return {
     restrict : 'ACE',
     template : function (elem, attrs){
-      return '<div class="carousel slide archives-carousel" data-ride="carousel"><div class="carousel-inner" role="listbox"><div class="item active"><div class="background-thumbnail"></div><div class="carousel-caption"><h5>{{archive_name}}</h5></div></div></div></div>';
+      return '<div class="carousel slide archives-carousel random-image-carousel" data-ride="carousel"><div class="carousel-inner" role="listbox"><div class="item active"><img class="archives-random-image" ng-src="{{selectedImage}}"><div class="carousel-caption"><h5>{{archive_name}}</h5></div></div></div></div>';
       //return '<div class="background-thumbnail"></div>';
 
     },
@@ -20,7 +20,8 @@ function directiveRandomArchiveImage($http, $compile){
 
         $scope.image_name = selected._id;
         $scope.selectedArchiveImage = selected._source.cdn1.small;
-        element.attr('background-image', $scope.selectedArchiveImage);
+        $scope.selectedImage = $scope.selectedArchiveImage;
+        //element.attr('background-image', $scope.selectedArchiveImage);
         $compile(element)($scope);
       });
     },

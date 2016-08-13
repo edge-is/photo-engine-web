@@ -3,7 +3,7 @@ search.service('suggester', ['$http', serviceSuggester]);
 function serviceSuggester($http){
   return function (query, filters, options){
     options = options || {};
-    var apiURL = [config.api, '/search/suggest?'].join('');
+    var apiURL = [config.api, '/search/suggest/phrase?'].join('');
 
     var url = options.url || apiURL;
 

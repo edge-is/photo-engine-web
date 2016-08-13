@@ -7,15 +7,15 @@ search.controller('main',
   '$log',
   '$location',
   'imageCache',
- function ($scope, $window, _search, $uibModal, $log, $location, imageCache){
-   console.log(
-     'what the fuck',
-     angular.element('#mainsearch').attr("sf-typeahead")
-    )
+  'notifyDevelopment',
+ function ($scope, $window, _search, $uibModal, $log, $location, imageCache, notifyDevelopment){
+  //  console.log(
+  //    'what the fuck',
+  //    angular.element('#mainsearch').attr("sf-typeahead")
+  //   )
     $scope.photographersapi = [config.api, '/aggregates/Credit'].join('');
     $scope.keywordsApi =      [config.api, '/aggregates/Keywords'].join('');
-
-
+    notifyDevelopment();
 
 
     //

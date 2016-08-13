@@ -3,7 +3,7 @@ search.config([
   '$routeProvider',
   '$locationProvider',
   'uiSelectConfig',
-  function ($routeProvider, $locationProvider,uiSelectConfig) {
+  function ($routeProvider, $locationProvider, uiSelectConfig) {
 
   uiSelectConfig.theme = 'bootstrap';
 
