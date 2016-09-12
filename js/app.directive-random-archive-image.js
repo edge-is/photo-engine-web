@@ -18,6 +18,16 @@ function directiveRandomArchiveImage($http, $compile){
         $scope.availableImages = response.data.hits;
         var selected = response.data.hits.pop();
 
+
+
+        if (!selected){
+          var container = $(element).closest('.random-archive-images-container');
+
+          container.addClass('hidden');
+          
+          return;
+        }
+
         $scope.image_name = selected._id;
         $scope.selectedArchiveImage = selected._source.cdn1.small;
         $scope.selectedImage = $scope.selectedArchiveImage;

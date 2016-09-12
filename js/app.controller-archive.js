@@ -55,6 +55,16 @@ function controllerArchive($scope, $route, $http, $window, $timeout, $location, 
   });
 
 
+  var globalSearch = false;
+
+  $scope.convertToGlobal = function (){
+    console.log('CONVERTING ::::');
+
+
+    globalSearch = true;
+  }
+
+
   $scope.requestQuery = function (limit, offset, newSearch, callback){
 
     callback = callback || function (){};
@@ -149,6 +159,12 @@ function controllerArchive($scope, $route, $http, $window, $timeout, $location, 
   }
   $scope.submitNavSearch = function (){
     $scope.queryString = $scope.navSearch;
+
+
+    if (globalSearch){
+      return $window.location = '#/?query=' + $scope.queryString;
+    }
+
     $scope.requestQuery($scope.limit, 0, true);
   }
 

@@ -258,6 +258,16 @@ function controllerArchive($scope, $route, $http, $window, $timeout, $location, 
   });
 
 
+  var globalSearch = false;
+
+  $scope.convertToGlobal = function (){
+    console.log('CONVERTING ::::');
+
+
+    globalSearch = true;
+  }
+
+
   $scope.requestQuery = function (limit, offset, newSearch, callback){
 
     callback = callback || function (){};
@@ -352,6 +362,12 @@ function controllerArchive($scope, $route, $http, $window, $timeout, $location, 
   }
   $scope.submitNavSearch = function (){
     $scope.queryString = $scope.navSearch;
+
+
+    if (globalSearch){
+      return $window.location = '#/?query=' + $scope.queryString;
+    }
+
     $scope.requestQuery($scope.limit, 0, true);
   }
 
@@ -415,6 +431,19 @@ function archiveController($scope, $http){
     $scope.archives = response.data.results_raw;
   });
 }
+
+
+search.controller('globalsearch', ['$scope', '$window',  globalsearchController]);
+
+
+
+function globalsearchController($scope, $window){
+  $scope.global_search = function (){
+    if ($scope.query){
+      $window.location = '#/?query=' + $scope.query;
+    }
+  }
+};
 
 
 
@@ -1094,6 +1123,16 @@ function directiveRandomArchiveImage($http, $compile){
       $http.get(url).success(function (response){
         $scope.availableImages = response.data.hits;
         var selected = response.data.hits.pop();
+
+
+
+        if (!selected){
+          var container = $(element).closest('.random-archive-images-container');
+
+          container.addClass('hidden');
+          
+          return;
+        }
 
         $scope.image_name = selected._id;
         $scope.selectedArchiveImage = selected._source.cdn1.small;

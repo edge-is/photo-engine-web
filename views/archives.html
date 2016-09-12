@@ -3,12 +3,25 @@
 <nav class="navbar navbar-custom navbar-fixed-top top-nav-collapse" role="navigation">
     <div class="container-fluid">
         <div class="navbar-header">
-            <a class="navbar-brand page-scroll  hidden-sm hidden-xs" href="#">
+            <a class="navbar-brand page-scroll  hidden-sm hidden-xs" href="/#/">
                 [[logo]]
             </a>
         </div>
         <!-- Collect the nav links, forms, and other content for toggling -->
         <!-- /.navbar-collapse -->
+
+
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+         <form class="navbar-form navbar-right" ng-submit="global_search();" ng-controller="globalsearch">
+           <div class="form-group">
+             <input type="text" ng-model="query" class="form-control" placeholder="Leita í stöfnum">
+           </div>
+           <button type="submit" class="btn btn-default"><i class="fa fa-search"></i></button>
+         </form>
+       </div><!-- /.navbar-collapse -->
+
+
+
     </div>
     <!-- /.container -->
 </nav>
@@ -26,7 +39,7 @@
 <div class="all-archives-content padding-top-70px container-fluid">
   <div class="row">
     <div ng-repeat="(index, archive) in archives">
-      <div class="col-lg-3 col-md-3 col-sm-4">
+      <div class="col-lg-3 col-md-3 col-sm-4 random-archive-images-container">
         <a href="#/archive/{{archive.archive_id}}" class="thumbnail">
           <random-archive-image archive="{{archive.archive_id}}" archive-name="{{archive.name}}"></random-archive-image>
         </a>

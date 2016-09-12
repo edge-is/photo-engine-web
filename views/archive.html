@@ -12,13 +12,16 @@
 
             </div>
 
-            <a class="navbar-brand page-scroll  hidden-sm hidden-xs" href="#">
+            <a class="navbar-brand page-scroll  hidden-sm hidden-xs" href="/#/">
                 [[logo]]
             </a>
             <form class="navbar-main-search navbar-form" role="search" ng-submit="submitNavSearch()">
               <div class="form-group">
                 <div class="input-group">
-                  <div class="input-group-addon hidden-sm hidden-xs">Þessu safni</div>
+                  <div class="input-group-addon hidden-sm hidden-xs">
+                    <button class="btn btn-xs" ng-click="convertToGlobal();"><i class="fa fa-times"></i></button>
+                    Þessu safni
+                  </div>
 
                   <typeahead-suggest class="form-control nav-search typeahead" ng-model="navSearch" submit="submitNavSearch"></typeahead-suggest>
                   <!-- <input type="text"
