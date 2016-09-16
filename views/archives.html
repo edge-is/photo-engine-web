@@ -3,8 +3,8 @@
 <nav class="navbar navbar-custom navbar-fixed-top top-nav-collapse" role="navigation">
     <div class="container-fluid">
         <div class="navbar-header">
-            <a class="navbar-brand page-scroll  hidden-sm hidden-xs" href="/#/">
-                [[logo]]
+            <a class="navbar-brand page-scroll  hidden-sm hidden-xs navbar-img-logo" href="/#/">
+              <img src="img/nav-logo.png" alt="" />
             </a>
         </div>
         <!-- Collect the nav links, forms, and other content for toggling -->
@@ -14,7 +14,7 @@
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
          <form class="navbar-form navbar-right" ng-submit="global_search();" ng-controller="globalsearch">
            <div class="form-group">
-             <input type="text" ng-model="query" class="form-control" placeholder="Leita í stöfnum">
+             <input type="text" ng-model="query" class="form-control" placeholder="Leita í öllum söfnum">
            </div>
            <button type="submit" class="btn btn-default"><i class="fa fa-search"></i></button>
          </form>

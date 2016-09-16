@@ -5,8 +5,8 @@
             <!-- <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-main-collapse">
                 <i class="fa fa-bars"></i>
             </button> -->
-            <a class="navbar-brand page-scroll hidden-xs" href="/#/">
-                <i class="fa fa-play-circle"></i>[[logo]]
+            <a class="navbar-brand page-scroll hidden-xs navbar-img-logo" href="/#/">
+              <img src="img/nav-logo.png" alt="" />
             </a>
             <a class="navbar-brand page-scroll hidden-xs" href="#/archives">
                 Myndasöfn
@@ -49,21 +49,21 @@
     <div class="container">
       <div class="row">
         <div class="col-md-8 col-md-offset-2">
+          <div class="intro-logo">
+            <img src="img/logo-large.png" alt="" />
+          </div>
           <!-- <h3 class="brand-heading">Metadata search</h3> -->
           <div class="input-group-lg">
-            <input id="startsearch" ng-model="StartSearch" type="text" class="form-control" placeholder="Search" aria-describedby="sizing-addon1">
+            <input id="startsearch" ng-model="StartSearch" type="text" class="form-control" placeholder="Leit í öllum myndasöfnum" aria-describedby="sizing-addon1">
           </div>
-          <p class="intro-text">Photo metadata search engine</p>
+          <p class="intro-text">Myndasafn Héraðsskjalasafns Árnesinga</p>
           <!-- <a href="#about" class="btn btn-circle page-scroll">
               <i class="fa fa-angle-double-down animated"></i>
           </a> -->
         </div>
       </div>
     </div>
-
-
   </div>
-
 </header>
 
 
@@ -79,7 +79,6 @@
                  </h4>
              </li>
           </ul>
-
            <filter-list filter-key="Credit.raw" dataset="photographers" api="{{photographersapi}}" query="queryString" filter="filterString" result-type="raw"></filter-list>
            <ul class="sidebar-nav">
              <li class="sidebar-brand">
@@ -103,11 +102,10 @@
                <div class="row">
                  <div  ng-repeat="(index, image) in mainSearchHits">
                    <div class="col-lg-3 col-md-3 col-sm-4">
-                     <a href="#/image/{{image._id}}" class="thumbnail"  ng-click="openImage(index, image, mainSearchHits)"  uib-tooltip="{{item._source.Description}}">
+                     <a href="#/image/{{image._id}}" class="thumbnail"  ng-click="openImage(index, image, mainSearchHits)"  uib-tooltip="{{image._source.Description}}">
                      <div class="background-thumbnail" background-image="{{image._source.cdn1[DefaultImage]}}"></div>
                      </a>
                    </div>
-
                  </div>
                </div>
              </div>
@@ -115,5 +113,4 @@
            </div>
        </div>
        <!-- /#page-content-wrapper -->
-
    </div>

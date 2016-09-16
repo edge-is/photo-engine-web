@@ -55,9 +55,8 @@ function directiveFilterList ($http, utils){
         if (uri === '?') return;
 
         $http.get(uri).then(function (response){
-          console.log(response)
           $scope[attrs.dataset] = response.data.data[resultKey];
-        })
+        });
 
       }
       update();

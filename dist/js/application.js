@@ -898,8 +898,8 @@ search.controller('main',
       imageCache.image = image;
       imageCache.index = index;
       imageCache.images = results;
-
      };
+
      $scope.openAdvancedSearch = function (index, image, results) {
         var modalInstance = $uibModal.open({
           templateUrl: 'views/advanced-search-modal.html',
@@ -1043,9 +1043,8 @@ function directiveFilterList ($http, utils){
         if (uri === '?') return;
 
         $http.get(uri).then(function (response){
-          console.log(response)
           $scope[attrs.dataset] = response.data.data[resultKey];
-        })
+        });
 
       }
       update();
