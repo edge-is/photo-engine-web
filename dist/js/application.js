@@ -939,9 +939,9 @@ search.controller('main',
 ]);
 
 
-search.controller('mainSearch', ['$scope','_search', '$location', mainSearchController]);
+search.controller('mainSearch', ['$scope','apiSearch', '$location', mainSearchController]);
 
-function mainSearchController($scope, _search, $location ){
+function mainSearchController($scope, apiSearch, $location ){
   $scope.DefaultImage = "x-small";
   console.log('Index controller');
   $scope.searchResultsTotal = false;
@@ -950,42 +950,63 @@ function mainSearchController($scope, _search, $location ){
 
   $scope.scrollDisabled = true;
 
-  $scope.mainSearchOptions = {
-    limit : 30,
+  $scope.maxHits = 30;
+  $scope.queryObject = {
+    query : false,
+    filter: false,
+    limit : $scope.maxHits,
     offset : 0
   };
 
 
 
-
-
   $scope.onTypeaheadSubmit = function submitOnSearch(query){
-    $scope.search(query);
+
+    $scope.queryObject.query = query;
+
+    $scope.search();
   };
 
-  $scope.search = function (query, filter){
-    _search.query(query, $scope.mainSearchOptions).then( function (response){
+  $scope.updateURI = function (){
+    var url = {};
+    if($scope.mainSearchQuery !== ''){
+      url.query = $scope.mainSearchQuery;
+    }
+    if($scope.mainSearchFilter !== ''){
+      url.filter = $scope.mainSearchFilter;
+    }
+    $location.search(url);
+  };
+
+  $scope.search = function (){
+
+
+    apiSearch.query($scope.queryObject).then( function (response){
       $scope.displayResultCount = true;
       $scope.searchTime = response.data._took;
       $scope.searchResultsTotal = response.data._total;
       $scope.mainSearchHits = response.data.hits;
       $scope.mainSearchSize = response.data.hits.length;
-      $scope.submittedQuery = query;
-
       $scope.scrollDisabled = false;
+
+      $scope.submittedQuery = $scope.queryObject;
     });
   }
 
+  $scope.scrollDisabled = false;
+
   $scope.load_more_data = function (callback){
-    console.log('Load more....');
     if ($scope.mainSearchSize < 1){
       return;
     }
-    var options = {
-      limit : $scope.mainSearchOptions.limit,
-      offset : $scope.mainSearchSize
-    };
-    _search.query($scope.submittedQuery, options).then( function (response){
+
+    if ($scope.scrollDisabled) return;
+
+    $scope.scrollDisabled = true;
+
+    $scope.submittedQuery.offset +=$scope.maxHits;
+
+    apiSearch.query($scope.submittedQuery).then( function (response){
       if (!response) return;
 
       if (response.data.hits.length < 1){
@@ -994,19 +1015,20 @@ function mainSearchController($scope, _search, $location ){
       $scope.searchTime = response.data._took;
       $scope.searchResultsTotal = response.data._total;
 
-      // $scope.mainSearchHits.concat(response.data.hits);
       response.data.hits.forEach(function (item){
         $scope.mainSearchHits.push(item);
       });
+
       $scope.mainSearchSize += response.data.hits.length;
-      callback();
+      $scope.scrollDisabled = false;
+
+      setTimeout(callback, 500);
     });
   };
 
 
   $scope.uriQuery = $location.search().query || false;
   $scope.uriFilter= $location.search().filter || false;
-  console.log($scope, $location.search());
   if ($scope.uriQuery || $scope.uriFilter){
     $scope.search($scope.uriQuery, $scope.uriFilter);
   }
@@ -1014,49 +1036,49 @@ function mainSearchController($scope, _search, $location ){
 
 }
 
-search.controller('AdvancedSearchController', [
-  '$scope',
-  '$modalInstance',
-  'data',
-  'translate',
-  function ($scope, $modalInstance, data, translate) {
-
-    var AdvancedSearchTemplate = function  (){
-      return { bool : 'AND', key : '', operator : '==', query : '' };
-    };
-
-    $scope.advanced_search_query = [ new AdvancedSearchTemplate()];
-    $scope.advanced_search_fields = [];
-
-    $.each(settings.search.fields, function (key, value){
-      var translated = translate(key);
-      var string = key;
-
-      if(translated){
-        string = translated.name;
-      }
-
-      $scope.advanced_search_fields.push({ name: string, key : key });
-    });
-
-    $scope.advanced_search_add = function (index){
-      $scope.advanced_search_query.push( new AdvancedSearchTemplate());
-    };
-
-    $scope.advanced_search_remove = function (i) {
-      $scope.advanced_search_query.splice( i , 1 );
-    };
-
-    $scope.search = function (){
-      console.log($scope.advanced_search_query);
-      $modalInstance.close({ query:$scope.advanced_search_query});
-    };
-
-    $scope.close = function () {
-      $modalInstance.dismiss();
-    };
-
-  }]);
+// search.controller('AdvancedSearchController', [
+//   '$scope',
+//   '$modalInstance',
+//   'data',
+//   'translate',
+//   function ($scope, $modalInstance, data, translate) {
+//
+//     var AdvancedSearchTemplate = function  (){
+//       return { bool : 'AND', key : '', operator : '==', query : '' };
+//     };
+//
+//     $scope.advanced_search_query = [ new AdvancedSearchTemplate()];
+//     $scope.advanced_search_fields = [];
+//
+//     $.each(settings.search.fields, function (key, value){
+//       var translated = translate(key);
+//       var string = key;
+//
+//       if(translated){
+//         string = translated.name;
+//       }
+//
+//       $scope.advanced_search_fields.push({ name: string, key : key });
+//     });
+//
+//     $scope.advanced_search_add = function (index){
+//       $scope.advanced_search_query.push( new AdvancedSearchTemplate());
+//     };
+//
+//     $scope.advanced_search_remove = function (i) {
+//       $scope.advanced_search_query.splice( i , 1 );
+//     };
+//
+//     $scope.search = function (){
+//       console.log($scope.advanced_search_query);
+//       $modalInstance.close({ query:$scope.advanced_search_query});
+//     };
+//
+//     $scope.close = function () {
+//       $modalInstance.dismiss();
+//     };
+//
+//   }]);
 
 search.directive('backgroundImage', [directiveBackgroundImage]);
 
@@ -1165,30 +1187,30 @@ function directiveLazyImage($timeout){
   };
 }
 
-search.directive('typeaheadsearch', typeaheadDirective);
-
-function typeaheadDirective(){
-  return {
-    restrict : 'ACE',
-    scope : {
-      enabled: "&MainSearchHidden"
-    },
-
-    transclude : true,
-    // template : function (elem, attrs, sc){
-    //   console.log(elem, attrs, sc);
-    //   if(attrs.enabled === "") return "";
-    //   return "HELLO";
-    //   return '<form class="navbar-main-search navbar-form" ng-hide="(MainSearchHidden)" role="search"><div class="form-group"><input type="text" ng-focus="false" id="mainsearch" sf-typeahead options="TypeaheadOptions" datasets="TypeaheadEngineData" ng-model="MainSearch" class="form-control nav-search typeahead" placeholder="Search"></div><button type="submit" class="btn btn-default submit-search" ng-click="submitMainSearch()">Search</button><a href="#/advancedsearch.html" type="submit" class="btn btn-default a-nograyscale hidden-xs" ng-click="openAdvancedSearch()">Advanced</a></form>';
-    // },
-    link : function (scope, elem, attrs){
-      console.log(elem, scope, attrs);
-      return 'HELLO';
-    }
-    //template : ,
-  }
-
-};
+// search.directive('typeaheadsearch', typeaheadDirective);
+//
+// function typeaheadDirective(){
+//   return {
+//     restrict : 'ACE',
+//     scope : {
+//       enabled: "&MainSearchHidden"
+//     },
+//
+//     transclude : true,
+//     // template : function (elem, attrs, sc){
+//     //   console.log(elem, attrs, sc);
+//     //   if(attrs.enabled === "") return "";
+//     //   return "HELLO";
+//     //   return '<form class="navbar-main-search navbar-form" ng-hide="(MainSearchHidden)" role="search"><div class="form-group"><input type="text" ng-focus="false" id="mainsearch" sf-typeahead options="TypeaheadOptions" datasets="TypeaheadEngineData" ng-model="MainSearch" class="form-control nav-search typeahead" placeholder="Search"></div><button type="submit" class="btn btn-default submit-search" ng-click="submitMainSearch()">Search</button><a href="#/advancedsearch.html" type="submit" class="btn btn-default a-nograyscale hidden-xs" ng-click="openAdvancedSearch()">Advanced</a></form>';
+//     // },
+//     link : function (scope, elem, attrs){
+//       console.log(elem, scope, attrs);
+//       return 'HELLO';
+//     }
+//     //template : ,
+//   }
+//
+// };
 
 search.directive('randomArchiveImage', ['$http','$compile',  directiveRandomArchiveImage] );
 
@@ -1393,18 +1415,33 @@ function typeaheadDirective(suggester){
     //   onTypeaheadSubmit : '&'
     // },
     template : function (element, attrs){
-      return '<form class="navbar-form navbar-right" ng-submit="submit();" ><div class="form-group"><input type="text" ng-model="query" class="form-control" placeholder="Leita í öllum söfnum"></div><button type="submit" class="btn btn-default"><i class="fa fa-search"></i></button></form>';
+      console.log(element, attrs);
+      //return '<form class="navbar-form navbar-right" ng-submit="submit();" ><div class="form-group"><input type="text" ng-model="query" class="form-control" placeholder="Leita í öllum söfnum"></div><button type="submit" class="btn btn-default"><i class="fa fa-search"></i></button></form>';
+      return '<input type="text" ng-model="query" class="form-control" placeholder="{{placeholder}}">';
+
     },
     link : function ($scope, element, attrs, ngModel){
-      var inputBox = element.find('input');
+
+      $scope.placeholder = attrs.inputPlaceholder;
+
+
+      var form = $(element).closest('form');
       var submit = (typeof $scope['onTypeaheadSubmit'] === 'function') ? $scope['onTypeaheadSubmit'] : function (){};
 
-      $scope.submit = function (){
+
+      $(form).on('submit', function (e){
+        e.preventDefault();
+
         submit($scope.query);
-      }
+        console.log('search', $scope.query);
+        return false;
+      })
+
 
       function updateScope (object, suggestion, dataset) {
-        submit(object, suggestion, dataset);
+
+        submit($scope.query);
+        console.log(suggestion, object);
         // $scope.$apply(function () {
         //   var newViewValue = (angular.isDefined($scope.suggestionKey)) ?
         //       suggestion[$scope.suggestionKey] : suggestion;
@@ -1472,7 +1509,7 @@ function typeaheadDirective(suggester){
 
 
 
-      $(inputBox).typeahead({
+      $(element).typeahead({
         hint: true,
         highlight: false,
         minLength: 1,
@@ -1483,8 +1520,6 @@ function typeaheadDirective(suggester){
         name: 'suggester',
         source: elasticsearchSuggester()
       });
-
-      element = $(inputBox);
 
       // Update the value binding when a value is manually selected from the dropdown.
       element.bind('typeahead:selected', function(object, suggestion, dataset) {
@@ -1625,6 +1660,47 @@ function serviceImage($http){
 }
 
 search.service('imageService', ['$http', serviceImage]);
+
+
+search.service('apiSearch',[ '$http','$q', 'utils', serviceApiSearch]);
+
+function serviceApiSearch($http, $q, utils){
+  function post(url, data){
+    return $http.post(url, data);
+  };
+  function get(url){
+    return $http.get(url);
+  };
+
+  return {
+      typeahead : function (query){
+
+      },
+      filter : function (filter){
+
+      },
+
+      query : function (queryObject, options){
+        var deferred = $q.defer();
+        options = options || {};
+
+        var baseURI = [config.api,'/search/query'].join('');
+
+        queryObject.limit = queryObject.limit || 30;
+        queryObject.offset = queryObject.offset || 30;
+
+
+        var url = utils.createURI(baseURI, queryObject);
+
+        $http.get(url).success(function(data){
+          deferred.resolve(data);
+      	}).error(function(data){
+          deferred.reject(data);
+        });
+        return deferred.promise;
+      }
+    }
+  }
 
 search.service('suggester', ['$http', serviceSuggester]);
 

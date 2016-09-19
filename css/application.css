@@ -32,9 +32,7 @@
 	-webkit-transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;
 	      transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;
 }
-.navbar .tt-hint {
-  height : 32px !important;
-}
+
 .tt-menu {
 	min-width: 160px;
 	margin-top: 2px;
@@ -79,6 +77,17 @@
 span.twitter-typeahead {
 	height : 100%;
 }
+
+
+.navbar .tt-hint {
+  height : 32px !important;
+  top: inherit;
+}
+
+.navbar .twitter-typeahead {
+  top: -5px;
+}
+
 
 .a-nograyscale {
 	transition: none;
@@ -353,4 +362,8 @@ span.twitter-typeahead {
 
 .intro-back-fixed {
 	position : fixed !important;
+}
+
+section.container{
+  color : #fff;
 }

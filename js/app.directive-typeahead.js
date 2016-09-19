@@ -9,18 +9,33 @@ function typeaheadDirective(suggester){
     //   onTypeaheadSubmit : '&'
     // },
     template : function (element, attrs){
-      return '<form class="navbar-form navbar-right" ng-submit="submit();" ><div class="form-group"><input type="text" ng-model="query" class="form-control" placeholder="Leita í öllum söfnum"></div><button type="submit" class="btn btn-default"><i class="fa fa-search"></i></button></form>';
+      console.log(element, attrs);
+      //return '<form class="navbar-form navbar-right" ng-submit="submit();" ><div class="form-group"><input type="text" ng-model="query" class="form-control" placeholder="Leita í öllum söfnum"></div><button type="submit" class="btn btn-default"><i class="fa fa-search"></i></button></form>';
+      return '<input type="text" ng-model="query" class="form-control" placeholder="{{placeholder}}">';
+
     },
     link : function ($scope, element, attrs, ngModel){
-      var inputBox = element.find('input');
+
+      $scope.placeholder = attrs.inputPlaceholder;
+
+
+      var form = $(element).closest('form');
       var submit = (typeof $scope['onTypeaheadSubmit'] === 'function') ? $scope['onTypeaheadSubmit'] : function (){};
 
-      $scope.submit = function (){
+
+      $(form).on('submit', function (e){
+        e.preventDefault();
+
         submit($scope.query);
-      }
+        console.log('search', $scope.query);
+        return false;
+      })
+
 
       function updateScope (object, suggestion, dataset) {
-        submit(object, suggestion, dataset);
+
+        submit($scope.query);
+        console.log(suggestion, object);
         // $scope.$apply(function () {
         //   var newViewValue = (angular.isDefined($scope.suggestionKey)) ?
         //       suggestion[$scope.suggestionKey] : suggestion;
@@ -88,7 +103,7 @@ function typeaheadDirective(suggester){
 
 
 
-      $(inputBox).typeahead({
+      $(element).typeahead({
         hint: true,
         highlight: false,
         minLength: 1,
@@ -99,8 +114,6 @@ function typeaheadDirective(suggester){
         name: 'suggester',
         source: elasticsearchSuggester()
       });
-
-      element = $(inputBox);
 
       // Update the value binding when a value is manually selected from the dropdown.
       element.bind('typeahead:selected', function(object, suggestion, dataset) {
