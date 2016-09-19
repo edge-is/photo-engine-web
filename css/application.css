@@ -32,6 +32,9 @@
 	-webkit-transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;
 	      transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;
 }
+.navbar .tt-hint {
+  height : 32px !important;
+}
 .tt-menu {
 	min-width: 160px;
 	margin-top: 2px;
@@ -168,9 +171,9 @@ span.twitter-typeahead {
 /*.lazy-img img {
 	height: 600px;
 }*/
-.intro-back {
+/*.intro-back {
 	position : fixed;
-}
+}*/
 .nav-lowercase {
 	text-transform: none;
 }
@@ -226,7 +229,7 @@ span.twitter-typeahead {
 	}
 
   @media (min-width: 1200px) {
-		.navbar-main-search { width: 1070px; }
+		.navbar-main-search { width: 800px; }
 		.nav-search { width: 600px !important; }
 		.gallery .thumbnail img {
 			max-height: 236px;
@@ -329,17 +332,25 @@ span.twitter-typeahead {
 
 
 .intro-logo {
-  color: white;
+  color: #fff;
   text-align: center;
-  margin: auto;
-  position: absolute;
-  top: -170%;
-  left: 50%;
-  -webkit-transform: translate(-50%, -50%);
-  -ms-transform: translate(-50%, -50%);
-  transform: translate(-50%, -50%);
+  /* margin: auto; */
+  position: relative;
 }
 
 .intro-logo img{
   width:500px;
+}
+.intro-body .container{
+  margin-top: 260px;
+}
+
+.navbar-custom .navbar-toggle {
+  color: #fff;
+  background-color: rgba(255,255,255,.2);
+  font-size: 12px;
+}
+
+.intro-back-fixed {
+	position : fixed !important;
 }

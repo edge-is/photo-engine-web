@@ -14,11 +14,11 @@ search.config([
       requireBase: false
     });
   $routeProvider
-    .when('/', {
-      controller : 'main',
-      reloadOnSearch: false,
-      templateUrl : 'views/main.html'
-    })
+    // .when('/', {
+    //   controller : 'main',
+    //   reloadOnSearch: false,
+    //   templateUrl : 'views/main.html'
+    // })
     .when('/archives', {
       controller : 'archives',
       reloadOnSearch: false,

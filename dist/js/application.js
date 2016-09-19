@@ -173,11 +173,11 @@ search.config([
       requireBase: false
     });
   $routeProvider
-    .when('/', {
-      controller : 'main',
-      reloadOnSearch: false,
-      templateUrl : 'views/main.html'
-    })
+    // .when('/', {
+    //   controller : 'main',
+    //   reloadOnSearch: false,
+    //   templateUrl : 'views/main.html'
+    // })
     .when('/archives', {
       controller : 'archives',
       reloadOnSearch: false,
@@ -702,6 +702,17 @@ search.controller('imageLinked', [
 
 }]);
 
+
+search.controller('index', ['$scope','$window', indexController]);
+
+function indexController($scope, $window){
+
+  $scope.onTypeaheadSubmit = function submitOnSearch(query){
+    $window.location = '/search.html#?query=' + query;
+  };
+
+}
+
 search.controller('main',
 [
   '$scope',
@@ -926,6 +937,82 @@ search.controller('main',
       };
   }
 ]);
+
+
+search.controller('mainSearch', ['$scope','_search', '$location', mainSearchController]);
+
+function mainSearchController($scope, _search, $location ){
+  $scope.DefaultImage = "x-small";
+  console.log('Index controller');
+  $scope.searchResultsTotal = false;
+  $scope.mainSearchHits =  [];
+  $scope.mainSearchSize = 0;
+
+  $scope.scrollDisabled = true;
+
+  $scope.mainSearchOptions = {
+    limit : 30,
+    offset : 0
+  };
+
+
+
+
+
+  $scope.onTypeaheadSubmit = function submitOnSearch(query){
+    $scope.search(query);
+  };
+
+  $scope.search = function (query, filter){
+    _search.query(query, $scope.mainSearchOptions).then( function (response){
+      $scope.displayResultCount = true;
+      $scope.searchTime = response.data._took;
+      $scope.searchResultsTotal = response.data._total;
+      $scope.mainSearchHits = response.data.hits;
+      $scope.mainSearchSize = response.data.hits.length;
+      $scope.submittedQuery = query;
+
+      $scope.scrollDisabled = false;
+    });
+  }
+
+  $scope.load_more_data = function (callback){
+    console.log('Load more....');
+    if ($scope.mainSearchSize < 1){
+      return;
+    }
+    var options = {
+      limit : $scope.mainSearchOptions.limit,
+      offset : $scope.mainSearchSize
+    };
+    _search.query($scope.submittedQuery, options).then( function (response){
+      if (!response) return;
+
+      if (response.data.hits.length < 1){
+        return;
+      }
+      $scope.searchTime = response.data._took;
+      $scope.searchResultsTotal = response.data._total;
+
+      // $scope.mainSearchHits.concat(response.data.hits);
+      response.data.hits.forEach(function (item){
+        $scope.mainSearchHits.push(item);
+      });
+      $scope.mainSearchSize += response.data.hits.length;
+      callback();
+    });
+  };
+
+
+  $scope.uriQuery = $location.search().query || false;
+  $scope.uriFilter= $location.search().filter || false;
+  console.log($scope, $location.search());
+  if ($scope.uriQuery || $scope.uriFilter){
+    $scope.search($scope.uriQuery, $scope.uriFilter);
+  }
+
+
+}
 
 search.controller('AdvancedSearchController', [
   '$scope',
@@ -1162,7 +1249,7 @@ function directiveTypeaheadSuggest(suggester){
       if (typeof $scope[attrs.submit] === 'function'){
         submit = $scope[attrs.submit];
       }
-
+      console.log(ngModel);
 
       function orderByScore(a,b){
         if (a.score < b.score){
@@ -1293,6 +1380,157 @@ function directiveTypeaheadSuggest(suggester){
 
     }
   }
+}
+
+
+search.directive('typeaheadSearch', ['suggester', typeaheadDirective]);
+
+function typeaheadDirective(suggester){
+  return {
+    restrict : 'ACE',
+    replace : true,
+    // scope : {
+    //   onTypeaheadSubmit : '&'
+    // },
+    template : function (element, attrs){
+      return '<form class="navbar-form navbar-right" ng-submit="submit();" ><div class="form-group"><input type="text" ng-model="query" class="form-control" placeholder="Leita í öllum söfnum"></div><button type="submit" class="btn btn-default"><i class="fa fa-search"></i></button></form>';
+    },
+    link : function ($scope, element, attrs, ngModel){
+      var inputBox = element.find('input');
+      var submit = (typeof $scope['onTypeaheadSubmit'] === 'function') ? $scope['onTypeaheadSubmit'] : function (){};
+
+      $scope.submit = function (){
+        submit($scope.query);
+      }
+
+      function updateScope (object, suggestion, dataset) {
+        submit(object, suggestion, dataset);
+        // $scope.$apply(function () {
+        //   var newViewValue = (angular.isDefined($scope.suggestionKey)) ?
+        //       suggestion[$scope.suggestionKey] : suggestion;
+        //   ngModel.$setViewValue(newViewValue);
+        // });
+      }
+
+      function parseHits (hits){
+
+        var suggestions = [];
+
+        for (var key in hits.suggest){
+          var value = hits.suggest[key];
+          if (value.length === 0) continue;
+          value[0].options.forEach(function (item){
+            suggestions.push(item);
+          });
+        }
+
+        var results = suggestions.sort(orderByScore).reverse();
+
+        var array = results.map(function (item){
+          return item.text;
+        });
+
+
+        return array;
+      }
+
+      function orderByScore(a,b){
+        if (a.score < b.score){
+          return -1;
+        }
+        if (a.score > b.score){
+          return 1;
+        }
+        return 0;
+      }
+
+      function joinHits(pre, hits){
+        var prevString = pre.join(' ');
+        return hits.map(function (hit){
+          return [prevString, hit].join(' ');
+        });
+
+      }
+      function elasticsearchSuggester(){
+        return function (query, syncCallback, asyncCallback){
+          var parts = query.split(' ');
+          var last = parts.pop();
+
+          suggester(last).then(function(response){
+            var hits = parseHits(response.data.data);
+
+            hits = joinHits(parts, hits);
+
+            asyncCallback(hits);
+          }, function (){
+            asyncCallback([]);
+          });
+
+        };
+      }
+
+
+
+
+      $(inputBox).typeahead({
+        hint: true,
+        highlight: false,
+        minLength: 1,
+        async : true,
+      },
+      {
+        async : true,
+        name: 'suggester',
+        source: elasticsearchSuggester()
+      });
+
+      element = $(inputBox);
+
+      // Update the value binding when a value is manually selected from the dropdown.
+      element.bind('typeahead:selected', function(object, suggestion, dataset) {
+
+        updateScope(object, suggestion, dataset);
+        $scope.$emit('typeahead:selected', suggestion, dataset);
+      });
+
+      // Update the value binding when a query is autocompleted.
+      element.bind('typeahead:autocompleted', function(object, suggestion, dataset) {
+        updateScope(object, suggestion, dataset);
+        $scope.$emit('typeahead:autocompleted', suggestion, dataset);
+      });
+
+      // Propagate the opened event
+      element.bind('typeahead:opened', function() {
+        $scope.$emit('typeahead:opened');
+      });
+
+      // Propagate the closed event
+      element.bind('typeahead:closed', function() {
+        $scope.$emit('typeahead:closed');
+      });
+
+      // Propagate the asyncrequest event
+      element.bind('typeahead:asyncrequest', function() {
+        $scope.$emit('typeahead:asyncrequest');
+      });
+
+      // Propagate the asynccancel event
+      element.bind('typeahead:asynccancel', function() {
+        $scope.$emit('typeahead:asynccancel');
+      });
+
+      // Propagate the asyncreceive event
+      element.bind('typeahead:asyncreceive', function() {
+        $scope.$emit('typeahead:asyncreceive');
+      });
+
+      // Propagate the cursorchanged event
+      element.bind('typeahead:cursorchanged', function(event, suggestion, dataset) {
+        $scope.$emit('typeahead:cursorchanged', event, suggestion, dataset);
+      });
+    }
+  }
+
 }
 
 

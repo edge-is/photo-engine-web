@@ -17,7 +17,7 @@ function directiveTypeaheadSuggest(suggester){
       if (typeof $scope[attrs.submit] === 'function'){
         submit = $scope[attrs.submit];
       }
-
+      console.log(ngModel);
 
       function orderByScore(a,b){
         if (a.score < b.score){

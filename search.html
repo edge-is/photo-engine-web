@@ -20,8 +20,6 @@
     <!-- Custom CSS -->
     <link href="dist/css/grayscale.min.css" rel="stylesheet">
 
-
-
     <!-- Custom CSS -->
     <link href="dist/css/sidebar.min.css" rel="stylesheet">
 
@@ -30,7 +28,6 @@
     <link href="lib/css/select.min.css" rel="stylesheet">
 
     <link rel="stylesheet" href="dist/css/application.min.css" media="screen" title="no title" charset="utf-8">
-
 
     <!-- Custom Fonts -->
     <link href="lib/css/font-awesome.min.css" rel="stylesheet" type="text/css">
@@ -49,25 +46,11 @@
 
 </head>
 
-<body id="page-top" data-spy="scroll" data-target=".navbar-fixed-top" ng-controller="index">
+<body id="page-top" data-spy="scroll" data-target=".navbar-fixed-top" ng-controller="mainSearch">
 
   <nav class="navbar navbar-custom navbar-fixed-top top-nav-collapse" role="navigation">
       <div class="container-fluid">
           <div class="navbar-header">
-            <!-- <form class="navbar-main-search navbar-form" ng-cloak ng-hide="(MainSearchHidden)" role="search">
-              <div class="form-group">
-                <input type="text"
-                  ng-focus="false"
-                  id="mainsearch"
-
-                  options="TypeaheadOptions"
-                  datasets="TypeaheadEngineData"
-                  ng-model="MainSearch"
-                  class="form-control nav-search typeahead" placeholder="Search">
-              </div>
-              <button type="submit" class="btn btn-default submit-search" ng-click="submitMainSearch()">Search</button>
-
-            </form> -->
             <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-main-collapse">
                 Menu <i class="fa fa-bars"></i>
             </button>
@@ -81,7 +64,7 @@
 
             <ul class="nav navbar-nav navbar-right">
               <li>
-                <a class="page-scroll" href="#/archives">Myndasöfn</a>
+                <a class="page-scroll" href="archives.html">Myndasöfn</a>
               </li>
             </ul>
 
@@ -89,65 +72,22 @@
       </div>
       <!-- /.container -->
   </nav>
-  <header class="intro intro-back" ng-class="(StartSearchHidden) ? 'intro-back-fixed' : ''">
-    <div class="intro-body" ng-hide="(StartSearchHidden)">
-      <div class="container">
-        <div class="row">
-          <div class="col-md-8 col-md-offset-2">
-
-            <!-- <h3 class="brand-heading">Metadata search</h3> -->
-            <!-- <div class="input-group-lg">
-              <input id="startsearch" ng-model="StartSearch" type="text" class="form-control" placeholder="Leit í öllum myndasöfnum" aria-describedby="sizing-addon1">
-            </div> -->
-            <!-- <p class="intro-text">Myndasafn Héraðsskjalasafns Árnesinga</p> -->
-            <!-- <div class="intro-logo">
-              <img src="img/logo-large.png" alt="" />
-            </div> -->
-            <!-- <a href="#about" class="btn btn-circle page-scroll">
-                <i class="fa fa-angle-double-down animated"></i>
-            </a> -->
-          </div>
-          <div class="col-md-8 col-md-offset-2">
-            <div class="intro-logo">
-              <img src="img/logo-large.png" alt="" />
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </header>
-
-   <div id="wrapper" class="toggled" >
-
-         <div id="page-content-wrapper">
-             <div class="container-fluid">
-               <div class="search-result-content container-fluid" ng-show="(StartSearchHidden)">
-                 <div class="row">
-                   <div  ng-repeat="(index, image) in mainSearchHits">
-                     <div class="col-lg-3 col-md-3 col-sm-4">
-                       <a href="#/image/{{image._id}}" class="thumbnail"  ng-click="openImage(index, image, mainSearchHits)"  uib-tooltip="{{image._source.Description}}">
-                       <div class="background-thumbnail" background-image="{{image._source.cdn1[DefaultImage]}}"></div>
-                       </a>
-                     </div>
-                   </div>
-                 </div>
+   <div id="page-content-wrapper">
+       <div class="container-fluid">
+         <div class="search-result-content container-fluid">
+           <div class="row">
+             <div  ng-repeat="(index, image) in mainSearchHits">
+               <div class="col-lg-3 col-md-3 col-sm-4">
+                 <a href="#/image/{{image._id}}" class="thumbnail"  ng-click="openImage(index, image, mainSearchHits)"  uib-tooltip="{{image._source.Description}}">
+                 <div class="background-thumbnail" background-image="{{image._source.cdn1[DefaultImage]}}"></div>
+                 </a>
                </div>
-               <div angular-scroll="load_more_data" disabled="{{scrollDisabled}}" px="1000" ></div>
              </div>
+           </div>
          </div>
-         <!-- /#page-content-wrapper -->
-     </div>
-     <section id="about" class="container content-section text-center" ng-hide="StartSearchHidden">
-         <div class="row">
-             <div class="col-lg-8 col-lg-offset-2">
-               <div >
-
-               </div>
-                 <h2>Um myndasetur.is</h2>
-                 <p>...</p>
-             </div>
-         </div>
-     </section>
+         <div angular-scroll="load_more_data" disabled="{{scrollDisabled}}" px="1000" ></div>
+       </div>
+   </div>
 
 
 

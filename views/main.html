@@ -1,16 +1,7 @@
-<!-- Navigation -->
+<!-- Navigation -
 <nav class="navbar navbar-custom navbar-fixed-top" role="navigation" ng-class="(MainSearchHidden) ? '' : 'top-nav-collapse'">
     <div class="container-fluid">
         <div class="navbar-header">
-            <!-- <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-main-collapse">
-                <i class="fa fa-bars"></i>
-            </button> -->
-            <a class="navbar-brand page-scroll hidden-xs navbar-img-logo" href="/#/">
-              <img src="img/nav-logo.png" alt="" />
-            </a>
-            <a class="navbar-brand page-scroll hidden-xs" href="#/archives">
-                Myndasöfn
-            </a>
             <form class="navbar-main-search navbar-form" ng-cloak ng-hide="(MainSearchHidden)" role="search">
               <div class="form-group">
                 <input type="text"
@@ -23,79 +14,91 @@
                   class="form-control nav-search typeahead" placeholder="Search">
               </div>
               <button type="submit" class="btn btn-default submit-search" ng-click="submitMainSearch()">Search</button>
-              <!-- <a href="#/advancedsearch.html" type="submit" class="btn btn-default a-nograyscale hidden-xs" ng-click="openAdvancedSearch()">Advanced</a> -->
               <button href="" type="submit" class="btn btn-default a-nograyscale hidden-xs" ng-click="showSidebar=!showSidebar">Advanced</button>
 
             </form>
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-main-collapse">
+                Menu <i class="fa fa-bars"></i>
+            </button>
         </div>
 
-        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-          <ul class="nav navbar-nav navbar-right nav-lowercase" ng-hide="MainSearchHidden">
-            <li><a href="#" class="hidden-sm" ng-show="displayResultCount"><small> Found {{searchResultsTotal}} ({{searchTime | ms}})</small></a></li>
+        <div class="collapse navbar-collapse navbar-main-collapse" id="collapse">
+          <ul class="nav navbar-nav navbar-right">
+            <li>
+              <a class="page-scroll" href="#/archives">Myndasöfn</a>
+            </li>
           </ul>
-        </div><!-- /.navbar-collapse -->
 
+        </div><!-- /.navbar-collapse --
+
+        <!-- Collect the nav links, forms, and other content for toggling --
+        <!-- /.navbar-collapse --
+    </div>
+    <!-- /.container --
+</nav>-->
+
+<nav class="navbar navbar-custom navbar-fixed-top top-nav-collapse" role="navigation">
+    <div class="container-fluid">
+        <div class="navbar-header">
+
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-main-collapse">
+              Menu <i class="fa fa-bars"></i>
+          </button>
+        </div>
         <!-- Collect the nav links, forms, and other content for toggling -->
         <!-- /.navbar-collapse -->
+
+
+        <div class="collapse navbar-collapse navbar-main-collapse" id="collapse">
+
+          <ul class="nav navbar-nav navbar-right">
+            <li>
+              <a class="page-scroll" href="#/archives">Myndasöfn</a>
+            </li>
+          </ul>
+
+        </div>
+
+
+
     </div>
     <!-- /.container -->
 </nav>
 
 
 
+
 <!-- Intro Header -->
-<header class="intro intro-back">
+<header class="intro intro-back" ng-class="(StartSearchHidden) ? 'intro-back-fixed' : ''">
   <div class="intro-body" ng-hide="(StartSearchHidden)">
     <div class="container">
       <div class="row">
         <div class="col-md-8 col-md-offset-2">
-          <div class="intro-logo">
-            <img src="img/logo-large.png" alt="" />
-          </div>
+
           <!-- <h3 class="brand-heading">Metadata search</h3> -->
           <div class="input-group-lg">
             <input id="startsearch" ng-model="StartSearch" type="text" class="form-control" placeholder="Leit í öllum myndasöfnum" aria-describedby="sizing-addon1">
           </div>
-          <p class="intro-text">Myndasafn Héraðsskjalasafns Árnesinga</p>
+          <!-- <p class="intro-text">Myndasafn Héraðsskjalasafns Árnesinga</p> -->
+          <!-- <div class="intro-logo">
+            <img src="img/logo-large.png" alt="" />
+          </div> -->
           <!-- <a href="#about" class="btn btn-circle page-scroll">
               <i class="fa fa-angle-double-down animated"></i>
           </a> -->
+        </div>
+        <div class="col-md-8 col-md-offset-2">
+          <div class="intro-logo">
+            <img src="img/logo-large.png" alt="" />
+          </div>
         </div>
       </div>
     </div>
   </div>
 </header>
 
+ <div id="wrapper" class="toggled" >
 
-
-<div id="wrapper" class="toggled" ng-class="(showSidebar) ? '' : 'toggled'">
-
-       <!-- Sidebar -->
-       <div id="sidebar-wrapper">
-         <ul class="sidebar-nav">
-             <li class="sidebar-brand">
-                 <h4>
-                     Ljósmyndarar
-                 </h4>
-             </li>
-          </ul>
-           <filter-list filter-key="Credit.raw" dataset="photographers" api="{{photographersapi}}" query="queryString" filter="filterString" result-type="raw"></filter-list>
-           <ul class="sidebar-nav">
-             <li class="sidebar-brand">
-                 <h4>
-                     Lykilorð
-                 </h4>
-             </li>
-           </ul>
-           <filter-list filter-key="Keywords" dataset="keywords" api="{{keywordsApi}}" query="queryString" filter="filterString" ></filter-list>
-
-           <!-- <li ng-repeat="photographer in photographers">
-             <a href ng-click="addToFilter('Credit.raw', photographer.name)"><input type="checkbox"> {{photographer.name}} <span class="pull-right">{{photographer.count}}</span></a>
-           </li> -->
-       </div>
-       <!-- /#sidebar-wrapper -->
-
-       <!-- Page Content -->
        <div id="page-content-wrapper">
            <div class="container-fluid">
              <div class="search-result-content container-fluid" ng-show="(StartSearchHidden)">
@@ -114,3 +117,14 @@
        </div>
        <!-- /#page-content-wrapper -->
    </div>
+   <section id="about" class="container content-section text-center" ng-hide="StartSearchHidden">
+       <div class="row">
+           <div class="col-lg-8 col-lg-offset-2">
+             <div >
+
+             </div>
+               <h2>Um myndasetur.is</h2>
+               <p>...</p>
+           </div>
+       </div>
+   </section>
