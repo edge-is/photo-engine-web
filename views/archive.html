@@ -1,102 +1,50 @@
-<!-- Navigation -->
-
-
-<!--FIXME: Move me to a special controller-->
-<nav class="navbar navbar-custom navbar-fixed-top top-nav-collapse" role="navigation">
-    <div class="container-fluid">
-        <div class="navbar-header">
-            <div class="pull-left">
-            <button type="button" class="toggle-sidebar" ng-click="showSidebar = !showSidebar">
-                <i class="fa fa-bars"></i>
-            </button>
-
-            </div>
-
-            <a class="navbar-brand page-scroll  hidden-sm hidden-xs navbar-img-logo" href="/#/">
-                <img src="img/nav-logo.png" alt="" />
-            </a>
-            <form class="navbar-main-search navbar-form" role="search" ng-submit="submitNavSearch()">
-              <div class="form-group">
-                <div class="input-group">
-                  <div class="input-group-addon hidden-sm hidden-xs">
-                    <button class="btn btn-xs" ng-click="convertToGlobal();"><i class="fa fa-times"></i></button>
-                    Þessu safni
-                  </div>
-
-                  <typeahead-suggest class="form-control nav-search typeahead" ng-model="navSearch" submit="submitNavSearch"></typeahead-suggest>
-                  <!-- <input type="text"
-                    ng-focus="false"
-                    id="mainsearch"
-                    ng-model="navSearch"
-                    class="form-control nav-search typeahead" placeholder="Leit"> -->
-                </div>
-
-              </div>
-              <button type="submit" class="btn btn-default submit-search" ng-click="submitNavSearch()"><i class="fa fa-search"></i></button>
-            </form>
-        </div>
-
-        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-          <ul class="nav navbar-nav navbar-right nav-lowercase hidden-sm hidden-xs">
-            <li><a href="#" ng-show="displayResultCount"><small> Found {{availableImagesCount}} ({{searchTime | ms}})</small></a></li>
-          </ul>
-        </div><!-- /.navbar-collapse -->
-
-        <!-- Collect the nav links, forms, and other content for toggling -->
-        <!-- /.navbar-collapse -->
-    </div>
-    <!-- /.container -->
-</nav>
-
 
 <div id="wrapper"   ng-class="(showSidebar) ? '' : 'toggled'">
+     <!-- Sidebar -->
+     <div id="sidebar-wrapper">
+       <ul class="sidebar-nav">
+         <li class="sidebar-brand">
+           <p>
+              Ljósmyndarar
+           </p>
+         </li>
 
-       <!-- Sidebar -->
-       <div id="sidebar-wrapper">
-           <ul class="sidebar-nav">
-               <li class="sidebar-brand">
-                   <p>
-                       Ljósmyndarar
-                   </p>
-               </li>
+         <filter-list type="" filter-key="Credit.raw" dataset="photographers" api="{{photographersapi}}" query="queryString" filter="filterString"></filter-list>
+         <!-- <li ng-repeat="photographer in photographers">
+           <a href ng-click="addToFilter('Credit.raw', photographer.name)"><input type="checkbox"> {{photographer.name}} <span class="pull-right">{{photographer.count}}</span></a>
+         </li> -->
+       </ul>
+     </div>
+     <!-- /#sidebar-wrapper -->
 
-               <filter-list type="" filter-key="Credit.raw" dataset="photographers" api="{{photographersapi}}" query="queryString" filter="filterString"></filter-list>
-               <!-- <li ng-repeat="photographer in photographers">
-                 <a href ng-click="addToFilter('Credit.raw', photographer.name)"><input type="checkbox"> {{photographer.name}} <span class="pull-right">{{photographer.count}}</span></a>
-               </li> -->
-           </ul>
-       </div>
-       <!-- /#sidebar-wrapper -->
+     <!-- Page Content -->
+     <div id="page-content-wrapper">
+        <div class="container-fluid">
+          <div class="row">
+            <div class="col-lg-10">
 
-       <!-- Page Content -->
-       <div id="page-content-wrapper">
-          <div class="container-fluid">
-            <div class="row">
-              <div class="col-lg-10">
-
-                <h3><a href="#/">Forsíða</a>/<a href="#/archives">Söfn</a>/<a href>{{archive}} </a></h3>
-              </div>
-
+              <h3><a href="#/">Forsíða</a>/<a href="#/archives">Söfn</a>/<a href>{{archive}} </a></h3>
             </div>
+
           </div>
+        </div>
 
+         <div class="container-fluid">
            <div class="container-fluid">
-             <div class="container-fluid">
-               <div class="row">
-                 <div  ng-repeat="(index, image) in archiveImages">
-                   <div class="col-lg-3 col-md-3 col-sm-4">
-                     <!-- <a href="#/image/{{image._id}}?root={{root}}&index={{index}}" ng-click="setImagesInCache(index, image)" class="thumbnail" tooltip-placement="bottom" uib-tooltip="{{image._source.Description}}"> -->
-                     <a ng-click="openModal(index, image)" class="thumbnail" tooltip-placement="bottom" uib-tooltip="{{image._source.Description}}">
+             <div class="row">
+               <div  ng-repeat="(index, image) in archiveImages">
+                 <div class="col-lg-3 col-md-3 col-sm-4">
+                   <!-- <a href="#/image/{{image._id}}?root={{root}}&index={{index}}" ng-click="setImagesInCache(index, image)" class="thumbnail" tooltip-placement="bottom" uib-tooltip="{{image._source.Description}}"> -->
+                   <a ng-click="openModal(index, image)" class="thumbnail" tooltip-placement="bottom" uib-tooltip="{{image._source.Description}}">
 
-                     <div class="background-thumbnail" background-image="{{image._source.cdn1[DefaultImage]}}"></div>
-                     </a>
-                   </div>
+                   <div class="background-thumbnail" background-image="{{image._source.cdn1[DefaultImage]}}"></div>
+                   </a>
                  </div>
                </div>
              </div>
-             <div angular-scroll="load_more_data" disabled="{{scrollDisabled}}" px="1000" ></div>
            </div>
-       </div>
-       <!-- /#page-content-wrapper -->
-
-   </div>
+           <div angular-scroll="load_more_data" disabled="{{scrollDisabled}}" px="1000" ></div>
+         </div>
+     </div>
+     <!-- /#page-content-wrapper -->
+ </div>

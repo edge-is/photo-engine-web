@@ -48,54 +48,34 @@
 
 <body id="page-top" data-spy="scroll" data-target=".navbar-fixed-top" ng-controller="mainSearch">
 
-  <nav class="navbar navbar-custom navbar-fixed-top top-nav-collapse" role="navigation">
-      <div class="container-fluid">
-          <div class="navbar-header">
-            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-main-collapse">
-                Menu <i class="fa fa-bars"></i>
-            </button>
-          </div>
-          <!-- Collect the nav links, forms, and other content for toggling -->
-          <!-- /.navbar-collapse -->
+  <div ng-include="'views/templates/navbar.html'">
 
+  </div>
+  <div id="wrapper"   ng-class="(showSidebar) ? '' : 'toggled'">
+     <!-- Sidebar -->
+     <!-- <div ng-include="'views/templates/sidebar.html'"></div> -->
+     <div id="sidebar-wrapper">
+       <ul class="sidebar-nav">
+           <li class="sidebar-brand">
+               <p>
+                   Ljósmyndarar
+               </p>
+           </li>
 
-          <div class="collapse navbar-collapse navbar-main-collapse" id="collapse">
+           <filter-list type="" filter-key="Credit.raw" dataset="photographers" api="{{photographersapi}}" query="query" query-object="queryObject"></filter-list>
+           <!-- <li ng-repeat="photographer in photographers">
+             <a href ng-click="addToFilter('Credit.raw', photographer.name)"><input type="checkbox"> {{photographer.name}} <span class="pull-right">{{photographer.count}}</span></a>
+           </li> -->
+       </ul>
+     </div>
 
-            <form class="navbar-form navbar-right">
-              <div class="form-group">
-                <typeahead-search filter="false" on-typeahead-submit="onTypeaheadSubmit" input-placeholder="Leita í öllum söfnum"></typeahead-search>
-                <button type="submit" class="btn btn-default"><i class="fa fa-search"></i></button>
-
-              </div>
-            </form>'
-
-
-            <ul class="nav navbar-nav navbar-right">
-              <li>
-                <a class="page-scroll" href="archives.html">Myndasöfn</a>
-              </li>
-            </ul>
-
-          </div>
-      </div>
-      <!-- /.container -->
-  </nav>
+         <!-- /#sidebar-wrapper -->
    <div id="page-content-wrapper">
-       <div class="container-fluid">
-         <div class="search-result-content container-fluid">
-           <div class="row">
-             <div ng-repeat="(index, image) in mainSearchHits track by $index">
-               <div class="col-lg-3 col-md-3 col-sm-4">
-                 <a href="#/image/{{image._id}}" class="thumbnail"  ng-click="openImage(index, image, mainSearchHits)"  uib-tooltip="{{image._source.Description}}">
-                 <div class="background-thumbnail" background-image="{{image._source.cdn1[DefaultImage]}}"></div>
-                 </a>
-               </div>
-             </div>
-           </div>
-         </div>
-         <div angular-scroll="load_more_data" disabled="{{scrollDisabled}}" px="1000" ></div>
-       </div>
-   </div>
+     <div ng-include="'views/templates/images.html'">
+
+     </div>
+  </div>
+ </div>
 
 
 

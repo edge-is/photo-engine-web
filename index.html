@@ -63,11 +63,16 @@
 
 
           <div class="collapse navbar-collapse navbar-main-collapse" id="collapse">
-            <typeahead-search filter="false" on-typeahead-submit="onTypeaheadSubmit"></typeahead-search>
+            <form class="navbar-form navbar-right">
+              <div class="form-group">
+                <typeahead-search filter="false" on-typeahead-submit="onTypeaheadSubmit" input-placeholder="Leita í öllum söfnum"></typeahead-search>
+                <button type="submit" class="btn btn-default"><i class="fa fa-search"></i></button>
+              </div>
+            </form>'
 
             <ul class="nav navbar-nav navbar-right">
               <li>
-                <a class="page-scroll" href="/archives.html">Myndasöfn</a>
+                <a class="page-scroll" href="/archives.html" target="_self">Myndasöfn</a>
               </li>
             </ul>
 
@@ -109,7 +114,7 @@
              <div class="container-fluid">
                <div class="search-result-content container-fluid" ng-show="(StartSearchHidden)">
                  <div class="row">
-                   <div  ng-repeat="(index, image) in mainSearchHits">
+                   <div ng-repeat="(index, image) in mainSearchHits">
                      <div class="col-lg-3 col-md-3 col-sm-4">
                        <a href="#/image/{{image._id}}" class="thumbnail"  ng-click="openImage(index, image, mainSearchHits)"  uib-tooltip="{{image._source.Description}}">
                        <div class="background-thumbnail" background-image="{{image._source.cdn1[DefaultImage]}}"></div>

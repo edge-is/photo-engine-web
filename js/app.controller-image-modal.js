@@ -5,17 +5,20 @@ search.controller('imageModalController', [
   '$location',
   '$modalInstance',
   'data',
-  'map',
   'hotkeys',
   '$rootScope',
-  function ($scope, $location, $modalInstance, data, map, hotkeys, $rootScope) {
+  'osm',
+  function ($scope, $location, $modalInstance, data, hotkeys, $rootScope, osm) {
+    setTimeout(function (){
+      $rootScope.modalOpen = true;
+    }, 300);
     $scope.index = data.index;
     $scope.images = data.results
     $scope.image = data.image;
     $scope.isFullscreen = false;
     $scope.fullscreenClass="no-fullscreen";
-    $scope.root = data.root;
 
+    $scope.lastURI = data.lastURI;
     $scope.currentLocation = $location.$$url;
     $scope.close = function () {
       $modalInstance.close();
@@ -24,6 +27,12 @@ search.controller('imageModalController', [
     $scope.dismiss = function () {
       $modalInstance.dismiss();
     };
+
+    $rootScope.$on('historyBack', function (event, back){
+      console.log('Hey!, back?', event, back, $scope.index);
+
+      //$scope.prev();
+    });
 
     $scope.nextImg = $scope.images[$scope.index + 1];
     $scope.prevImg = $scope.images[$scope.index - 1];
@@ -34,6 +43,9 @@ search.controller('imageModalController', [
         $scope.index = $scope.index + 1;
         $scope.image = $scope.images[$scope.index];
         $scope.nextImg = $scope.images[$scope.index];
+        $scope.prevImg = $scope.images[$scope.index - 1];
+
+        $location.url('image.html?image=' + $scope.image._id );
       }
     };
 
@@ -43,18 +55,21 @@ search.controller('imageModalController', [
         $scope.index = $scope.index - 1;
         $scope.image = $scope.images[$scope.index];
         $scope.prevImg = $scope.images[$scope.index];
+        $location.url('image.html?image=' + $scope.image._id );
       }
     };
 
+
+
     $scope.nextURL = function (){
       if( $scope.nextImg ){
-        return '#/image/' + $scope.nextImg._id;
+        return '/image.html?image=' + $scope.nextImg._id;
       }
     };
 
     $scope.prevURL = function (){
       if($scope.prevImg){
-        return '#/image/' + $scope.prevImg._id;
+        return '/image.html?image=' + $scope.prevImg._id;
       }
     };
 
@@ -146,24 +161,9 @@ search.controller('imageModalController', [
 
     $scope.Map = function (){
       $scope.MapLoaded = false;
-      var osmParams = {};
-      var SearchOSM=false;
-      if ('City' in $scope.image._source){
-        SearchOSM=true;
-        osmParams.city = $scope.image._source.City;
-      }else if('State' in $scope.image._source){
-        SearchOSM=true;
-        osmParams.state = $scope.image._source.State;
-      }
-      if('Country' in $scope.image._source){
-        if($scope.image._source.Country.split(' ').length <= 2){
-          osmParams.Country = $scope.image._source.Country;
-        }
-      }
-
-      /** FIXME: Move to special controller **/
-      if(SearchOSM == true){
-        map.osm(osmParams).then(function (d){
+      osm.search($scope.image._source, function (d){
+        console.log(d);
+        // map.osm(osmParams).then(function (d){
           if(d.length > 0){
             $scope.MapLoaded = true;
             //angular.extend($scope, )
@@ -181,7 +181,7 @@ search.controller('imageModalController', [
               }
             };
           }
-        });
-      };
-  }
+        // });
+      })
+    }
 }]);

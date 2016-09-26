@@ -1,22 +1,32 @@
-search.directive('filterList', ['$http', 'utils', directiveFilterList]);
+search.directive('filterList', ['$http', 'utils', '$rootScope', directiveFilterList]);
 
 
 
-function directiveFilterList ($http, utils){
+function directiveFilterList ($http, utils, $rootScope){
   return {
     restrict : 'ACE',
     replace:true,
+    scope : {
+      queryObject : '=',
+      query : '='
+    },
     template : function (element, attrs){
 
 
       var credit_raw = "'" + attrs.filterKey + "'";
 
-      return '<ul class="sidebar-nav"><li ng-repeat="item in ' + attrs.dataset + '"><a href ng-click="addToFilter('+credit_raw+', item.name)"><input ng-checked="filters['+credit_raw+'] === item.name" type="checkbox"> {{item.name}} <span class="pull-right">{{item.count}}</span></a></li></ul>';
+      return '<ul class="sidebar-nav"><li class="filterlist-list"  ng-repeat="item in filterResults"><a href ng-click="toggleFilters('+credit_raw+', item.value)"><input ng-checked="applydfilters['+credit_raw+'] === item.value" type="checkbox"> <span class="list-item-name">{{item.name}}</span> <span class="pull-right">{{item.count}}</span></a></li></ul>';
     },
-    link : function ($scope, element, attrs, ngModel){
+    link : function ($scope, element, attrs){
       var api = attrs.api;
 
+      var limit = attrs.limit || 10;
+
+      var stringMaxLength = attrs.stringLength || 15;
+
       var resultKey = "results_raw";
+
+      $scope.applydfilters = {};
 
       if (attrs.resultType === 'raw'){
         var resultKey = "results_raw";
@@ -28,36 +38,56 @@ function directiveFilterList ($http, utils){
       function getFilter(){
         return $scope[attrs.filter];
       }
+      $scope.toggleFilters = function (filterKey, filterValue){
 
+        if (!$scope.queryObject.filter){
+          $scope.queryObject.filter = {};
+        }
+        if ($scope.applydfilters[filterKey] === filterValue){
+          delete $scope.applydfilters[filterKey];
+          delete $scope.queryObject.filter[filterKey];
+          return update($scope.queryObject);
+        }
+        $scope.applydfilters[filterKey] = filterValue;
+        $scope.queryObject.filter[filterKey] = filterValue;
+        update($scope.queryObject);
+      }
+      function parseList(array, limit, stringMaxLength){
+        return array.map(function (item){
+          var text = item.name;
 
-      if (attrs.filter){
+          item.value = text;
+          if (text.length > stringMaxLength){
+            item.name = text.substring(0, stringMaxLength);
+            item.name +="..";
+          }
 
-        $scope.$watch(attrs.filter, function (_new, _old){
-          update(getQuery(), getFilter());
+          return item;
+
         });
+
+        return array;
       }
 
-      if (attrs.query){
+      $rootScope.$on('queryUpdate', function (event, _new, _old){
+        update({ query: _new, filter : $scope.queryObject.filter });
+      });
 
-        $scope.$watch(attrs.query, function (_new, _old){
-          update(getQuery(), getFilter());
-        });
-      }
 
-      function update(query, filter){
-        var queryParams = {};
+      function update(_query){
 
-        queryParams.filter = filter || false;
+        console.log('queryObject', _query);
 
-        queryParams.query = query || false;
-        var uri = utils.createURI(api, queryParams);
+        queryObject = _query || {};
+
+        var uri = utils.createURI(api, queryObject);
 
         if (uri === '?') return;
 
         $http.get(uri).then(function (response){
-          $scope[attrs.dataset] = response.data.data[resultKey];
+          console.log(queryObject, uri);
+          $scope.filterResults= parseList(response.data.data[resultKey], limit, stringMaxLength);
         });
-
       }
       update();
     }

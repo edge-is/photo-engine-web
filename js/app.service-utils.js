@@ -2,11 +2,33 @@ search.service('utils', serviceUtils);
 
 function serviceUtils(){
   return {
-    createURI : function (url, queryParams){
+    JSON : {
+      parse : function (json){
+        try {
+          return JSON.parse(json);
+        } catch (e) {
+          return false;
+        }
+      },
+      stringify : function (object){
+        try {
+          return JSON.parse(object);
+        } catch (e) {
+          return false;
+        }
+      }
+    },
+    createURI : function (url, query){
+
+      var queryParams = angular.copy(query);
 
       var queryParamsArray = [];
       for (var key in queryParams ){
         var value = queryParams[key];
+
+        if (typeof value === 'object') {
+          value = JSON.stringify(value);
+        }
 
         if (!value) continue;
 
@@ -14,7 +36,6 @@ function serviceUtils(){
       }
 
       var queryString = queryParamsArray.join('&');
-
 
       return [url, queryString].join('?');
     },

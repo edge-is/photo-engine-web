@@ -146,15 +146,26 @@ span.twitter-typeahead {
 }
 
 
-.lazy-img.lazy-img-landscape img {
+/*.lazy-img.lazy-img-landscape img {
 	width: 100%;
 	height: 100%;
-	/*max-height: 633px;*/
+	/*max-height: 633px;*
 }
 .lazy-img.lazy-img-portrait img {
 	overflow: hidden;
 	max-height: 633px;
+}*/
+
+.lazy-img.lazy-img-landscape img {
+  height: 650px;
+  max-width: 100%;
+	/*max-height: 633px;*/
 }
+.lazy-img.lazy-img-portrait img {
+  height: 650px;
+  max-width: 100%;
+}
+
 
 
 .lazy-img.thumbnail {
@@ -366,4 +377,7 @@ span.twitter-typeahead {
 
 section.container{
   color : #fff;
+}
+.sidebar-brand p{
+  font-size: 18px;
 }

@@ -1,23 +1,19 @@
 
-search.directive('typeaheadSearch', ['suggester', typeaheadDirective]);
 
-function typeaheadDirective(suggester){
+function typeaheadDirective(suggester, $rootScope){
   return {
     restrict : 'ACE',
     replace : true,
-    // scope : {
-    //   onTypeaheadSubmit : '&'
-    // },
-    template : function (element, attrs){
-      console.log(element, attrs);
-      //return '<form class="navbar-form navbar-right" ng-submit="submit();" ><div class="form-group"><input type="text" ng-model="query" class="form-control" placeholder="Leita í öllum söfnum"></div><button type="submit" class="btn btn-default"><i class="fa fa-search"></i></button></form>';
-      return '<input type="text" ng-model="query" class="form-control" placeholder="{{placeholder}}">';
-
+    scope : {
+      query : "=",
+      onTypeaheadSubmit : "="
     },
-    link : function ($scope, element, attrs, ngModel){
+    template : function (element, attrs){
+      return '<input type="text" ng-model="query" class="form-control" placeholder="{{placeholder}}">';
+    },
+    link : function ($scope, element, attrs){
 
       $scope.placeholder = attrs.inputPlaceholder;
-
 
       var form = $(element).closest('form');
       var submit = (typeof $scope['onTypeaheadSubmit'] === 'function') ? $scope['onTypeaheadSubmit'] : function (){};
@@ -25,74 +21,74 @@ function typeaheadDirective(suggester){
 
       $(form).on('submit', function (e){
         e.preventDefault();
-
         submit($scope.query);
-        console.log('search', $scope.query);
         return false;
+      });
+
+      $scope.$watch('query', function (_new, _old){
+        $rootScope.$emit('queryUpdate', _new, _old);
       })
 
-
       function updateScope (object, suggestion, dataset) {
-
-        submit($scope.query);
-        console.log(suggestion, object);
-        // $scope.$apply(function () {
-        //   var newViewValue = (angular.isDefined($scope.suggestionKey)) ?
-        //       suggestion[$scope.suggestionKey] : suggestion;
-        //   ngModel.$setViewValue(newViewValue);
-        // });
+        submit(suggestion);
       }
 
-      function parseHits (hits){
+      function removeDupes(hits, key){
+        var cache = {};
 
-        var suggestions = [];
+        return hits.filter(function (item){
+          var hit = item[key];
+          if (cache[hit]){
+            return false;
+          }
+          cache[hit] = true;
 
-        for (var key in hits.suggest){
-          var value = hits.suggest[key];
-          if (value.length === 0) continue;
-          value[0].options.forEach(function (item){
-            suggestions.push(item);
-          });
-        }
+          return true;
 
-        var results = suggestions.sort(orderByScore).reverse();
-
-        var array = results.map(function (item){
-          return item.text;
         });
 
 
-        return array;
       }
 
-      function orderByScore(a,b){
-        if (a.score < b.score){
-          return -1;
+      function orderBy(key){
+        return function (a,b){
+          if (a[key] < b[key]){
+            return -1;
+          }
+          if (a[key] > b[key]){
+            return 1;
+          }
+          return 0;
+
         }
-        if (a.score > b.score){
-          return 1;
-        }
-        return 0;
       }
 
-      function joinHits(pre, hits){
-        var prevString = pre.join(' ');
-        return hits.map(function (hit){
-          return [prevString, hit].join(' ');
-        });
 
+      function hitMe(response){
+        var arr = [];
+        for (var key in response.suggest){
+          var suggest = response.suggest[key];
+          var items = suggest.pop().options;
+          items.forEach(function (item){
+            arr.push(item);
+          })
+        }
+
+        var ordered = arr.sort(orderBy('score')).reverse();
+
+        return removeDupes(ordered, 'text');
       }
       function elasticsearchSuggester(){
         return function (query, syncCallback, asyncCallback){
-          var parts = query.split(' ');
-          var last = parts.pop();
 
-          suggester(last).then(function(response){
-            var hits = parseHits(response.data.data);
+          suggester(query).then(function(response){
+            var h = hitMe(response.data.data);
 
-            hits = joinHits(parts, hits);
+            var parsedHits = h.map(function (item){
+              return item.text;
+            });
 
-            asyncCallback(hits);
+            asyncCallback(parsedHits);
           }, function (){
             asyncCallback([]);
           });
@@ -117,7 +113,6 @@ function typeaheadDirective(suggester){
 
       // Update the value binding when a value is manually selected from the dropdown.
       element.bind('typeahead:selected', function(object, suggestion, dataset) {
-
         updateScope(object, suggestion, dataset);
         $scope.$emit('typeahead:selected', suggestion, dataset);
       });

@@ -1,40 +1,30 @@
-<!-- Navigation -->
-<nav class="navbar navbar-custom navbar-fixed-top" role="navigation" ng-class="(MainSearchHidden) ? '' : 'top-nav-collapse'">
-    <div class="container">
+<nav class="navbar navbar-custom navbar-fixed-top top-nav-collapse" role="navigation">
+    <div class="container-fluid">
         <div class="navbar-header">
-            <!-- <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-main-collapse">
-                <i class="fa fa-bars"></i>
-            </button> -->
-            <a class="navbar-brand page-scroll" href="#page-top">
-                <i class="fa fa-play-circle"></i>[[logo]]fad
-            </a>
-            <a class="navbar-brand page-scroll" href="#page-top">
-                Myndasöfn
-            </a>
-            <form class="navbar-main-search navbar-form" ng-cloak ng-hide="(MainSearchHidden)" role="search">
-              <div class="form-group">
-                <input type="text"
-                  ng-focus="false"
-                  id="mainsearch"
-
-                  options="TypeaheadOptions"
-                  datasets="TypeaheadEngineData"
-                  ng-model="MainSearch"
-                  class="form-control nav-search typeahead" placeholder="Search">
-              </div>
-              <button type="submit" class="btn btn-default submit-search" ng-click="submitMainSearch()">Search</button>
-              <a href="#/advancedsearch.html" type="submit" class="btn btn-default a-nograyscale hidden-xs" ng-click="openAdvancedSearch()">Advanced</a>
-            </form>
+          <a class="navbar-brand page-scroll  hidden-sm hidden-xs navbar-img-logo" href="/" target="_self">
+            <img src="img/nav-logo.png" alt="" />
+          </a>
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-main-collapse">
+              Menu <i class="fa fa-bars"></i>
+          </button>
         </div>
-
-        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-          <ul class="nav navbar-nav navbar-right nav-lowercase" ng-hide="MainSearchHidden">
-            <li><a href="#" ng-show="displayResultCount"><small> Found {{searchResultsTotal}} ({{searchTime | ms}})</small></a></li>
-          </ul>
-        </div><!-- /.navbar-collapse -->
-
         <!-- Collect the nav links, forms, and other content for toggling -->
         <!-- /.navbar-collapse -->
+        <div class="collapse navbar-collapse navbar-main-collapse" id="collapse">
+
+          <form class="navbar-form navbar-right">
+            <div class="form-group">
+              <typeahead-search query="query" on-typeahead-submit="onTypeaheadSubmit" input-placeholder="Leita í öllum söfnum"></typeahead-search>
+              <button type="submit" class="btn btn-default"><i class="fa fa-search"></i></button>
+              <a class="btn btn-info" href ng-click="showSidebar =!showSidebar"><i class="fa fa-wrench"></i></a>
+            </div>
+          </form>
+          <ul class="nav navbar-nav navbar-right">
+            <li>
+              <a class="page-scroll" href="archives.html" target="_self">Myndasöfn</a>
+            </li>
+          </ul>
+        </div>
     </div>
     <!-- /.container -->
 </nav>

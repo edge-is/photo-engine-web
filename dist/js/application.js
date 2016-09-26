@@ -1,7 +1,7 @@
 var search = angular.module('search', [
   'siyfion.sfTypeahead',
   'ui.bootstrap',
-  'ngRoute',
+  // 'ngRoute',
   'nemLogging',
   'leaflet-directive',
   'cfp.hotkeys',
@@ -16,16 +16,70 @@ search.run( ['$rootScope', '$location', function ($rootScope, $location) {
   var allowModalsInControllers = ['imageLinked'];
 
   $rootScope.history = [];
-  $rootScope.$on('$routeChangeSuccess', function(ev, data) {
-    if (data.$$route){
-      if (allowModalsInControllers.indexOf(data.$$route.controller) === -1){
-        if($rootScope.modalInstance) {
-          $rootScope.modalInstance.close();
-        }
-      }
-    }
-    $rootScope.history.push($location.$$path);
+
+  $rootScope.oldPath = $location.$$path;
+  $rootScope.$on('$locationChangeStart', function (event, data){
+    $rootScope.oldPath = $location.$$path;
   });
+
+  $rootScope.$on('$locationChangeSuccess', function(e, data) {
+    var newPath = $location.$$path;
+
+    var back = fromHistory(data);
+    if (back){
+      $rootScope.$emit('historyBack', back);
+    }
+
+    var myLastLocation = $rootScope.history[$rootScope.history.length -1];
+
+    console.log($rootScope.modalOpen, newPath, myLastLocation);
+    if ($rootScope.modalOpen){
+
+      if (!myLastLocation) return;
+      if (newPath !== myLastLocation.path){
+        // close modal instance
+
+        $rootScope.modalInstance.close();
+      }
+
+    }
+
+    $rootScope.history.push({
+      url : $location.$$url,
+      path : $location.$$path,
+      absUrl : $location.$$absUrl,
+      params : $location.search()
+    });
+
+
+    function fromHistory(absURL){
+      var found = false;
+      var last = $rootScope.history[$rootScope.history.length - 2 ];
+      if (!last) return false;
+      if (last.absUrl === absURL) return last;
+      return false;
+    }
+    // if (p ==)
+    //window.location = state;
+
+    // $route.reload();
+    //window.location.reload();
+    //$location.reload();
+    // if (data.$$route){
+    //   if (allowModalsInControllers.indexOf(data.$$route.controller) === -1){
+    //     if($rootScope.modalInstance) {
+    //       $rootScope.modalInstance.close();
+    //     }
+    //   }
+    // }
+    // $rootScope.history.push($location.$$path);
+  });
+
+  // $routeProvider.$on('$locationChangeSuccess', function (a,b,c){
+  //   console.log('AF', a,b,c);
+  // })
+
+
 }]);
 
 function parseJSON(string){
@@ -159,262 +213,232 @@ var settings = {
 
 
 search.config([
-  '$routeProvider',
   '$locationProvider',
   'uiSelectConfig',
-  function ($routeProvider, $locationProvider, uiSelectConfig) {
-
+  function ( $locationProvider, uiSelectConfig) {
+    // $(window).on("navigate", function (event, data) {
+    //   var direction = data.state.direction;
+    //   if (direction == 'back') {
+    //     // do something
+    //   }
+    //   if (direction == 'forward') {
+    //     // do something else
+    //   }
+    // });
   uiSelectConfig.theme = 'bootstrap';
-
-  var initialized = false;
   $locationProvider
     .html5Mode({
-      enabled: false,
-      requireBase: false
+      enabled: true,
+      requireBase: false,
+      reloadOnSearch : true
     });
-  $routeProvider
-    // .when('/', {
-    //   controller : 'main',
-    //   reloadOnSearch: false,
-    //   templateUrl : 'views/main.html'
-    // })
-    .when('/archives', {
-      controller : 'archives',
-      reloadOnSearch: false,
-      templateUrl : 'views/archives.html'
-    })
-    .when('/archive/:archiveID', {
-      controller : 'archive',
-      reloadOnSearch: false,
-      templateUrl : 'views/archive.html'
-    })
-    .when('/image/:imageID', {
-      controller : 'imageLinked',
-      reloadOnSearch: false,
-      templateUrl : 'views/image.html'
-    })
-    .otherwise({
-      controller : 'main',
-      reloadOnSearch: false,
-      templateUrl : 'views/main.html'
-    });
-
 }]);
 
 search.controller('archive', [
     '$scope',
-    '$route',
-    '$http',
-    '$window',
-    '$timeout',
     '$location',
-    '$uibModal',
-    '$log',
-    'imageCache',
-    'utils',
-    'notifyDevelopment',
     controllerArchive
   ]);
 
 
-function controllerArchive($scope, $route, $http, $window, $timeout, $location, $uibModal, $log, imageCache, utils, notifyDevelopment){
+function controllerArchive($scope, $location){
 
-  var archive_id = $route.current.params.archiveID;
-  notifyDevelopment();
-
-  $scope.limit = 30;
-  $scope.offset= 0;
-  $scope.DefaultImage = 'small';
-  $scope.archiveImages=[];
-  $scope.scrollDisabled = true;
-  $scope.loadedImages = 0;
-  $scope.filters = {};
-  $scope.queryString = "";
-  $scope.showSidebar = true;
-  $scope.displayResultCount = false;
-  $scope.navSearch = "";
-
-  $scope.archive = "";
-
-  $scope.root = $window.location.hash.replace(/\#/g, '');
-
-  // Set initial filter
-  $scope.filters.archive_id = archive_id;
-  $scope.searchTime = 0;
-
-
-  var thisArchiveAggregateInfo = utils.createURI([ config.api, '/aggregates/archive'].join(''), {
-    filter : 'archive_id:' + archive_id
-  });
-  // "http://localhost:3000/api/aggregates/archive?filter=archive_id:68b2ae89e6dc2807aec8008e20ba132c";
-
-  $http.get(thisArchiveAggregateInfo).then(function (response){
-    var results = response.data.data.results_raw;
-
-    if (results.length > 0){
-
-      $scope.archive = results[0].name ;
-    }
-  });
-
-
-  var globalSearch = false;
-
-  $scope.convertToGlobal = function (){
-    console.log('CONVERTING ::::');
-
-
-    globalSearch = true;
-  }
-
-
-  $scope.requestQuery = function (limit, offset, newSearch, callback){
-
-    callback = callback || function (){};
-
-    var filterStringArray = [];
-    $scope.filterString = (function (filters){
-      var arr = [];
-      var string = "";
-
-      for (var key in filters){
-        var value = filters[key];
-        arr.push([ key, value].join(':'));
-
-      }
-
-      string += arr.join(',');
-      return string;
-    })($scope.filters);
-
-
-    $scope.filterString+=filterStringArray.join(',');
-
-
-    if (!$scope.queryString){
-      $scope.queryString = "";
-    }
-
-    if ($scope.queryString.length > 1){
-
-      $location.search('query', $scope.queryString);
-    }
-    if ($scope.filters.length > 1){
-      var uriFilter = angular.copy($scope.filters);
-      delete uriFilter.archive_id;
-
-      $location.search('filter', uriFilter);
-    }
-
-    var arciveAPI = [config.api, '/search/query?'].join('');
-
-     var uri = utils.createURI(arciveAPI, {
-       limit : limit,
-       offset : offset,
-       query : $scope.queryString,
-       filter : $scope.filterString
-     });
-
-
-    $scope.scrollDisabled = true;
-
-    $http.get(uri).then(function (response){
-      if (newSearch){
-        $scope.archiveImages=[];
-      }
-
-      $scope.displayResultCount = true;
-
-      $scope.searchTime = response.data.data._took;
-      response.data.data.hits.forEach(function (hit){
-        $scope.archiveImages.push(hit);
-      });
-
-      $scope.loadedImages = $scope.archiveImages.length;
-      $scope.availableImagesCount = response.data.data._total;
-
-      if ($scope.loadedImages <= $scope.availableImagesCount ){
-        $scope.scrollDisabled = false;
-      }
-
-    }, callback);
-  }
-
-  $scope.photographersapi = [config.api, '/aggregates/Credit'].join('');
-
-
-  $scope.searchDelay = 300;
-
-  $scope.searching = false;
-
-
-  $scope.addToFilter = function (key, value){
-
-    if ($scope.filters[key] === value){
-      delete $scope.filters[key];
-    }else if (!$scope.filters[key]){
-      $scope.filters[key] = value;
-    }else{
-      delete $scope.filters[key];
-      $scope.filters[key] = value;
-    }
-    $scope.requestQuery($scope.limit, 0, true);
-  }
-  $scope.submitNavSearch = function (){
-    $scope.queryString = $scope.navSearch;
-
-
-    if (globalSearch){
-      return $window.location = '#/?query=' + $scope.queryString;
-    }
-
-    $scope.requestQuery($scope.limit, 0, true);
-  }
-
-  $scope.setImagesInCache = function (index, image){
-    imageCache.images = $scope.archiveImages;
-    imageCache.image = image;
-    imageCache.index = index;
-  }
-
-  $scope.openModal = function (index, image){
-    var modalInstance = $uibModal.open({
-      animation: $scope.animationsEnabled,
-      templateUrl: 'views/image-modal.html',
-      controller: 'imageModalController',
-      size: 'lg',
-      resolve: {
-        data: function () {
-          return {
-            index : index,
-            image : image,
-            results : $scope.archiveImages
-          };
-        }
-      }
-    });
-
-    modalInstance.result.then(function (selectedItem) {
-      $scope.selected = selectedItem;
-    }, function () {
-      $log.info('Modal dismissed at: ' + new Date());
-    });
-
-  }
-
-
-  $scope.load_more_data = function (callback){
-    $scope.requestQuery($scope.limit, $scope.loadedImages, false, callback);
-  }
-
-  var url_query_string = $location.search().query;
-
-  if (typeof url_query_string === 'string'){
-    $scope.queryString = url_query_string;
-    $scope.navSearch = url_query_string;
-  }
-
-  $scope.requestQuery($scope.limit, 0, false);
+  // var archive_id = $route.current.params.archiveID;
+  // notifyDevelopment();
+  //
+  // $scope.limit = 30;
+  // $scope.offset= 0;
+  // $scope.DefaultImage = 'small';
+  // $scope.archiveImages=[];
+  // $scope.scrollDisabled = true;
+  // $scope.loadedImages = 0;
+  // $scope.filters = {};
+  // $scope.queryString = "";
+  // $scope.showSidebar = true;
+  // $scope.displayResultCount = false;
+  // $scope.navSearch = "";
+  //
+  // $scope.archive = "";
+  //
+  // $scope.root = $window.location.hash.replace(/\#/g, '');
+  //
+  // // Set initial filter
+  // $scope.filters.archive_id = archive_id;
+  // $scope.searchTime = 0;
+  //
+  //
+  // var thisArchiveAggregateInfo = utils.createURI([ config.api, '/aggregates/archive'].join(''), {
+  //   filter : 'archive_id:' + archive_id
+  // });
+  // // "http://localhost:3000/api/aggregates/archive?filter=archive_id:68b2ae89e6dc2807aec8008e20ba132c";
+  //
+  // $http.get(thisArchiveAggregateInfo).then(function (response){
+  //   var results = response.data.data.results_raw;
+  //
+  //   if (results.length > 0){
+  //
+  //     $scope.archive = results[0].name ;
+  //   }
+  // });
+  //
+  //
+  // var globalSearch = false;
+  //
+  // $scope.convertToGlobal = function (){
+  //   console.log('CONVERTING ::::');
+  //
+  //
+  //   globalSearch = true;
+  // }
+  //
+  //
+  // $scope.requestQuery = function (limit, offset, newSearch, callback){
+  //
+  //   callback = callback || function (){};
+  //
+  //   var filterStringArray = [];
+  //   $scope.filterString = (function (filters){
+  //     var arr = [];
+  //     var string = "";
+  //
+  //     for (var key in filters){
+  //       var value = filters[key];
+  //       arr.push([ key, value].join(':'));
+  //
+  //     }
+  //
+  //     string += arr.join(',');
+  //     return string;
+  //   })($scope.filters);
+  //
+  //
+  //   $scope.filterString+=filterStringArray.join(',');
+  //
+  //
+  //   if (!$scope.queryString){
+  //     $scope.queryString = "";
+  //   }
+  //
+  //   if ($scope.queryString.length > 1){
+  //
+  //     $location.search('query', $scope.queryString);
+  //   }
+  //   if ($scope.filters.length > 1){
+  //     var uriFilter = angular.copy($scope.filters);
+  //     delete uriFilter.archive_id;
+  //
+  //     $location.search('filter', uriFilter);
+  //   }
+  //
+  //   var arciveAPI = [config.api, '/search/query?'].join('');
+  //
+  //    var uri = utils.createURI(arciveAPI, {
+  //      limit : limit,
+  //      offset : offset,
+  //      query : $scope.queryString,
+  //      filter : $scope.filterString
+  //    });
+  //
+  //
+  //   $scope.scrollDisabled = true;
+  //
+  //   $http.get(uri).then(function (response){
+  //     if (newSearch){
+  //       $scope.archiveImages=[];
+  //     }
+  //
+  //     $scope.displayResultCount = true;
+  //
+  //     $scope.searchTime = response.data.data._took;
+  //     response.data.data.hits.forEach(function (hit){
+  //       $scope.archiveImages.push(hit);
+  //     });
+  //
+  //     $scope.loadedImages = $scope.archiveImages.length;
+  //     $scope.availableImagesCount = response.data.data._total;
+  //
+  //     if ($scope.loadedImages <= $scope.availableImagesCount ){
+  //       $scope.scrollDisabled = false;
+  //     }
+  //
+  //   }, callback);
+  // }
+  //
+  // $scope.photographersapi = [config.api, '/aggregates/Credit'].join('');
+  //
+  //
+  // $scope.searchDelay = 300;
+  //
+  // $scope.searching = false;
+  //
+  //
+  // $scope.addToFilter = function (key, value){
+  //
+  //   if ($scope.filters[key] === value){
+  //     delete $scope.filters[key];
+  //   }else if (!$scope.filters[key]){
+  //     $scope.filters[key] = value;
+  //   }else{
+  //     delete $scope.filters[key];
+  //     $scope.filters[key] = value;
+  //   }
+  //   $scope.requestQuery($scope.limit, 0, true);
+  // }
+  // $scope.submitNavSearch = function (){
+  //   $scope.queryString = $scope.navSearch;
+  //
+  //
+  //   if (globalSearch){
+  //     return $window.location = '#/?query=' + $scope.queryString;
+  //   }
+  //
+  //   $scope.requestQuery($scope.limit, 0, true);
+  // }
+  //
+  // $scope.setImagesInCache = function (index, image){
+  //   imageCache.images = $scope.archiveImages;
+  //   imageCache.image = image;
+  //   imageCache.index = index;
+  // }
+  //
+  // $scope.openModal = function (index, image){
+  //   var modalInstance = $uibModal.open({
+  //     animation: $scope.animationsEnabled,
+  //     templateUrl: 'views/image-modal.html',
+  //     controller: 'imageModalController',
+  //     size: 'lg',
+  //     resolve: {
+  //       data: function () {
+  //         return {
+  //           index : index,
+  //           image : image,
+  //           results : $scope.archiveImages
+  //         };
+  //       }
+  //     }
+  //   });
+  //
+  //   modalInstance.result.then(function (selectedItem) {
+  //     $scope.selected = selectedItem;
+  //   }, function () {
+  //     $log.info('Modal dismissed at: ' + new Date());
+  //   });
+  //
+  // }
+  //
+  //
+  // $scope.load_more_data = function (callback){
+  //   $scope.requestQuery($scope.limit, $scope.loadedImages, false, callback);
+  // }
+  //
+  // var url_query_string = $location.search().query;
+  //
+  // if (typeof url_query_string === 'string'){
+  //   $scope.queryString = url_query_string;
+  //   $scope.navSearch = url_query_string;
+  // }
+  //
+  // $scope.requestQuery($scope.limit, 0, false);
 
 
 }
@@ -452,17 +476,20 @@ search.controller('imageModalController', [
   '$location',
   '$modalInstance',
   'data',
-  'map',
   'hotkeys',
   '$rootScope',
-  function ($scope, $location, $modalInstance, data, map, hotkeys, $rootScope) {
+  'osm',
+  function ($scope, $location, $modalInstance, data, hotkeys, $rootScope, osm) {
+    setTimeout(function (){
+      $rootScope.modalOpen = true;
+    }, 300);
     $scope.index = data.index;
     $scope.images = data.results
     $scope.image = data.image;
     $scope.isFullscreen = false;
     $scope.fullscreenClass="no-fullscreen";
-    $scope.root = data.root;
 
+    $scope.lastURI = data.lastURI;
     $scope.currentLocation = $location.$$url;
     $scope.close = function () {
       $modalInstance.close();
@@ -471,6 +498,12 @@ search.controller('imageModalController', [
     $scope.dismiss = function () {
       $modalInstance.dismiss();
     };
+
+    $rootScope.$on('historyBack', function (event, back){
+      console.log('Hey!, back?', event, back, $scope.index);
+
+      //$scope.prev();
+    });
 
     $scope.nextImg = $scope.images[$scope.index + 1];
     $scope.prevImg = $scope.images[$scope.index - 1];
@@ -481,6 +514,9 @@ search.controller('imageModalController', [
         $scope.index = $scope.index + 1;
         $scope.image = $scope.images[$scope.index];
         $scope.nextImg = $scope.images[$scope.index];
+        $scope.prevImg = $scope.images[$scope.index - 1];
+
+        $location.url('image.html?image=' + $scope.image._id );
       }
     };
 
@@ -490,18 +526,21 @@ search.controller('imageModalController', [
         $scope.index = $scope.index - 1;
         $scope.image = $scope.images[$scope.index];
         $scope.prevImg = $scope.images[$scope.index];
+        $location.url('image.html?image=' + $scope.image._id );
       }
     };
 
+
+
     $scope.nextURL = function (){
       if( $scope.nextImg ){
-        return '#/image/' + $scope.nextImg._id;
+        return '/image.html?image=' + $scope.nextImg._id;
       }
     };
 
     $scope.prevURL = function (){
       if($scope.prevImg){
-        return '#/image/' + $scope.prevImg._id;
+        return '/image.html?image=' + $scope.prevImg._id;
       }
     };
 
@@ -593,24 +632,9 @@ search.controller('imageModalController', [
 
     $scope.Map = function (){
       $scope.MapLoaded = false;
-      var osmParams = {};
-      var SearchOSM=false;
-      if ('City' in $scope.image._source){
-        SearchOSM=true;
-        osmParams.city = $scope.image._source.City;
-      }else if('State' in $scope.image._source){
-        SearchOSM=true;
-        osmParams.state = $scope.image._source.State;
-      }
-      if('Country' in $scope.image._source){
-        if($scope.image._source.Country.split(' ').length <= 2){
-          osmParams.Country = $scope.image._source.Country;
-        }
-      }
-
-      /** FIXME: Move to special controller **/
-      if(SearchOSM == true){
-        map.osm(osmParams).then(function (d){
+      osm.search($scope.image._source, function (d){
+        console.log(d);
+        // map.osm(osmParams).then(function (d){
           if(d.length > 0){
             $scope.MapLoaded = true;
             //angular.extend($scope, )
@@ -628,79 +652,69 @@ search.controller('imageModalController', [
               }
             };
           }
-        });
-      };
-  }
-}]);
-
-search.controller('imageLinked', [
-  '$scope', '$route', 'imageService', '$uibModal', '$location', 'imageCache', '$window', '$rootScope', '$location',
-  function ($scope, $route, imageService, $uibModal, $location, imageCache, $window, $rootScope, $location){
-
-    if(imageCache.loaded) return;
-
-    var root = $location.search().root || '/';
-
-    $scope.lastURI = $rootScope.history[$rootScope.history.length - 2];
-
-    $scope.imageID = $route.current.params.imageID;
-
-    if (!imageCache.index && imageCache.index !== 0){
-      function selectData(response){
-        return response.data[0][0];
-      }
-      imageService.getImageByID($scope.imageID).then(function (response){
-        if(response.data){
-          var img = selectData(response.data);
-          openModal(0, img, []);
-        }
-      });
-    }else{
-      openModal(imageCache.index, imageCache.image, imageCache.images);
-      imageCache.loaded =true;
+        // });
+      })
     }
-
-  function openModal(index, image, results) {
-
-     var modalInstance = $uibModal.open({
-       templateUrl: 'views/image-modal.html',
-       controller: 'imageModalController',
-       size: 'lg',
-       animation: false,
-       resolve: {
-         data : function () {
-           return {
-             root : root,
-             index : index,
-             image : image,
-             results : results
-           }
-         }
-       }
-     });
-
-     $rootScope.modalInstance = modalInstance;
-
-     modalInstance.result.then(function (data) {
-
-       //successful close,
-       imageCache.loaded =false;
-        var lastUri = root;
-
-        console.log(lastUri);
-        //$window.history.back();
-        //What was the last url????
-        $location.url(lastUri);
-     }, function () {
-       // close but dont change URI
-       imageCache.loaded = false;
-
-     });
-   };
-
-
-
 }]);
+
+
+
+
+
+function imageController($scope, $location, photoApi, cacheFactory, $rootScope, osm){
+  var myLocation = $location.$$absUrl;
+  $rootScope.$on('$locationChangeSuccess', function (event, newLocation){
+    // console.log('i should go back now....', event, { DATA: newLocation, oldURI: myLocation}, $window);
+
+    if (newLocation !== myLocation){
+      window.location.reload();
+    }
+  });
+
+  $scope.imageID = $location.search().image;
+
+  $scope.cacheKey = $location.search().cache;
+
+
+  $scope.image = {};
+
+  photoApi.getByID($scope.imageID).success(function ( response){
+    $scope.image = response.data;
+
+    $scope.initMap();
+  });
+
+  $scope.center = {};
+
+  $scope.defaults = { scrollWheelZoom: false };
+  $scope.mapmarker = {};
+  $scope.initMap = function (image){
+    $scope.MapLoaded = false;
+    osm.search($scope.image._source, function (d){
+      if (d.lenght === 0) return;
+
+      var location = d.pop();
+      $scope.MapLoaded = true;
+      //angular.extend($scope, )
+      $scope.center = {
+        lat : +location.lat,
+        lng : +location.lon,
+        zoom : 4
+      };
+      $scope.mapmarker = {
+        m1 : {
+          lat : +location.lat,
+          lng : +location.lon,
+          message : ':)',
+          icon: 'img/map-marker.png'
+        }
+      };
+
+      // });
+    })
+  }
+
+}
 
 
 search.controller('index', ['$scope','$window', indexController]);
@@ -708,7 +722,7 @@ search.controller('index', ['$scope','$window', indexController]);
 function indexController($scope, $window){
 
   $scope.onTypeaheadSubmit = function submitOnSearch(query){
-    $window.location = '/search.html#?query=' + query;
+    $window.location = '/search.html?query=' + query;
   };
 
 }
@@ -939,20 +953,26 @@ search.controller('main',
 ]);
 
 
-search.controller('mainSearch', ['$scope','apiSearch', '$location', mainSearchController]);
-
-function mainSearchController($scope, apiSearch, $location ){
+function mainSearchController($scope, photoApi, $location, $anchorScroll, $uibModal, $rootScope, utils){
   $scope.DefaultImage = "x-small";
-  console.log('Index controller');
   $scope.searchResultsTotal = false;
   $scope.mainSearchHits =  [];
   $scope.mainSearchSize = 0;
-
+  $scope.noResults = false;
   $scope.scrollDisabled = true;
 
+  $scope.currentURI = $location.$$url;
+  $scope.showSidebar = true;
+  $scope.scrollDisabled = true;
+  $scope.photographersapi =  [config.api, '/aggregates/Credit'].join('');
+  setTimeout(function (){
+    $scope.scrollDisabled = false;
+  }, 500);
   $scope.maxHits = 30;
+
+
   $scope.queryObject = {
-    query : false,
+    query : $scope.query,
     filter: false,
     limit : $scope.maxHits,
     offset : 0
@@ -964,74 +984,158 @@ function mainSearchController($scope, apiSearch, $location ){
 
     $scope.queryObject.query = query;
 
-    $scope.search();
+    $scope.prevResultsAvailable = false;
+    $scope.search($scope.queryObject, true);
+
   };
 
-  $scope.updateURI = function (){
-    var url = {};
-    if($scope.mainSearchQuery !== ''){
-      url.query = $scope.mainSearchQuery;
+  $scope.updateURI = function (queryObject){
+
+    var qObject = angular.copy(queryObject);
+    for (var key in qObject){
+      if (!qObject[key]) delete qObject[key];
+
+      if (typeof qObject[key] === 'object'){
+        qObject[key] = JSON.stringify(qObject[key]);
+      }
     }
-    if($scope.mainSearchFilter !== ''){
-      url.filter = $scope.mainSearchFilter;
-    }
-    $location.search(url);
+    $location.search(qObject);
+    $scope.currentURI = $location.$$url;
   };
 
-  $scope.search = function (){
+  $scope.search = function (queryObject, newQuery, callback){
+    if (newQuery){
+      $scope.mainSearchHits =  [];
+      $scope.queryObject = queryObject;
+    }
+    $scope.updateURI(queryObject);
+    callback = callback || function (){};
 
-
-    apiSearch.query($scope.queryObject).then( function (response){
+    photoApi.query(queryObject).then( function (response){
       $scope.displayResultCount = true;
       $scope.searchTime = response.data._took;
       $scope.searchResultsTotal = response.data._total;
-      $scope.mainSearchHits = response.data.hits;
-      $scope.mainSearchSize = response.data.hits.length;
-      $scope.scrollDisabled = false;
+      $scope.submittedQuery = queryObject;
 
-      $scope.submittedQuery = $scope.queryObject;
-    });
-  }
-
-  $scope.scrollDisabled = false;
-
-  $scope.load_more_data = function (callback){
-    if ($scope.mainSearchSize < 1){
-      return;
-    }
-
-    if ($scope.scrollDisabled) return;
-
-    $scope.scrollDisabled = true;
-
-    $scope.submittedQuery.offset +=$scope.maxHits;
-
-    apiSearch.query($scope.submittedQuery).then( function (response){
-      if (!response) return;
-
-      if (response.data.hits.length < 1){
-        return;
+      if (response.data.hits.length === 0){
+        $scope.noResults = true;
       }
-      $scope.searchTime = response.data._took;
-      $scope.searchResultsTotal = response.data._total;
 
       response.data.hits.forEach(function (item){
         $scope.mainSearchHits.push(item);
       });
 
-      $scope.mainSearchSize += response.data.hits.length;
-      $scope.scrollDisabled = false;
+      callback();
+    });
+  }
 
+  $scope.updateViewPort = function (imageID){
+    $scope.submittedQuery.anchor = imageID;
+    $scope.updateURI($scope.submittedQuery);
+  }
+
+  function int(number){
+    var i = parseInt(number);
+
+    if (isNaN(i)) return false;
+
+    return i;
+  }
+
+  $scope.load_more_data = function (callback){
+    if ($scope.mainSearchHits.length < $scope.maxHits){
+      return $scope.noResults = true;
+    }
+
+    if ($scope.scrollDisabled) return;
+
+
+    var nextOffset = $scope.submittedQuery.offset + $scope.maxHits;
+    if ($scope.searchResultsTotal > nextOffset ){
+      $scope.submittedQuery.offset = nextOffset;
+    }else{
+      $scope.noResults = true;
+      return $scope.scrollDisabled = true;
+    }
+
+    $scope.scrollDisabled = true;
+    $scope.search($scope.submittedQuery, false, function (){
+      $scope.scrollDisabled = false;
       setTimeout(callback, 500);
     });
   };
 
+  $scope.openImage = function (index, image, images){
+    var lastURI = "";
+    var modalInstance = $uibModal.open({
+      animation: $scope.animationsEnabled,
+      templateUrl: 'views/image-modal.html',
+      controller: 'imageModalController',
+      size: 'lg',
+      resolve: {
+        data: function () {
+          return {
+            lastURI: $scope.currentURI,
+            index: index,
+            image: image,
+            results: images
+          };
+        }
+      }
+    });
 
-  $scope.uriQuery = $location.search().query || false;
-  $scope.uriFilter= $location.search().filter || false;
-  if ($scope.uriQuery || $scope.uriFilter){
-    $scope.search($scope.uriQuery, $scope.uriFilter);
+    modalInstance.result.then(function (selectedItem) {
+      $scope.selected = selectedItem;
+      $location.url($scope.currentURI);
+      $rootScope.modalOpen = false;
+    }, function () {
+      $location.url($scope.currentURI);
+      $rootScope.modalOpen = false;
+      // $log.info('Modal dismissed at: ' + new Date());
+    });
+
+    $rootScope.modalInstance = modalInstance;
+
+
+  };
+
+  $scope.queryParams = $location.search() || {};
+
+  $scope.queryParams.limit = int($scope.queryParams.limit) || false;
+  $scope.queryParams.offset = int($scope.queryParams.offset) || false;
+
+  $scope.queryParams.filter = utils.JSON.parse($scope.queryParams.filter);
+
+  $scope.loadPrevResults = function (){
+    $scope.queryParams.offset = 0;
+    $scope.prevResultsAvailable = false;
+    $scope.search($scope.queryParams, true, function (){
+      var anchor = $scope.queryParams.anchor || false;
+      if (anchor){
+        $anchorScroll(anchor);
+      }
+    });
   }
+
+  if ( $scope.queryParams.query){
+    $scope.query = $scope.queryParams.query;
+    if ($scope.queryParams.offset > 0 ) $scope.prevResultsAvailable = true;
+    var anchor = $scope.queryParams.anchor || false;
+    $scope.search($scope.queryParams, true, function (){
+      if (anchor){
+        $anchorScroll(anchor);
+      }
+    });
+  }
+
+  if ( $scope.queryParams.archive){
+
+    $scope.queryObject.filter = {archive_id : $scope.queryParams.archive};
+  }
+
+  $scope.$watchCollection('queryObject.filter', function (_new, _old){
+    $scope.search($scope.queryObject, true);
+  });
 
 
 }
@@ -1095,25 +1199,35 @@ function directiveBackgroundImage(){
   };
 }
 
-search.directive('filterList', ['$http', 'utils', directiveFilterList]);
+search.directive('filterList', ['$http', 'utils', '$rootScope', directiveFilterList]);
 
 
 
-function directiveFilterList ($http, utils){
+function directiveFilterList ($http, utils, $rootScope){
   return {
     restrict : 'ACE',
     replace:true,
+    scope : {
+      queryObject : '=',
+      query : '='
+    },
     template : function (element, attrs){
 
 
       var credit_raw = "'" + attrs.filterKey + "'";
 
-      return '<ul class="sidebar-nav"><li ng-repeat="item in ' + attrs.dataset + '"><a href ng-click="addToFilter('+credit_raw+', item.name)"><input ng-checked="filters['+credit_raw+'] === item.name" type="checkbox"> {{item.name}} <span class="pull-right">{{item.count}}</span></a></li></ul>';
+      return '<ul class="sidebar-nav"><li class="filterlist-list"  ng-repeat="item in filterResults"><a href ng-click="toggleFilters('+credit_raw+', item.value)"><input ng-checked="applydfilters['+credit_raw+'] === item.value" type="checkbox"> <span class="list-item-name">{{item.name}}</span> <span class="pull-right">{{item.count}}</span></a></li></ul>';
     },
-    link : function ($scope, element, attrs, ngModel){
+    link : function ($scope, element, attrs){
       var api = attrs.api;
 
+      var limit = attrs.limit || 10;
+
+      var stringMaxLength = attrs.stringLength || 15;
+
       var resultKey = "results_raw";
+
+      $scope.applydfilters = {};
 
       if (attrs.resultType === 'raw'){
         var resultKey = "results_raw";
@@ -1125,38 +1239,118 @@ function directiveFilterList ($http, utils){
       function getFilter(){
         return $scope[attrs.filter];
       }
+      $scope.toggleFilters = function (filterKey, filterValue){
 
+        if (!$scope.queryObject.filter){
+          $scope.queryObject.filter = {};
+        }
+        if ($scope.applydfilters[filterKey] === filterValue){
+          delete $scope.applydfilters[filterKey];
+          delete $scope.queryObject.filter[filterKey];
+          return update($scope.queryObject);
+        }
+        $scope.applydfilters[filterKey] = filterValue;
+        $scope.queryObject.filter[filterKey] = filterValue;
+        update($scope.queryObject);
+      }
+      function parseList(array, limit, stringMaxLength){
+        return array.map(function (item){
+          var text = item.name;
 
-      if (attrs.filter){
+          item.value = text;
+          if (text.length > stringMaxLength){
+            item.name = text.substring(0, stringMaxLength);
+            item.name +="..";
+          }
 
-        $scope.$watch(attrs.filter, function (_new, _old){
-          update(getQuery(), getFilter());
+          return item;
+
         });
+
+        return array;
       }
 
-      if (attrs.query){
+      $rootScope.$on('queryUpdate', function (event, _new, _old){
+        update({ query: _new, filter : $scope.queryObject.filter });
+      });
 
-        $scope.$watch(attrs.query, function (_new, _old){
-          update(getQuery(), getFilter());
-        });
-      }
 
-      function update(query, filter){
-        var queryParams = {};
+      function update(_query){
 
-        queryParams.filter = filter || false;
+        console.log('queryObject', _query);
 
-        queryParams.query = query || false;
-        var uri = utils.createURI(api, queryParams);
+        queryObject = _query || {};
+
+        var uri = utils.createURI(api, queryObject);
 
         if (uri === '?') return;
 
         $http.get(uri).then(function (response){
-          $scope[attrs.dataset] = response.data.data[resultKey];
+          console.log(queryObject, uri);
+          $scope.filterResults= parseList(response.data.data[resultKey], limit, stringMaxLength);
         });
-
       }
       update();
+    }
+  }
+}
+
+
+search.directive('inView', ['$window', directiveInView]);
+
+function directiveInView($window){
+  return {
+    restrict : 'A',
+    link : function ($scope, element, attrs, ngModel){
+
+      var offset = attrs['inViewOffset'];
+
+      var count = attrs['inViewCount'];
+
+      var id = attrs['id'];
+
+      var trigger = function (){};
+
+      var fnName= attrs['inView'];
+
+      var fn = $scope.$parent[fnName];
+      if (typeof fn === 'function'){
+        trigger = fn;
+      }else{
+        return;
+      }
+
+      var loading = false;
+      if (isEven(count / offset )) {
+
+        angular.element($window).bind('scroll', function (){
+          if (loading) return;
+          loading = true;
+          setTimeout(function (){
+            if (isInView(element)){
+              trigger(id, element);
+            }
+            loading = false;
+          }, 1000);
+        });
+      }
+
+      function isEven(n) {
+         return n % 2 == 0;
+      }
+
+      function isInView(element){
+        var docViewTop = $(window).scrollTop();
+        var docViewBottom = docViewTop + $(window).height();
+
+        var elemTop = $(element).offset().top;
+        var elemBottom = elemTop + $(element).height();
+
+        return ((elemBottom <= docViewBottom) && (elemTop >= docViewTop));
+        if (wS > (hT+hH-wH)){
+          return true;
+        }
+      }
     }
   }
 }
@@ -1405,25 +1599,21 @@ function directiveTypeaheadSuggest(suggester){
 }
 
 
-search.directive('typeaheadSearch', ['suggester', typeaheadDirective]);
 
-function typeaheadDirective(suggester){
+function typeaheadDirective(suggester, $rootScope){
   return {
     restrict : 'ACE',
     replace : true,
-    // scope : {
-    //   onTypeaheadSubmit : '&'
-    // },
-    template : function (element, attrs){
-      console.log(element, attrs);
-      //return '<form class="navbar-form navbar-right" ng-submit="submit();" ><div class="form-group"><input type="text" ng-model="query" class="form-control" placeholder="Leita í öllum söfnum"></div><button type="submit" class="btn btn-default"><i class="fa fa-search"></i></button></form>';
-      return '<input type="text" ng-model="query" class="form-control" placeholder="{{placeholder}}">';
-
+    scope : {
+      query : "=",
+      onTypeaheadSubmit : "="
     },
-    link : function ($scope, element, attrs, ngModel){
+    template : function (element, attrs){
+      return '<input type="text" ng-model="query" class="form-control" placeholder="{{placeholder}}">';
+    },
+    link : function ($scope, element, attrs){
 
       $scope.placeholder = attrs.inputPlaceholder;
-
 
       var form = $(element).closest('form');
       var submit = (typeof $scope['onTypeaheadSubmit'] === 'function') ? $scope['onTypeaheadSubmit'] : function (){};
@@ -1431,74 +1621,74 @@ function typeaheadDirective(suggester){
 
       $(form).on('submit', function (e){
         e.preventDefault();
-
         submit($scope.query);
-        console.log('search', $scope.query);
         return false;
+      });
+
+      $scope.$watch('query', function (_new, _old){
+        $rootScope.$emit('queryUpdate', _new, _old);
       })
 
-
       function updateScope (object, suggestion, dataset) {
-
-        submit($scope.query);
-        console.log(suggestion, object);
-        // $scope.$apply(function () {
-        //   var newViewValue = (angular.isDefined($scope.suggestionKey)) ?
-        //       suggestion[$scope.suggestionKey] : suggestion;
-        //   ngModel.$setViewValue(newViewValue);
-        // });
+        submit(suggestion);
       }
 
-      function parseHits (hits){
+      function removeDupes(hits, key){
+        var cache = {};
 
-        var suggestions = [];
+        return hits.filter(function (item){
+          var hit = item[key];
+          if (cache[hit]){
+            return false;
+          }
+          cache[hit] = true;
 
-        for (var key in hits.suggest){
-          var value = hits.suggest[key];
-          if (value.length === 0) continue;
-          value[0].options.forEach(function (item){
-            suggestions.push(item);
-          });
-        }
+          return true;
 
-        var results = suggestions.sort(orderByScore).reverse();
-
-        var array = results.map(function (item){
-          return item.text;
         });
 
 
-        return array;
       }
 
-      function orderByScore(a,b){
-        if (a.score < b.score){
-          return -1;
+      function orderBy(key){
+        return function (a,b){
+          if (a[key] < b[key]){
+            return -1;
+          }
+          if (a[key] > b[key]){
+            return 1;
+          }
+          return 0;
+
         }
-        if (a.score > b.score){
-          return 1;
-        }
-        return 0;
       }
 
-      function joinHits(pre, hits){
-        var prevString = pre.join(' ');
-        return hits.map(function (hit){
-          return [prevString, hit].join(' ');
-        });
 
+      function hitMe(response){
+        var arr = [];
+        for (var key in response.suggest){
+          var suggest = response.suggest[key];
+          var items = suggest.pop().options;
+          items.forEach(function (item){
+            arr.push(item);
+          })
+        }
+
+        var ordered = arr.sort(orderBy('score')).reverse();
+
+        return removeDupes(ordered, 'text');
       }
       function elasticsearchSuggester(){
         return function (query, syncCallback, asyncCallback){
-          var parts = query.split(' ');
-          var last = parts.pop();
 
-          suggester(last).then(function(response){
-            var hits = parseHits(response.data.data);
+          suggester(query).then(function(response){
+            var h = hitMe(response.data.data);
 
-            hits = joinHits(parts, hits);
+            var parsedHits = h.map(function (item){
+              return item.text;
+            });
 
-            asyncCallback(hits);
+            asyncCallback(parsedHits);
           }, function (){
             asyncCallback([]);
           });
@@ -1523,7 +1713,6 @@ function typeaheadDirective(suggester){
 
       // Update the value binding when a value is manually selected from the dropdown.
       element.bind('typeahead:selected', function(object, suggestion, dataset) {
-
         updateScope(object, suggestion, dataset);
         $scope.$emit('typeahead:selected', suggestion, dataset);
       });
@@ -1570,15 +1759,41 @@ function typeaheadDirective(suggester){
 
 
 
-search.factory('imageCache', factorySharedImages);
-function factorySharedImages(){
-    return {
-      startUrl : "/",
-      index : null,
-      image :null,
-      images : [],
-      loaded : false
-    };
+function cacheFactory($cacheFactory){
+  return {
+    get : function getCacheByKey(object){
+      var now = new Date().getTime();
+      var cache = $cacheFactory.get(object);
+
+      if (cache.__ttl){
+        if (__cache.ttl < now){
+          return false;
+        }
+      }
+
+      if (cache.__value) return cache.__value;
+
+      delete cache.__ttl;
+
+      return cache;
+    },
+    put : function putCacheByKey(value, ttl){
+      ttl = ttl || false;
+      var cacheObject = value;
+      if (typeof value === 'string'){
+        cacheObject = {
+          __value : value
+        }
+      }
+      var now = new Date().getTime();
+      var expires = now + ttl;
+
+
+      cacheObject.__ttl = expires;
+      return $cacheFactory.put(cacheObject);
+
+    }
+  }
 }
 
 search.filter('ms', [function (){
@@ -1626,6 +1841,18 @@ search.filter('propsFilter', function() {
 
 
 
+search.service('photoApi',[ '$http','$q', 'utils', photoApiService]);
+search.controller('image', [ '$scope', '$location', 'photoApi', 'cacheFactory', '$rootScope', 'osm', imageController]);
+search.controller('mainSearch', ['$scope','photoApi', '$location', '$anchorScroll', '$uibModal', '$rootScope', 'utils', mainSearchController]);
+
+search.directive('typeaheadSearch', ['suggester', '$rootScope', typeaheadDirective]);
+
+search.factory('cacheFactory', ['$cacheFactory', cacheFactory]);
+
+search.service('osm', ['map', serviceOSM]);
+
+
+
 function developmentService($log, $cookies, ngNotify){
   return function (){
 
@@ -1662,9 +1889,57 @@ function serviceImage($http){
 search.service('imageService', ['$http', serviceImage]);
 
 
-search.service('apiSearch',[ '$http','$q', 'utils', serviceApiSearch]);
 
-function serviceApiSearch($http, $q, utils){
+function serviceOSM(map){
+  return {
+    search : function (queryObject, callback){
+      console.log('OSM');
+      var osmParams = {};
+      var searchOSM=false;
+      if ('City' in queryObject){
+        searchOSM=true;
+        osmParams.city = queryObject.City;
+      }else if('State' in queryObject){
+        searchOSM=true;
+        osmParams.state = queryObject.State;
+      }
+      if('Country' in queryObject){
+        if(queryObject.Country.split(' ').length <= 2){
+          osmParams.Country = queryObject.Country;
+        }
+      }
+
+      if(searchOSM == true){
+        map.osm(osmParams).then(callback);
+        // map.osm(osmParams).then(function (d){
+        //   if(d.length > 0){
+        //     $scope.MapLoaded = true;
+        //     //angular.extend($scope, )
+        //     $scope.center = {
+        //       lat : +d[0].lat,
+        //       lng : +d[0].lon,
+        //       zoom : 4
+        //     };
+        //     $scope.mapmarker = {
+        //       m1 : {
+        //         lat : +d[0].lat,
+        //         lng : +d[0].lon,
+        //         message : 'Wazzuuup?',
+        //         icon: 'img/map-marker.png'
+        //       }
+        //     };
+        //   }
+        // });
+      };
+    }
+  };
+
+}
+
+
+
+
+function photoApiService($http, $q, utils){
   function post(url, data){
     return $http.post(url, data);
   };
@@ -1673,34 +1948,35 @@ function serviceApiSearch($http, $q, utils){
   };
 
   return {
-      typeahead : function (query){
+    getByID : function (id){
+      var url = [config.api, '/image/', id].join('');
+      return get(url);
+    },
+    filter : function (filter){
 
-      },
-      filter : function (filter){
+    },
 
-      },
+    query : function (queryObject, options){
+      var deferred = $q.defer();
+      options = options || {};
 
-      query : function (queryObject, options){
-        var deferred = $q.defer();
-        options = options || {};
+      var baseURI = [config.api,'/search/query'].join('');
 
-        var baseURI = [config.api,'/search/query'].join('');
-
-        queryObject.limit = queryObject.limit || 30;
-        queryObject.offset = queryObject.offset || 30;
+      queryObject.limit = queryObject.limit || 30;
+      queryObject.offset = queryObject.offset || 30;
 
 
-        var url = utils.createURI(baseURI, queryObject);
+      var url = utils.createURI(baseURI, queryObject);
 
-        $http.get(url).success(function(data){
-          deferred.resolve(data);
-      	}).error(function(data){
-          deferred.reject(data);
-        });
-        return deferred.promise;
-      }
+      $http.get(url).success(function(data){
+        deferred.resolve(data);
+    	}).error(function(data){
+        deferred.reject(data);
+      });
+      return deferred.promise;
     }
   }
+}
 
 search.service('suggester', ['$http', serviceSuggester]);
 
@@ -1721,11 +1997,33 @@ search.service('utils', serviceUtils);
 
 function serviceUtils(){
   return {
-    createURI : function (url, queryParams){
+    JSON : {
+      parse : function (json){
+        try {
+          return JSON.parse(json);
+        } catch (e) {
+          return false;
+        }
+      },
+      stringify : function (object){
+        try {
+          return JSON.parse(object);
+        } catch (e) {
+          return false;
+        }
+      }
+    },
+    createURI : function (url, query){
+
+      var queryParams = angular.copy(query);
 
       var queryParamsArray = [];
       for (var key in queryParams ){
         var value = queryParams[key];
+
+        if (typeof value === 'object') {
+          value = JSON.stringify(value);
+        }
 
         if (!value) continue;
 
@@ -1733,7 +2031,6 @@ function serviceUtils(){
       }
 
       var queryString = queryParamsArray.join('&');
-
 
       return [url, queryString].join('?');
     },

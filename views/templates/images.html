@@ -1,0 +1,22 @@
+<div class="">
+  <div class="container-fluid">
+    <div class="btn btn-block btn-success text-center load-previous-data" ng-show="prevResultsAvailable" ng-click="loadPrevResults();">
+      <i class="fa fa-search"> Hlaða fyrri niðurstöðum</i>
+    </div>
+    <div class="search-result-content container-fluid">
+      <div class="row">
+        <div ng-repeat="(index, image) in mainSearchHits track by $index">
+          <div class="col-lg-3 col-md-4 col-sm-6" id="image_{{image._id}}" in-view="updateViewPort" in-view-offset="4" in-view-count="{{index}}">
+            <a href="/image.html?image={{image._id}}" class="thumbnail"  ng-click="openImage(index, image, mainSearchHits)"  uib-tooltip="{{image._source.Description}}">
+            <div class="background-thumbnail" background-image="{{image._source.cdn1[DefaultImage]}}"></div>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div angular-scroll="load_more_data" disabled="{{scrollDisabled}}" px="1000" ></div>
+  </div>
+  <div class="alert alert-info text-center" ng-show="noResults">
+    <h4><i class="fa fa-search"> Engar niðurstöður</i></h4>
+  </div>
+</div>
