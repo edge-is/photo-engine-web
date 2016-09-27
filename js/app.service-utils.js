@@ -22,6 +22,9 @@ function serviceUtils(){
 
       var queryParams = angular.copy(query);
 
+      if (query.api){
+        delete query.api;
+      }
       var queryParamsArray = [];
       for (var key in queryParams ){
         var value = queryParams[key];

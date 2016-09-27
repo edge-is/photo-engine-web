@@ -1,14 +1,17 @@
+/**
+ * Directive to notify development
+ */
 
-
-function developmentService($log, $cookies, ngNotify){
-  return function (){
-
+function developmentDirective($log, $cookies, ngNotify){
+  return {
+    restrict : 'E',
+    link : function ($scope, element, attrs){
       if (!config.development) return;
 
       var cookieKey = 'developmentDismiss';
 
       var dismissed = $cookies.get(cookieKey);
-      if (dismissed) return $log.info('DEVELOPMENT: Already dismissed');
+      if (dismissed) return $log.info('DEVELOPMENT BANNER: Already dismissed');
 
       ngNotify.set('Þessi vefur er í vinnslu.', {
           html: true,
@@ -17,7 +20,7 @@ function developmentService($log, $cookies, ngNotify){
       }, function dismissNotify(){
         $cookies.put(cookieKey, 'true');
       });
-    }
-}
 
-search.service('notifyDevelopment', ['$log',  '$cookies', 'ngNotify', developmentService]);
+    }
+  }
+}

@@ -1,4 +1,6 @@
-
+/**
+ * Cache factory, for saving results
+ */
 
 function cacheFactory($cacheFactory){
   return {

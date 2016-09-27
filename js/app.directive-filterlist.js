@@ -1,8 +1,7 @@
-search.directive('filterList', ['$http', 'utils', '$rootScope', directiveFilterList]);
 
 
 
-function directiveFilterList ($http, utils, $rootScope){
+function directiveFilterList ($http, utils, $rootScope, photoApi){
   return {
     restrict : 'ACE',
     replace:true,
@@ -11,11 +10,8 @@ function directiveFilterList ($http, utils, $rootScope){
       query : '='
     },
     template : function (element, attrs){
-
-
       var credit_raw = "'" + attrs.filterKey + "'";
-
-      return '<ul class="sidebar-nav"><li class="filterlist-list"  ng-repeat="item in filterResults"><a href ng-click="toggleFilters('+credit_raw+', item.value)"><input ng-checked="applydfilters['+credit_raw+'] === item.value" type="checkbox"> <span class="list-item-name">{{item.name}}</span> <span class="pull-right">{{item.count}}</span></a></li></ul>';
+      return '<ul class="sidebar-nav"><li class="filterlist-list" ng-repeat="item in filterResults"><a href uib-tooltip="{{item.value}}" tooltip-append-to-body="true" tooltip-placement="right" ng-click="toggleFilters('+credit_raw+', item.value)"><input ng-checked="applydfilters['+credit_raw+'] === item.value" type="checkbox"> <span class="list-item-name">{{item.name}}</span> <span class="pull-right">{{item.count}}</span></a></li></ul>';
     },
     link : function ($scope, element, attrs){
       var api = attrs.api;
@@ -73,19 +69,11 @@ function directiveFilterList ($http, utils, $rootScope){
         update({ query: _new, filter : $scope.queryObject.filter });
       });
 
-
       function update(_query){
+        _query = _query || {};
 
-        console.log('queryObject', _query);
-
-        queryObject = _query || {};
-
-        var uri = utils.createURI(api, queryObject);
-
-        if (uri === '?') return;
-
-        $http.get(uri).then(function (response){
-          console.log(queryObject, uri);
+        console.log('API', api)
+        photoApi.aggrigate(_query, api).then(function (response){
           $scope.filterResults= parseList(response.data.data[resultKey], limit, stringMaxLength);
         });
       }

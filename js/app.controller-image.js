@@ -1,8 +1,9 @@
 
 
-
-
-function imageController($scope, $location, photoApi, cacheFactory, $rootScope, osm){
+/**
+ * Controller for static linking to images
+ */
+function imageController($scope, $location, photoApi, cacheFactory, $rootScope, osm, $window){
   var myLocation = $location.$$absUrl;
   $rootScope.$on('$locationChangeSuccess', function (event, newLocation){
     // console.log('i should go back now....', event, { DATA: newLocation, oldURI: myLocation}, $window);
@@ -11,6 +12,10 @@ function imageController($scope, $location, photoApi, cacheFactory, $rootScope, 
       window.location.reload();
     }
   });
+
+  $scope.onTypeaheadSubmit = function submitOnSearch(query){
+    $window.location = '/search.html?query=' + query;
+  };
 
   $scope.imageID = $location.search().image;
 
@@ -51,8 +56,6 @@ function imageController($scope, $location, photoApi, cacheFactory, $rootScope, 
         }
       };
 
-      // });
-    })
+    });
   }
-
 }

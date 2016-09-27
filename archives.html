@@ -52,13 +52,15 @@
     <div class="row">
       <div ng-repeat="(index, archive) in archives">
         <div class="col-lg-3 col-md-3 col-sm-4 random-archive-images-container">
-          <a href="/search.html?archive={{archive.archive_id}}" class="thumbnail" follow-link  target="_self">
+          <a href="/search.html?filter={{archive.filterJSON}}" class="thumbnail" follow-link  target="_self">
             <random-archive-image archive="{{archive.archive_id}}" archive-name="{{archive.name}}"></random-archive-image>
           </a>
         </div>
       </div>
     </div>
   </div>
+  <notify-development></notify-development>
+
 
 
 

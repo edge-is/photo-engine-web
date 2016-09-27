@@ -1,12 +1,9 @@
-search.directive('randomArchiveImage', ['$http','$compile',  directiveRandomArchiveImage] );
 
 function directiveRandomArchiveImage($http, $compile){
   return {
     restrict : 'ACE',
     template : function (elem, attrs){
       return '<div class="carousel slide archives-carousel random-image-carousel" data-ride="carousel"><div class="carousel-inner" role="listbox"><div class="item active"><img class="archives-random-image" ng-src="{{selectedImage}}"><div class="carousel-caption"><h5>{{archive_name}}</h5></div></div></div></div>';
-      //return '<div class="background-thumbnail"></div>';
-
     },
     replace : true,
     link : function ($scope, element, attrs){
@@ -17,21 +14,14 @@ function directiveRandomArchiveImage($http, $compile){
       $http.get(url).success(function (response){
         $scope.availableImages = response.data.hits;
         var selected = response.data.hits.pop();
-
-
-
         if (!selected){
           var container = $(element).closest('.random-archive-images-container');
-
-          container.addClass('hidden');
-          
-          return;
+          return container.addClass('hidden');
         }
 
         $scope.image_name = selected._id;
         $scope.selectedArchiveImage = selected._source.cdn1.small;
         $scope.selectedImage = $scope.selectedArchiveImage;
-        //element.attr('background-image', $scope.selectedArchiveImage);
         $compile(element)($scope);
       });
     },

@@ -24,8 +24,6 @@ function mainSearchController($scope, photoApi, $location, $anchorScroll, $uibMo
     offset : 0
   };
 
-
-
   $scope.onTypeaheadSubmit = function submitOnSearch(query){
 
     $scope.queryObject.query = query;
@@ -50,6 +48,7 @@ function mainSearchController($scope, photoApi, $location, $anchorScroll, $uibMo
   };
 
   $scope.search = function (queryObject, newQuery, callback){
+    console.log('SEARCH', queryObject);
     if (newQuery){
       $scope.mainSearchHits =  [];
       $scope.queryObject = queryObject;
@@ -89,12 +88,12 @@ function mainSearchController($scope, photoApi, $location, $anchorScroll, $uibMo
   }
 
   $scope.load_more_data = function (callback){
+    console.log('LOAD MORE DATA');
     if ($scope.mainSearchHits.length < $scope.maxHits){
       return $scope.noResults = true;
     }
 
     if ($scope.scrollDisabled) return;
-
 
     var nextOffset = $scope.submittedQuery.offset + $scope.maxHits;
     if ($scope.searchResultsTotal > nextOffset ){
@@ -137,12 +136,9 @@ function mainSearchController($scope, photoApi, $location, $anchorScroll, $uibMo
     }, function () {
       $location.url($scope.currentURI);
       $rootScope.modalOpen = false;
-      // $log.info('Modal dismissed at: ' + new Date());
-    });
+   });
 
     $rootScope.modalInstance = modalInstance;
-
-
   };
 
   $scope.queryParams = $location.search() || {};
@@ -151,6 +147,8 @@ function mainSearchController($scope, photoApi, $location, $anchorScroll, $uibMo
   $scope.queryParams.offset = int($scope.queryParams.offset) || false;
 
   $scope.queryParams.filter = utils.JSON.parse($scope.queryParams.filter);
+  $scope.queryParams.query = $scope.queryParams.query || false;
+
 
   $scope.loadPrevResults = function (){
     $scope.queryParams.offset = 0;
@@ -174,13 +172,12 @@ function mainSearchController($scope, photoApi, $location, $anchorScroll, $uibMo
     });
   }
 
-  if ( $scope.queryParams.archive){
-
-    $scope.queryObject.filter = {archive_id : $scope.queryParams.archive};
+  if ($scope.queryParams.filter){
+    $scope.search($scope.queryParams, true);
   }
 
   $scope.$watchCollection('queryObject.filter', function (_new, _old){
-    $scope.search($scope.queryObject, true);
+    if (_new) $scope.search($scope.queryObject, true);
   });
 
 

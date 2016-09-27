@@ -1,5 +1,4 @@
 
-search.directive('inView', ['$window', directiveInView]);
 
 function directiveInView($window){
   return {

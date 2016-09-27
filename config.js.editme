@@ -1,4 +1,5 @@
 var config = {
   api :  'http://localhost:3000/api',
-  development : true
+  development : true,
+  logging : 'dev'
 };

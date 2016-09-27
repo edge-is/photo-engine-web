@@ -1,7 +1,12 @@
 
 
-
-function photoApiService($http, $q, utils){
+/**
+ * Service providing connection to the Photo-Engine API
+ */
+function photoApiService($http, $q, utils, $log){
+  /**
+   * Helpers
+   */
   function post(url, data){
     return $http.post(url, data);
   };
@@ -19,16 +24,21 @@ function photoApiService($http, $q, utils){
     },
 
     query : function (queryObject, options){
+
+
+      var _query = angular.copy(queryObject);
+
+
       var deferred = $q.defer();
       options = options || {};
 
       var baseURI = [config.api,'/search/query'].join('');
 
-      queryObject.limit = queryObject.limit || 30;
-      queryObject.offset = queryObject.offset || 30;
+      _query.limit = _query.limit || 30;
+      _query.offset = _query.offset || 0;
 
 
-      var url = utils.createURI(baseURI, queryObject);
+      var url = utils.createURI(baseURI, _query);
 
       $http.get(url).success(function(data){
         deferred.resolve(data);
@@ -36,6 +46,32 @@ function photoApiService($http, $q, utils){
         deferred.reject(data);
       });
       return deferred.promise;
+    },
+    aggrigate : function (queryObject, api){
+      queryObject = queryObject || {};
+
+      var _query = angular.copy(queryObject);
+      if (!api) return $log.error('No API selected');
+
+      if (uri === '?') return;
+      if (_query.query){
+        if (_query.query.charAt(_query.query.length -1) !== '*') _query.query+="*";
+      }
+      var uri = utils.createURI(api, _query);
+      return get(uri);
+    },
+    suggest : function (queryObject, options){
+
+      var _query = angular.copy(queryObject);
+      options = options || {};
+      var baseURI = [config.api, '/search/suggest/phrase'].join('');
+
+      _query.limit = 100;
+      _query.offset = 0;
+
+      var uri = utils.createURI(baseURI, _query);
+
+      return $http.get(uri);
     }
   }
 }

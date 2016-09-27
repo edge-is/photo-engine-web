@@ -1,5 +1,6 @@
-search.directive('backgroundImage', [directiveBackgroundImage]);
-
+/**
+ * Directive to create a background image
+ */
 
 function directiveBackgroundImage(){
   return {

@@ -1,14 +1,8 @@
 
-
-search.controller('imageModalController', [
-  '$scope',
-  '$location',
-  '$modalInstance',
-  'data',
-  'hotkeys',
-  '$rootScope',
-  'osm',
-  function ($scope, $location, $modalInstance, data, hotkeys, $rootScope, osm) {
+/**
+ * Controller for image Modal
+ */
+function imageModalController($scope, $location, $modalInstance, data, hotkeys, $rootScope, osm) {
     setTimeout(function (){
       $rootScope.modalOpen = true;
     }, 300);
@@ -124,7 +118,7 @@ search.controller('imageModalController', [
       $scope.fullscreenClass = 'fullscreen';
       $scope.isFullscreen = true;
 
-      // $scope.$apply();
+      $scope.$apply();
     };
 
     function exitHandler(event){
@@ -184,4 +178,4 @@ search.controller('imageModalController', [
         // });
       })
     }
-}]);
+}

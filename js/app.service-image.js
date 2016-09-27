@@ -6,7 +6,4 @@ function serviceImage($http){
         return $http.get(url);
     }
   }
-
 }
-
-search.service('imageService', ['$http', serviceImage]);

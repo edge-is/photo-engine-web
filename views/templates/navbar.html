@@ -14,7 +14,7 @@
 
           <form class="navbar-form navbar-right">
             <div class="form-group">
-              <typeahead-search query="query" on-typeahead-submit="onTypeaheadSubmit" input-placeholder="Leita í öllum söfnum"></typeahead-search>
+              <typeahead-search query="query" filter="queryObject.filter" on-typeahead-submit="onTypeaheadSubmit" input-placeholder="Leita í öllum söfnum"></typeahead-search>
               <button type="submit" class="btn btn-default"><i class="fa fa-search"></i></button>
               <a class="btn btn-info" href ng-click="showSidebar =!showSidebar"><i class="fa fa-wrench"></i></a>
             </div>
