@@ -22,7 +22,13 @@ function typeaheadDirective(photoApi, $rootScope){
       $scope.query = $scope.query || "";
 
       var form = $(element).closest('form');
-      var submit = (typeof $scope['onTypeaheadSubmit'] === 'function') ? $scope['onTypeaheadSubmit'] : function (){};
+
+      var fallbackSubmit = function (query){
+        window.location = '/search.html?query=' + query;
+      }
+
+
+      var submit = (typeof $scope['onTypeaheadSubmit'] === 'function') ? $scope['onTypeaheadSubmit'] : fallbackSubmit;
 
       setTimeout(function (){
         console.log('typeaheadDirective', $scope);
