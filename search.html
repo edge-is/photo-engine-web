@@ -55,20 +55,11 @@
      <!-- Sidebar -->
      <!-- <div ng-include="'views/templates/sidebar.html'"></div> -->
      <div id="sidebar-wrapper">
-       <ul class="sidebar-nav">
-           <li class="sidebar-brand">
-               <p>
-                   Ljósmyndarar
-               </p>
-           </li>
 
-           <filter-list type="" filter-key="Credit.raw" dataset="photographers" api="{{photographersapi}}" query="query" query-object="queryObject"></filter-list>
-           <!-- <li ng-repeat="photographer in photographers">
-             <a href ng-click="addToFilter('Credit.raw', photographer.name)"><input type="checkbox"> {{photographer.name}} <span class="pull-right">{{photographer.count}}</span></a>
-           </li> -->
-       </ul>
-     </div>
+        <aggrigate type="" title="Ljósmyndarar" key="Credit.raw"  query-object="queryObject"></aggrigate>
+        <aggrigate type="" title="Lykilorð" key="Keywords" query-object="queryObject"></aggrigate>
 
+      </div>
          <!-- /#sidebar-wrapper -->
    <div id="page-content-wrapper">
      <div ng-include="'views/templates/images.html'">
@@ -82,23 +73,7 @@
 
 
   <script src="config.js"></script>
-  <script src="lib/js/jquery.min.js"></script>
-  <script src="lib/js/bootstrap.min.js"></script>
-  <script src="lib/js/leaflet.js"></script>
-  <script src="lib/js/angular.min.js"></script>
-  <script src="lib/js/angular-route.min.js"></script>
-  <script src="lib/js/typeahead.bundle.min.js"></script>
-  <script src="lib/js/angular-typeahead.min.js"></script>
-  <script src="lib/js/ui-bootstrap.min.js"></script>
-  <script src="lib/js/ui-bootstrap-tpls.min.js"></script>
-  <script src="lib/js/angular-simple-logger.min.js"></script>
-  <script src="lib/js/angular-leaflet-directive.min.js"></script>
-  <script src="lib/js/angular-scroll.min.js"></script>
-  <script src="lib/js/hotkeys.min.js"></script>
-  <script src="lib/js/select.min.js"></script>
-  <script src="lib/js/angular-sanitize.min.js"></script>
-  <script src="lib/js/angular-cookies.min.js"></script>
-  <script src="lib/js/ng-notify.min.js"></script>
+  <script src="dist/js/libs.js"></script>
   <script src="dist/js/is_IS.min.js"></script>
   <script src="dist/js/application.min.js"></script>
 </body>

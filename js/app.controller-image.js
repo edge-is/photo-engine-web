@@ -13,6 +13,8 @@ function imageController($scope, $location, photoApi, cacheFactory, $rootScope, 
     }
   });
 
+  $scope.globalCopyright = config.copyright || '';
+
   $scope.onTypeaheadSubmit = function submitOnSearch(query){
     $window.location = '/search.html?query=' + query;
   };
