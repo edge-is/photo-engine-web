@@ -7,16 +7,11 @@ function mainSearchController($scope, photoApi, $location, $anchorScroll, $uibMo
   $scope.noResults = false;
   $scope.showSidebar = true;
   $scope.scrollDisabled = true;
-  $scope.photographersapi =  [config.api, '/aggregates/Credit'].join('');
-
-  $scope.enableURIwatch = true;
-  // $scope.photographersapi =  [config.api, '/aggregates/Credit'].join('');
+  $scope.maxHits = 30;
 
   $timeout(function (){
     $scope.scrollDisabled = false;
   }, 500);
-  $scope.maxHits = 30;
-
 
   $scope.queryObject = {
     query : $scope.query,
@@ -32,9 +27,9 @@ function mainSearchController($scope, photoApi, $location, $anchorScroll, $uibMo
     $scope.prevResultsAvailable = false;
     $scope.queryObject.offset = 0;
 
+    $log.debug('typeaheadSubmit', query);
 
     $scope.search($scope.queryObject, true);
-
   };
 
   $scope.largeInputSubmit = function (){
@@ -46,6 +41,7 @@ function mainSearchController($scope, photoApi, $location, $anchorScroll, $uibMo
   }
 
   $scope.updateURI = function (queryObject){
+    $log.debug('updateURI', queryObject);
 
     var qObject = angular.copy(queryObject);
     for (var key in qObject){
@@ -55,23 +51,31 @@ function mainSearchController($scope, photoApi, $location, $anchorScroll, $uibMo
         qObject[key] = JSON.stringify(qObject[key]);
       }
     }
+    $rootScope.$emit('$updateURI', qObject);
     $location.search(qObject);
     $scope.currentURI = $location.$$url;
   };
 
-  $scope.search = function (queryObject, newQuery, callback){
+  $scope.search = function (_queryObject, newQuery, callback){
+    callback = callback || function (){};
+    var queryObject = angular.copy(_queryObject);
+
     $log.debug('SEARCH', queryObject, newQuery);
+    $rootScope.$emit('$search', queryObject, newQuery);
+
     if (newQuery){
       $scope.mainSearchHits =  [];
       $scope.queryObject = queryObject;
     }
     $scope.noResults = false;
+
     $scope.updateURI(queryObject);
-    callback = callback || function (){};
-    $scope.enableURIwatch = false;
 
     $log.debug('queryObject SEARCH', queryObject);
     photoApi.query(queryObject).then( function (response){
+
+      $log.debug('search::results', response.data.hits.length, response.data._took);
+
       $scope.displayResultCount = true;
       $scope.searchTime = response.data._took;
       $scope.submittedQuery = queryObject;
@@ -89,12 +93,14 @@ function mainSearchController($scope, photoApi, $location, $anchorScroll, $uibMo
       response.data.hits.forEach(function (item){
         $scope.mainSearchHits.push(item);
       });
-      $scope.enableURIwatch = true;
+
       callback();
     });
   }
 
   $scope.updateViewPort = function (imageID){
+
+    $rootScope.$emit('$anchor', imageID);
     $scope.submittedQuery.anchor = imageID;
     $scope.updateURI($scope.submittedQuery);
   }
@@ -138,6 +144,7 @@ function mainSearchController($scope, photoApi, $location, $anchorScroll, $uibMo
   });
 
   $scope.openImage = function (index, image, images){
+    $scope.enableURIwatch = false;
     var lastURI = "";
     var modalInstance = $uibModal.open({
       animation: $scope.animationsEnabled,
@@ -155,13 +162,16 @@ function mainSearchController($scope, photoApi, $location, $anchorScroll, $uibMo
         }
       }
     });
+    $rootScope.$emit('$modalOpen', modalInstance);
 
     modalInstance.result.then(function (selectedItem) {
       $scope.selected = selectedItem;
+      $scope.enableURIwatch = true;
       $location.url($scope.currentURI);
       $rootScope.modalOpen = false;
     }, function () {
       $location.url($scope.currentURI);
+      $scope.enableURIwatch = true;
       $rootScope.modalOpen = false;
    });
 
@@ -201,33 +211,15 @@ function mainSearchController($scope, photoApi, $location, $anchorScroll, $uibMo
     });
   }
 
-  // $scope.$watchCollection('queryObject.filter', function (_new, _old){
-  //   // Return if the value is the same
-  //   // to prevent loading the data twice
-  //   $log.debug('queryObject.filter', _new, _old);
-  //   if (_new === _old) return;
-  //   $log.debug('Searching from watchCollection(queryObject.fitler)', _new, _old)
-  //   if (_new) {
-  //     $scope.search($scope.queryObject, true);
-  //   }
-  // });
+  $rootScope.$on('$filterChange', function (event, filters){
+    $log.debug('filtersChange', filters, $scope.submittedQuery);
+    var newSearchObject = angular.copy($scope.submittedQuery);
 
-  $rootScope.$on('$locationChangeSuccess', function (event, data){
-    if ($scope.enableURIwatch){
-      var params = $location.search();
-      $log.debug('Searching from changed query params', params);
-      params.filter = utils.JSON.parse(params.filter);
-      params.query = params.query || "";
-      $scope.search(params, true);
-    }
+    newSearchObject.filter = filters;
+
+    $scope.search(newSearchObject, true);
 
   });
-  // $rootScope.$on('historyBack', function (event, data){
-  //   $log.debug('historyBack', data);
-  //
-  //   // if query or filter then search for it.
-  //   if (data.params.query || data.params.filter) $scope.search(data.params, true);
-  // });
 
 
 }

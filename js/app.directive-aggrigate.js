@@ -1,5 +1,6 @@
-
-
+/**
+ * Controller for Aggrigates directive
+ */
 
 function directiveAggrigates ($http, utils, $rootScope, photoApi, $log, $location, $timeout){
   return {
@@ -29,7 +30,6 @@ function directiveAggrigates ($http, utils, $rootScope, photoApi, $log, $locatio
 
       $scope.applydfilters = getFilters();
 
-
       $scope.selectedAPI = attrs.key;
 
       var rawResult = false;
@@ -52,22 +52,20 @@ function directiveAggrigates ($http, utils, $rootScope, photoApi, $log, $locatio
 
       function getFilters (){
         var params = $location.search();
-
         return utils.JSON.parse(params.filter) || {};
-
       }
 
       $scope.toggleFilters = function (filterKey, filterValue){
-
+        $scope.applydfilters = $scope.applydfilters || {};
         $log.debug('ToggleFilters', $scope.applydfilters, filterKey, filterValue, $scope.applydfilters[filterKey]);
 
         if ($scope.applydfilters[filterKey] === filterValue){
           delete $scope.applydfilters[filterKey];
-          if (Object.keys($scope.applydfilters).length === 0) return $location.search('filter', undefined);
-          return $location.search('filter', JSON.stringify($scope.applydfilters));
+        }else{
+          $scope.applydfilters[filterKey] = filterValue;
         }
-        $scope.applydfilters[filterKey] = filterValue;
-        $location.search('filter', JSON.stringify($scope.applydfilters));
+
+        $rootScope.$emit('$filterChange', angular.copy($scope.applydfilters));
       }
       function parseList(array, limit, stringMaxLength){
         return array.map(function (item){
@@ -84,34 +82,31 @@ function directiveAggrigates ($http, utils, $rootScope, photoApi, $log, $locatio
         return array;
       }
 
-      $rootScope.$on('queryUpdate', function (event, _new, _old){
-        update({ query: _new, filter : $scope.queryObject.filter });
-      });
+      function getChanges(object){
+        var changes = {};
 
-      $scope.$watch('query', function (_new, _old){
-        update({query: _new, filter: $scope.queryObject.filter });
-      });
+        for (var key in object){
+          if (object[key].new){
+            changes[key] = object[key].new;
+          }
+        }
 
+        return changes;
 
-      $rootScope.$on('$locationChangeSuccess', function (event, data){
-        $log.debug('$locationChangeSuccess', $location.search());
-        var params = $location.search();
-        params.filter = utils.JSON.parse(params.filter);
-        if (params.query || params.filter) update(params);
-      });
+      }
 
       $scope.searchInProgress = false;
       function update(_query){
-        _query = _query || {};
+        _query = angular.copy( _query || {} );
         _query.offset = 0;
-
-        if (_query.filter) $scope.applydfilters  = _query.filter;
 
         if ($scope.searchInProgress) return;
 
         $scope.searchInProgress = true;
-        photoApi.aggrigate(_query, api).then(function (response){
 
+        $log.debug('aggrigate::query', _query);
+
+        photoApi.aggrigate(_query, api).then(function (response){
           var res = parseList(response.data.data[resultKey], limit, stringMaxLength);
           if (res.length > 10){
             $scope.moreAvailable = true;
@@ -126,6 +121,18 @@ function directiveAggrigates ($http, utils, $rootScope, photoApi, $log, $locatio
           }, 300)
         });
       }
+      var initLoad = $timeout(function(){
+        var locationParams = $location.search();
+
+        update(locationParams);
+      }, 300);
+
+      $rootScope.$on('$search', function (event, queryObject, newSearch){
+        $log.debug('aggrigate::$search', queryObject, newSearch);
+        if (initLoad.cancel) initLoad.cancel();
+        update(queryObject);
+      });
+
     }
   }
 }
