@@ -32,6 +32,7 @@
     "angular-simple-logger": "^0.1.7",
     "angular-endless-scroll": "angular-infinite-scroll-xs#*",
     "ng-notify": "~0.8.0",
-    "angular-cookies": "~1.5.8"
+    "angular-cookies": "~1.5.8",
+    "turn.js": "*"
   }
 }

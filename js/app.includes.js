@@ -6,6 +6,10 @@ search.service('osm', ['map', serviceOSM]);
 search.controller('image', [ '$scope', '$location', 'photoApi', 'cacheFactory', '$rootScope', 'osm','$window', imageController]);
 search.controller('mainSearch', ['$scope','photoApi', '$location', '$anchorScroll', '$uibModal', '$rootScope', 'utils', '$timeout', '$log', mainSearchController]);
 search.controller('archives', ['$scope', '$http',  archiveController]);
+search.controller('archiveListing', ['$scope', '$http',  archiveListingController]);
+
+search.controller('tmpCarousel', ['$scope', '$http',  archiveImageCarousel]);
+
 search.controller('imageModalController', [ '$scope','$location','$modalInstance','data','hotkeys','$rootScope','osm', imageModalController ]);
 search.controller('index', ['$scope','$window', indexController]);
 search.directive('notifyDevelopment', ['$log',  '$cookies', 'ngNotify', developmentDirective]);
