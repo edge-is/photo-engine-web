@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="search">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Photo Engine</title>
+
+    <!-- Bootstrap Core CSS -->
+    <link href="lib/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Notify CSS -->
+    <link href="lib/css/ng-notify.min.css" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link href="dist/css/grayscale.min.css" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link href="dist/css/sidebar.min.css" rel="stylesheet">
+
+
+    <link href="lib/css/leaflet.css" rel="stylesheet">
+    <link href="lib/css/select.min.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="dist/css/application.min.css" media="screen" title="no title" charset="utf-8">
+
+    <!-- Custom Fonts -->
+    <link href="lib/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href="//fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic" rel="stylesheet" type="text/css">
+    <link href="//fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet" type="text/css">
+
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+
+</head>
+
+<body id="page-top" data-spy="scroll" data-target=".navbar-fixed-top" ng-controller="archiveListing">
+  <div ng-include="'views/templates/navbar.html'"></div>
+  <div class="all-archives-content padding-top-70px container">
+    <div class="row col-md-10">
+      <div class="list-group">
+        <button type="button" ng-click="next(item.type)" ng-repeat="(index, item) in items" class="list-group-item">{{item.name}}</button>
+      </div>
+    </div>
+  </div>
+
+  <notify-development></notify-development>
+
+  <script src="config.js"></script>
+  <script src="dist/js/libs.js"></script>
+  <script src="dist/js/is_IS.min.js"></script>
+  <script src="dist/js/application.min.js"></script>
+</body>
+
+</html>
