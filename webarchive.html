@@ -48,6 +48,16 @@
 <body id="page-top" data-spy="scroll" data-target=".navbar-fixed-top" ng-controller="archiveListing">
   <div ng-include="'views/templates/navbar.html'"></div>
   <div class="all-archives-content padding-top-70px container">
+    <ol class="breadcrumb">
+      <li ng-repeat="(index, folder) in order" ng-show="(folder.name)">
+
+        <span ng-show="setActive(index)">{{folder.name}}</span>
+
+
+
+        <a href="#" ng-hide="setActive(index)" ng-click="setField(index)" >{{folder.name}}</a>
+      </li>
+    </ol>
     <div class="row col-md-10">
       <div class="list-group">
         <button
