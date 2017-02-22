@@ -17,13 +17,27 @@ function controllerDisplayArchive($scope, $http, $location, $timeout, $rootScope
   var init = true;
 
 
+  function int(integer){
+    var _int = parseInt(_int);
+
+    if (isNaN(_int)){
+      return 0;
+    }
+
+    return _int;
+  }
+
   $scope.getImages = function (callback){
     callback = callback || function (){};
 
     var limit = $scope.limit;
 
-    if (init){
+    if (init && $scope.index){
       limit = $scope.index + 3;
+    }
+
+    if (isNaN(limit)){
+      limit = 0;
     }
 
     var url = [
