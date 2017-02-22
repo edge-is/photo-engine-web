@@ -1,7 +1,15 @@
 <div class="">
   <div class="container-fluid">
-    <div class="btn btn-block btn-success text-center load-previous-data" ng-show="prevResultsAvailable" ng-click="loadPrevResults();">
-      <i class="fa fa-search"> Hlaða fyrri niðurstöðum</i>
+    <div class="col-md-12">
+      <form class="" ng-submit="largeInputSubmit()">
+        <div class="input-group">
+          <span class="input-group-addon"><i class="fa fa-search"></i></span>
+          <input ng-model="queryObject.query" type="text" class="form-control" aria-label="Amount (to the nearest dollar)">
+        </div>
+      </form>
+      <div class="btn btn-block btn-success text-center load-previous-data" ng-show="prevResultsAvailable" ng-click="loadPrevResults();">
+        <i class="fa fa-search"> Hlaða fyrri niðurstöðum</i>
+      </div>
     </div>
     <div class="search-result-content container-fluid">
       <div class="row">

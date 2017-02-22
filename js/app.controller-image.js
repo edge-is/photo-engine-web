@@ -13,6 +13,8 @@ function imageController($scope, $location, photoApi, cacheFactory, $rootScope, 
     }
   });
 
+  $scope.globalCopyright = config.copyright || '';
+
   $scope.onTypeaheadSubmit = function submitOnSearch(query){
     $window.location = '/search.html?query=' + query;
   };
@@ -25,15 +27,26 @@ function imageController($scope, $location, photoApi, cacheFactory, $rootScope, 
   $scope.image = {};
 
   photoApi.getByID($scope.imageID).success(function ( response){
-    $scope.image = response.data;
+
+    var img = response.data || {};
+    img._source.Keywords = mustBeArray(img._source.Keywords);
+    img._source.Subject = mustBeArray(img._source.Subject);
+    $scope.image = img;
+
 
     $scope.initMap();
   });
+
+  function mustBeArray(arr){
+    if (Array.isArray(arr)) return arr;
+    return [arr];
+  }
 
   $scope.center = {};
 
   $scope.defaults = { scrollWheelZoom: false };
   $scope.mapmarker = {};
+
   $scope.initMap = function (image){
     $scope.MapLoaded = false;
     osm.search($scope.image._source, function (d){

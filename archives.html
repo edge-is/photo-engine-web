@@ -51,7 +51,7 @@
   <div class="all-archives-content padding-top-70px container-fluid">
     <div class="row">
       <div ng-repeat="(index, archive) in archives">
-        <div class="col-lg-3 col-md-3 col-sm-4 random-archive-images-container">
+        <div class="col-lg-2 col-md-2 col-sm-4 random-archive-images-container">
           <a href="/search.html?filter={{archive.filterJSON}}" class="thumbnail" follow-link  target="_self">
             <random-archive-image archive="{{archive.archive_id}}" archive-name="{{archive.name}}"></random-archive-image>
           </a>
@@ -66,23 +66,7 @@
 
 
   <script src="config.js"></script>
-  <script src="lib/js/jquery.min.js"></script>
-  <script src="lib/js/bootstrap.min.js"></script>
-  <script src="lib/js/leaflet.js"></script>
-  <script src="lib/js/angular.min.js"></script>
-  <script src="lib/js/angular-route.min.js"></script>
-  <script src="lib/js/typeahead.bundle.min.js"></script>
-  <script src="lib/js/angular-typeahead.min.js"></script>
-  <script src="lib/js/ui-bootstrap.min.js"></script>
-  <script src="lib/js/ui-bootstrap-tpls.min.js"></script>
-  <script src="lib/js/angular-simple-logger.min.js"></script>
-  <script src="lib/js/angular-leaflet-directive.min.js"></script>
-  <script src="lib/js/angular-scroll.min.js"></script>
-  <script src="lib/js/hotkeys.min.js"></script>
-  <script src="lib/js/select.min.js"></script>
-  <script src="lib/js/angular-sanitize.min.js"></script>
-  <script src="lib/js/angular-cookies.min.js"></script>
-  <script src="lib/js/ng-notify.min.js"></script>
+  <script src="dist/js/libs.js"></script>
   <script src="dist/js/is_IS.min.js"></script>
   <script src="dist/js/application.min.js"></script>
 </body>

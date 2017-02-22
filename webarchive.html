@@ -20,8 +20,6 @@
     <!-- Custom CSS -->
     <link href="dist/css/grayscale.min.css" rel="stylesheet">
 
-
-
     <!-- Custom CSS -->
     <link href="dist/css/sidebar.min.css" rel="stylesheet">
 
@@ -30,7 +28,6 @@
     <link href="lib/css/select.min.css" rel="stylesheet">
 
     <link rel="stylesheet" href="dist/css/application.min.css" media="screen" title="no title" charset="utf-8">
-
 
     <!-- Custom Fonts -->
     <link href="lib/css/font-awesome.min.css" rel="stylesheet" type="text/css">
@@ -46,28 +43,19 @@
     <![endif]-->
 
 
-
 </head>
 
-<body id="page-top" data-spy="scroll" data-target=".navbar-fixed-top" ng-controller="image" >
-
-  <div ng-include="'views/templates/navbar.html'">
-
+<body id="page-top" data-spy="scroll" data-target=".navbar-fixed-top" ng-controller="archiveListing">
+  <div ng-include="'views/templates/navbar.html'"></div>
+  <div class="all-archives-content padding-top-70px container">
+    <div class="row col-md-10">
+      <div class="list-group">
+        <button type="button" ng-click="next(item.type)" ng-repeat="(index, item) in items" class="list-group-item">{{item.name}}</button>
+      </div>
+    </div>
   </div>
 
-   <div id="wrapper" class="toggled" >
-       <div id="page-content-wrapper">
-           <div class="container-fluid">
-             <div ng-include="'views/templates/image-body.html'"></div>
-
-           </div>
-       </div>
-       <!-- /#page-content-wrapper -->
-   </div>
-   <notify-development></notify-development>
-
-
-
+  <notify-development></notify-development>
 
   <script src="config.js"></script>
   <script src="dist/js/libs.js"></script>

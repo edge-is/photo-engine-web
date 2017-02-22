@@ -8,7 +8,7 @@ function imageModalController($scope, $location, $modalInstance, data, hotkeys, 
     }, 300);
     $scope.index = data.index;
     $scope.images = data.results
-    $scope.image = data.image;
+    $scope.image = parseImage(data.image);
     $scope.isFullscreen = false;
     $scope.fullscreenClass="no-fullscreen";
 
@@ -28,6 +28,11 @@ function imageModalController($scope, $location, $modalInstance, data, hotkeys, 
       //$scope.prev();
     });
 
+    function mustBeArray(arr){
+      if (Array.isArray(arr)) return arr;
+      return [arr];
+    }
+
     $scope.nextImg = $scope.images[$scope.index + 1];
     $scope.prevImg = $scope.images[$scope.index - 1];
 
@@ -35,7 +40,9 @@ function imageModalController($scope, $location, $modalInstance, data, hotkeys, 
       if(($scope.index + 1) < $scope.images.length ){
         $scope.StopLazy();
         $scope.index = $scope.index + 1;
-        $scope.image = $scope.images[$scope.index];
+
+        var img = $scope.images[$scope.index];
+        $scope.image = parseImage(img);
         $scope.nextImg = $scope.images[$scope.index];
         $scope.prevImg = $scope.images[$scope.index - 1];
 
@@ -47,11 +54,18 @@ function imageModalController($scope, $location, $modalInstance, data, hotkeys, 
       if($scope.index > 0){
         $scope.StopLazy();
         $scope.index = $scope.index - 1;
-        $scope.image = $scope.images[$scope.index];
+        var img = $scope.images[$scope.index];
+        $scope.image = parseImage(img);
         $scope.prevImg = $scope.images[$scope.index];
         $location.url('image.html?image=' + $scope.image._id );
       }
     };
+
+    function parseImage(img){
+      img._source.Keywords = mustBeArray(img._source.Keywords);
+      img._source.Subject = mustBeArray(img._source.Subject);
+      return img;
+    }
 
 
 

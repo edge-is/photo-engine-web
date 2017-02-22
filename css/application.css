@@ -181,19 +181,9 @@ span.twitter-typeahead {
     text-transform: none;
 }
 
-/*.gallery .thumbnail img { max-height: 100px; }*/
-
-/*.lazy-img .low-resolution-image{
-	height : 600px;
-}*/
-
-
-/*.lazy-img img {
-	height: 600px;
-}*/
-/*.intro-back {
-	position : fixed;
-}*/
+.intro.intro-back {
+  margin-top:40px;
+}
 .nav-lowercase {
 	text-transform: none;
 }
@@ -380,4 +370,34 @@ section.container{
 }
 .sidebar-brand p{
   font-size: 18px;
+}
+
+.filterlist-list span.pull-right{
+  margin-right:10px;
+}
+
+.fullscreen-carousel .carousel {
+    height: 100%;
+}
+.fullscreen-carousel .item {
+    height: 100%;
+}
+.fullscreen-carousel .active {
+    height: 100%;
+}
+
+.fullscreen-carousel .carousel-inner {
+    height: 100%;
+}
+
+/* Background images are set within the HTML using inline CSS, not here */
+
+.fullscreen-carousel .fill {
+    width: 100%;
+    height: 100%;
+    background-position: center;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    background-size: cover;
+    -o-background-size: cover;
 }

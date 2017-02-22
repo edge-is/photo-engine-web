@@ -5,6 +5,28 @@ module.exports = function (grunt) {
         js : {
           src : ['js/app.js','js/app.*.js'],
           dest : 'dist/js/application.js'
+        },
+        libs : {
+          src : [
+            "lib/js/jquery.min.js",
+            "lib/js/bootstrap.min.js",
+            "lib/js/leaflet.js",
+            "lib/js/angular.min.js",
+            "lib/js/angular-route.min.js",
+            "lib/js/typeahead.bundle.min.js",
+            "lib/js/angular-typeahead.min.js",
+            "lib/js/ui-bootstrap.min.js",
+            "lib/js/ui-bootstrap-tpls.min.js",
+            "lib/js/angular-simple-logger.min.js",
+            "lib/js/angular-leaflet-directive.min.js",
+            "lib/js/angular-scroll.min.js",
+            "lib/js/hotkeys.min.js",
+            "lib/js/select.min.js",
+            "lib/js/angular-sanitize.min.js",
+            "lib/js/angular-cookies.min.js",
+            "lib/js/ng-notify.min.js"
+          ],
+          dest : 'dist/js/libs.js'
         }
       },
       uglify : {
