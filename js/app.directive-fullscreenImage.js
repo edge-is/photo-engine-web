@@ -19,7 +19,7 @@ function directiveFullscreenImage(){
 
       function selectImage(image){
         var cdnImage = image._source._thumbnails['xx-large'].name;
-        var cdn = "http://static.myndahlada.is/thumbnails/";
+        var cdn = "https://static.myndahlada.is/thumbnails/";
 
         return [cdn, cdnImage].join('');
       }
