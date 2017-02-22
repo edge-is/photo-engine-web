@@ -24,7 +24,8 @@ module.exports = function (grunt) {
             "lib/js/select.min.js",
             "lib/js/angular-sanitize.min.js",
             "lib/js/angular-cookies.min.js",
-            "lib/js/ng-notify.min.js"
+            "lib/js/ng-notify.min.js",
+            "lib/js/bodybuilder.min.js"
           ],
           dest : 'dist/js/libs.js'
         }
@@ -65,6 +66,10 @@ module.exports = function (grunt) {
               'bower_components/bootstrap/dist/css/bootstrap.min.css',
               'bower_components/bootstrap/dist/css/bootstrap.css.map'
               ], dest: 'lib/css/', filter: 'isFile'},
+
+            {expand: true, flatten:true, src: [
+              'bower_components/bootstrap/dist/fonts/*'
+            ], dest: 'lib/fonts/', filter: 'isFile'},
 
             //boostrap js
             {expand: true, flatten:true, src: [
@@ -152,7 +157,10 @@ module.exports = function (grunt) {
             {expand: true, flatten:true, src: ['bower_components/ng-notify/dist/ng-notify.min.css'], dest: 'lib/css/', filter: 'isFile'},
             {expand: true, flatten:true, src: ['bower_components/ng-notify/dist/ng-notify.min.js'], dest: 'lib/js/', filter: 'isFile'},
 
-            {expand: true, flatten:true, src: ['bower_components/angular-cookies/angular-cookies.min.js'], dest: 'lib/js/', filter: 'isFile'}
+            {expand: true, flatten:true, src: ['bower_components/angular-cookies/angular-cookies.min.js'], dest: 'lib/js/', filter: 'isFile'},
+
+            {expand: true, flatten:true, src: ['node_modules/bodybuilder/browser/bodybuilder.min.js'], dest: 'lib/js/', filter: 'isFile'}
+
 
             // Angular Webstorage
             //{expand: true, flatten:true, src: ['bower_components/angular-webstorage/angular-webstorage.min.js'], dest: 'lib/js/', filter: 'isFile'}

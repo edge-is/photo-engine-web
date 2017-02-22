@@ -6,6 +6,8 @@ function archiveListingController($scope, $http){
   var url = [config.api, '/aggregates/archive'].join('');
   $scope.items = [];
 
+  $scope.images = [];
+
   $scope.onTypeaheadSubmit = function submitOnSearch(query){
     window.location = '/search.html?query=' + query;
   };
@@ -13,114 +15,93 @@ function archiveListingController($scope, $http){
   $scope.query = "";
 
   $scope.queryObject = {};
+  $scope.lastField = "";
 
-  $scope.next = function (current){
-      console.log(current);
+  function findIndex(arr, obj){
 
-      if (current === 'listPaper'){
-        $scope.items = $scope.teams;
-      }else if (current === 'listTeams'){
-        $scope.items = $scope.teamArchives;
-      }else if (current === 'teamArchives'){
-        // display the archive
-        //
-        $scope.items = $scope.allPages;
+    var key = Object.keys(obj).pop();
+
+    var index = false;
+
+
+    arr.forEach(function (item, i){
+      if (item[key] === obj[key]) {
+        index = i;
       }
-  }
-
-  $scope.response = [];
-
-  $scope.listPapers = [];
-
-  $scope.paper = [];
-  $scope.teams = [];
-
-  $scope.teamArchives = [];
-
-  $scope.allPages = [];
-
-  // FIXME
-  // Should get all uniq .. no hacking required..
-  //
-  //
-  // First state is AvailableArchives -> Teams -> SelectTeam -> Select Paper
-  $http.get('./temp-exif.json').success(function (response){
-    $scope.response = response;
-
-    var papers = getPapers(response);
-
-    var teams = getTeams(response);
-
-    var teamArchives = getTeamArchives(response);
-
-
-    $scope.teamArchives = teamArchives;
-    $scope.items = papers;
-    $scope.teams = teams;
-
-    $scope.allPages = getPages(response);
-    console.log(allPages);
-  });
-
-  function getPages(arr){
-    return arr.map(function (item){
-      item.name = item.Description;
-      return item;
-    });
-  }
-
-  function getTeams(arr){
-    var array = getUniqKeys(arr, 'UserDefined4');
-    return array.map(function (name){
-      return { name : name, type : 'listTeams' };
-    });
-  }
-  function getTeamArchives(arr){
-    var array = getUniqKeys(arr, 'Comment', ' ');
-    return array.map(function (name){
-      return { name : name, type : 'teamArchives' };
-    });
-  }
-  //UserDefined4
-
-  function getPapers(arr){
-
-    var array = getUniqKeys(arr, 'Source');
-
-    return array.map(function (name){
-      return { name : name, type : 'listPaper' };
-    })
-  }
-
-  function getUniqKeys(arr, keyname, split){
-    var obj = {};
-
-    split = split || ' ';
-
-    arr.forEach(function (item){
-      var key = selectKeys(item, keyname);
-
-      if (Array.isArray(key)){
-        key = key.join(split);
-      }
-
-      obj[key] = true;
     });
 
-    return Object.keys(obj);
+    return index;
   }
 
-  function selectKeys(object, keys){
-    if (!Array.isArray(keys)){
-      return object[keys];
+  $scope.next = function (value){
+
+    var index = findIndex($scope.order, $scope.currentFieldObject);
+
+    if (index === -1) return console.log('WOW');
+
+    index++;
+
+    var field = $scope.order[index];
+
+    if (!field){
+      return window.location = '/displayarchive.html?f='+$scope.lastField+'&archive=' + value;
     }
-    var arr = [];
-    return keys.map(function (key){
-      return object[key];
-    });
+
+    $scope.lastField = value;
 
 
+
+    field.filter.value = value;
+
+    $scope.getField(field);
 
   }
+
+  $scope.currentFieldObject = false;
+
+  $scope.order = [
+    { field : "Source.raw" ,          filter : false },
+    { field : "UserDefined4.raw" ,    filter : { field : "Source.raw", value : "" } },
+    { field : "UserDefined12.raw" ,   filter : { field : "UserDefined4.raw", value : "" } },
+    { field : "ReferenceNumber.raw",  filter : { field : "UserDefined12.raw", value : "" } }
+  ];
+
+
+  $scope.getField = function(obj){
+    console.log(obj);
+    var field = obj.field;
+
+
+    $scope.currentFieldObject = obj;
+    var url = [config.api, '/es/midlunarverkefni2/archives/_search'].join('');
+
+
+    var aggr = bodybuilder()
+            .agg('terms', field, {}, field);
+
+
+    if (obj.filter){
+      aggr.filter('term', obj.filter.field, obj.filter.value);
+    }
+
+    aggr.build('v2');
+
+    $http({
+      url : url,
+      data : aggr.build('v2'),
+      method : 'POST'
+    }).then(function (res){
+
+      console.log(res);
+      $scope.items = res.data.aggregations[field].buckets;
+
+    });
+  }
+
+
+
+  $scope.getField($scope.order[0]);
+
+
 
 }

@@ -51,6 +51,7 @@
     var back = fromHistory(data);
     if (back){
       $rootScope.$emit('historyBack', back);
+      console.log('historyBack');
     }
 
     var myLastLocation = $rootScope.history[$rootScope.history.length -1];
@@ -63,7 +64,9 @@
       }
     }
 
-    $rootScope.history.push(newLocation);
+    //$rootScope.history.push(newLocation);
+
+
     function fromHistory(absURL){
       if ($rootScope.history.length === 1) {
         return getLocationInfo();
