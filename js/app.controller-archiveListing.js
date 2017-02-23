@@ -2,7 +2,7 @@
  * Controller for Archive Listing
  */
 
-function archiveListingController($scope, $http, $rootScope){
+function archiveListingController($scope, elasticsearch, $rootScope, $location){
   var url = [config.api, '/aggregates/archive'].join('');
   $scope.items = [];
 
@@ -13,24 +13,66 @@ function archiveListingController($scope, $http, $rootScope){
   };
 
   $scope.query = "";
-
   $scope.queryObject = {};
-  $scope.lastField = "";
+
+  $scope.lastValue = "";
+
+  $scope.dir = [];
 
   $scope.order = [
-    { field : "Source.raw" ,         name:false, value: false, filter : false },
-    { field : "UserDefined4.raw" ,   name:false, value: false, filter : { field : "Source.raw"} },
-    { field : "UserDefined12.raw" ,  name:false, value: false, filter : { field : "UserDefined4.raw"} },
-    { field : "ReferenceNumber.raw", name:false, value: false, filter : { field : "UserDefined12.raw"} }
+    { active:true,  field : "Source.raw" ,         filter : false },
+    { active:false, field : "UserDefined4.raw" ,   filter : { field : "Source.raw", value : false } },
+    { active:false, field : "UserDefined12.raw" ,  filter : { field : "UserDefined4.raw", value : false } },
+    { active:false, field : "ReferenceNumber.raw", filter : { field : "UserDefined12.raw", value : false } }
   ];
+
+  function setActive(field){
+    $scope.order.forEach(function (item, key){
+      $scope.order[key].active = false;
+
+      if (item.field === field){
+        $scope.order[key].active = true;
+      }
+    })
+  };
+
+  $scope.next = function (value, ord, oIndex){
+    var _next = oIndex + 1;
+
+    if (!$scope.order[_next]) {
+      var location = '/displayarchive.html?f='+$scope.lastValue+'&archive=' + value;
+      return window.location = location;
+    };
+
+    $scope.order[oIndex].active = false;
+    $scope.order[_next].active = true;
+
+    $scope.dir[oIndex] = $scope.order[_next];
+    $scope.lastValue = value;
+
+    $scope.order[_next].filter.value = value;
+    get(
+      $scope.order[_next].field,
+      $scope.order[_next].filter
+    );
+
+  };
+  $scope.setIndex = function (index, obj){
+    setActive(obj.field);
+
+    $scope.dir = $scope.dir.slice(0, index +1);
+
+    get(
+      obj.field,
+      obj.filter
+    );
+  }
+
 
   function findIndex(arr, obj){
 
     var key = Object.keys(obj).pop();
-
     var index = false;
-
-
     arr.forEach(function (item, i){
       if (item[key] === obj[key]) {
         index = i;
@@ -40,105 +82,23 @@ function archiveListingController($scope, $http, $rootScope){
     return index;
   }
 
-  $scope.setField = function (index){
-
-    for (var i = (index + 1); i < $scope.order.length; i++){
-      $scope.order[i].name = false;
-    }
-
-    $scope.getField(index);
-  }
-
-  $scope.setActive = function (index){
-    var v = $scope.order[index +1 ];
-    if (!v) return true;
-
-    if (!v.name) return true;
-    return false;
-
-  }
-
-  function getDir(order){
-    var arr = order.filter(function (item){
-      return (item.name);
-    }).map(function (item){
-      return item.name;
-    });
-
-    return arr.join('/');
-  }
-
-  $scope.next = function (value){
-
-    var index = findIndex($scope.order, $scope.currentFieldObject);
-
-    if (index === -1) return console.log('WOW');
-
-    $scope.order[index].name = value;
-
-    index++;
-
-    var dir = getDir($scope.order);
-
-    if (!$scope.order[index]){
-
-      var location = '/displayarchive.html?f='+$scope.lastField+'&archive=' + value;
-
-      return window.location = location + '&dir=' +dir;
-    }
-
-    $scope.order[index].value = value;
-
-    $scope.lastField = value;
-
-
-    $scope.getField(index);
-
-  }
-
-  $scope.currentFieldObject = false;
-
-
-
-  $scope.getField = function(index){
-    var obj = $scope.order[index];
-
-    console.log(obj, index);
-
-    var field = obj.field;
-
-    $scope.currentFieldObject = obj;
-    var url = [config.api, '/es/midlunarverkefni2/archives/_search'].join('');
-
+  function get(field, filter){
 
     var aggr = bodybuilder()
-            .agg('terms', field, {}, field);
-
-
-    if (obj.filter){
-      aggr.filter('term', obj.filter.field, obj.value);
+              .agg('terms', field, {}, field);
+    if (filter){
+      aggr.filter('term', filter.field, filter.value);
     }
-
-    aggr.build('v2');
-
-    $http({
-      url : url,
-      data : aggr.build('v2'),
-      method : 'POST'
-    }).then(function (res){
-
-      console.log('D', $scope.order);
-
-      console.log(res);
-      $scope.items = res.data.aggregations[field].buckets;
-
+    elasticsearch.search({
+      index : config.archive.index,
+      type : config.archive.type,
+      size : 0,
+      body : aggr.build()
+    }, function (err, res){
+      $scope.items = res.aggregations[field].buckets;
     });
   }
 
-
-
-  $scope.getField(0);
-
-
+  get("Source.raw", false);
 
 }

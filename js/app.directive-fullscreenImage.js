@@ -13,7 +13,7 @@ function directiveFullscreenImage(){
       var $item = $(element);
       var $wHeight = $(window).height();
 
-      $item.height($wHeight - 60);
+      $item.height($wHeight - 120);
 
       $scope.selectedImage = selectImage($scope.image);
 

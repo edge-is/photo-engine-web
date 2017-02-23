@@ -1,11 +1,9 @@
 
 
-function controllerDisplayArchive($scope, $http, $location, $timeout, $rootScope){
+function controllerDisplayArchive($scope, elasticsearch, $location, $timeout, $rootScope){
 
   $scope.images = [];
   $scope.archive = $location.search().archive;
-
-
   $scope.filter = $location.search().f;
 
   var _i = $location.search().index;
@@ -14,8 +12,11 @@ function controllerDisplayArchive($scope, $http, $location, $timeout, $rootScope
   $scope.offset = 0;
   $scope.limit = 30;
 
-  var init = true;
+  $scope.currenDoc = false;
 
+  $scope.dir = [];
+
+  var init = true;
 
   function int(integer){
     var _int = parseInt(_int);
@@ -26,6 +27,21 @@ function controllerDisplayArchive($scope, $http, $location, $timeout, $rootScope
 
     return _int;
   }
+
+
+  $scope.getDir = function (){
+    var image = $scope.images[0];
+    if (!image) return;
+    var src = image._source;
+
+    var ObjectName = $scope.currenDoc._source.ObjectName;
+    $scope.dir = [ src.Source, src.UserDefined4, src.UserDefined12, ObjectName ];
+
+    console.log($scope.dir);
+  };
+
+
+
 
   $scope.getImages = function (callback){
     callback = callback || function (){};
@@ -40,38 +56,37 @@ function controllerDisplayArchive($scope, $http, $location, $timeout, $rootScope
       limit = 0;
     }
 
-    var url = [
-      config.api,
-      '/es/midlunarverkefni2/archives/_search?size=',
-      limit,
-      '&from=',
-      $scope.offset
-    ].join('');
+    var query = bodybuilder()
+            .filter('term', 'ReferenceNumber.raw', $scope.archive)
+            .filter('term', 'UserDefined12.raw', $scope.filter)
+            .sort('filename', 'asc')
+            .build();
 
-    $http({
-      url : url,
-      data : bodybuilder()
-              .filter('term', 'ReferenceNumber.raw', $scope.archive)
-              .filter('term', 'UserDefined12.raw', $scope.filter)
+    elasticsearch.search({
+      index : config.archive.index,
+      type : config.archive.type,
+      size : limit,
+      from : $scope.offset,
+      body : query
+    }, function (err, res){
+      if (err) return console.log(err);
 
-              .sort('filename', 'asc')
-              .build(),
-      method : 'POST'
-    }).then(function (res){
-
-      var init = false;
-
-      res.data.hits.hits.forEach(function (item){
+      res.hits.hits.forEach(function (item){
         $scope.images.push(item);
       });
 
-      $scope.offset += res.data.hits.hits.length;
+      if (init){
+        $scope.currenDoc = $scope.images[0];
+      }
+      $scope.getDir();
 
-      if (res.data.hits.total < $scope.offset) return console.log('STOP');
+      $scope.offset += res.hits.hits.length;
+
+      if (res.hits.total < $scope.offset) return console.log('STOP');
 
 
+      init = false;
       callback();
-
     });
   }
 
@@ -79,8 +94,15 @@ function controllerDisplayArchive($scope, $http, $location, $timeout, $rootScope
 
     var i = findCurrentIndex();
 
-    if ( (i + 5) > $scope.images.length){
+    if (!i) return;
+    $scope.currenDoc = $scope.images[i];
+
+    $scope.getDir();
+
+
+    if ( ( i + 5 ) > $scope.images.length ){
       $scope.getImages();
+
     }
 
   });

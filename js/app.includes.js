@@ -6,7 +6,7 @@ search.service('osm', ['map', serviceOSM]);
 search.controller('image', [ '$scope', '$location', 'photoApi', 'cacheFactory', '$rootScope', 'osm','$window', imageController]);
 search.controller('mainSearch', ['$scope','photoApi', '$location', '$anchorScroll', '$uibModal', '$rootScope', 'utils', '$timeout', '$log', mainSearchController]);
 search.controller('archives', ['$scope', '$http',  archiveController]);
-search.controller('archiveListing', ['$scope', '$http', '$rootScope',  archiveListingController]);
+search.controller('archiveListing', ['$scope', 'elasticsearch', '$rootScope','$location',  archiveListingController]);
 
 search.controller('tmpCarousel', ['$scope', '$http',  archiveImageCarousel]);
 
@@ -21,9 +21,9 @@ search.directive('backgroundImage', [directiveBackgroundImage]);
 search.directive('lazyimg', ['$timeout', directiveLazyImage]);
 search.directive('fullscreenImage', ['$timeout', directiveFullscreenImage]);
 
-search.controller('displayArchive', ['$scope', '$http', '$location', '$timeout','$rootScope', controllerDisplayArchive]);
+search.controller('displayArchive', ['$scope', 'elasticsearch', '$location', '$timeout','$rootScope', controllerDisplayArchive]);
 
-
+search.service('elasticsearch', ['$http', serviceElasticsearch]);
 
 
 search.factory('cacheFactory', ['$cacheFactory', cacheFactory]);

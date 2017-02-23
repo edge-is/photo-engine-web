@@ -49,25 +49,24 @@
   <div ng-include="'views/templates/navbar.html'"></div>
   <div class="all-archives-content padding-top-70px container">
     <ol class="breadcrumb">
-      <li ng-repeat="(index, folder) in order" ng-show="(folder.name)">
-
-        <span ng-show="setActive(index)">{{folder.name}}</span>
-
-
-
-        <a href="#" ng-hide="setActive(index)" ng-click="setField(index)" >{{folder.name}}</a>
+      <li ng-repeat="(index, folder) in dir">
+        <a href="#" ng-click="setIndex(index, folder)" ng-show="folder.filter" >{{folder.filter.value}}</a>
       </li>
     </ol>
     <div class="row col-md-10">
-      <div class="list-group">
-        <button
-          type="button"
-          ng-click="next(item.key)"
-          ng-repeat="(index, item) in items"
-          class="list-group-item">
-          {{item.key}}
-          </button>
+
+      <div ng-repeat="( oIndex, ord) in order" ng-show="ord.active">
+        <div class="list-group">
+          <button
+            type="button"
+            ng-click="next(item.key, ord, oIndex)"
+            ng-repeat="(index, item) in items"
+            class="list-group-item">
+            {{item.key}}
+            </button>
+        </div>
       </div>
+
     </div>
   </div>
 
