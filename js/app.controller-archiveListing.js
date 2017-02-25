@@ -120,7 +120,7 @@ function archiveListingController($scope, elasticsearch, $rootScope, $location){
     console.log($scope.selectedValues);
     if (!field){
       var filter = createURIfilter(getQuerys($scope.selectedValues));
-      return window.location = '/displayArchive.html?' + buildURI(filter);
+      return window.location = '/displayarchive.html?' + buildURI(filter);
     }
 
 
