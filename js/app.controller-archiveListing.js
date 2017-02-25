@@ -15,6 +15,128 @@ function archiveListingController($scope, elasticsearch, $rootScope, $location){
   $scope.query = "";
   $scope.queryObject = {};
 
+  $scope.index = config.archive.index;
+  $scope.type = config.archive.type;
+
+  $scope.dir = [];
+
+  $scope._current = 0;
+
+
+ var fields = {
+    'Source.raw'        : 'UserDefined4.raw',
+    'UserDefined4.raw'  : 'UserDefined12.raw',
+    'UserDefined12.raw' : 'UserDefined14.raw',
+    'UserDefined14.raw' : false
+  };
+
+
+  var aggr = bodybuilder()
+              .agg('terms', 'Source.raw', {}, function (q){
+                return q.agg('terms', 'UserDefined4.raw', function (q){
+                  return q.agg('terms', 'UserDefined12.raw', function (q){
+                    return q.agg('terms', 'UserDefined14.raw');
+                  });
+                });
+              });
+
+  elasticsearch.search({
+    index : config.archive.index,
+    type : config.archive.type,
+    size : 1,
+    body : aggr.build()
+  }, function (err, res){
+    //console.log(err, res.hits.hits);
+
+    $scope.originalResponse=angular.copy(res);
+    $scope.aggregates = res;
+
+    var items= res.aggregations['agg_terms_Source.raw'].buckets //.buckets.pop();
+
+    //console.log(x['agg_terms_UserDefined4.raw']);
+    //var items= x['agg_terms_UserDefined4.raw'].buckets;
+    //
+
+
+    var items = selectItems(items, 'Source.raw', 'UserDefined4.raw');
+
+    $scope.originalItems = items;
+    $scope.items = items;
+  });
+
+  $scope.goToStart = function (){
+    $scope.selectedValues = [];
+    $scope.items = $scope.originalItems;
+  }
+
+  function selectItems(arr, field, next, name){
+    name = name || "";
+    return arr.map(function (item){
+      item._name = [name, item.key].join(' ');
+      item._next = next;
+      if (field){
+        item._query = { type : 'term', field : field, value : item.key };
+      }
+      return item;
+    });
+  }
+  $scope.selectedValues = [];
+  function buildURI(object){
+    var arr = [];
+
+    for (var key in object){
+      var value = object[key];
+      arr.push(
+        [key, value].join('=')
+      );
+    }
+
+    return arr.join('&');
+
+  };
+
+  function createURIfilter(arr){
+    return {
+      filter : ['BASE64', Base64.encode(JSON.stringify(arr))].join(':')
+    };
+  }
+
+  function getQuerys(arr){
+    return arr.map(function (item){
+      return item._query;
+    });
+  }
+
+  $scope.linkSelect = function (object, index){
+    $scope.selectedValues.splice(index , $scope.selectedValues.length);
+    $scope.select(object);
+  };
+
+
+  $scope.select = function (object){
+
+    $scope.selectedValues.push(object);
+    var field = object._next;
+    console.log($scope.selectedValues);
+    if (!field){
+      var filter = createURIfilter(getQuerys($scope.selectedValues));
+      return window.location = '/displayArchive.html?' + buildURI(filter);
+    }
+
+
+    var next = fields[field];
+    var items = object['agg_terms_' + field].buckets;
+
+    if (!items){
+      $scope.items = [];
+    }
+    if (items.length === 0 ){
+      $scope.items = [];
+    }
+    $scope.items = selectItems(items, field, next, object._name);
+
+  }
+  /*
   $scope.lastValue = "";
 
   $scope.dir = [];
@@ -99,6 +221,6 @@ function archiveListingController($scope, elasticsearch, $rootScope, $location){
     });
   }
 
-  get("Source.raw", false);
+  get("Source.raw", false);*/
 
 }

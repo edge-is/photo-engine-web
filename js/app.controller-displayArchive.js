@@ -3,14 +3,27 @@
 function controllerDisplayArchive($scope, elasticsearch, $location, $timeout, $rootScope){
 
   $scope.images = [];
-  $scope.archive = $location.search().archive;
-  $scope.filter = $location.search().f;
+  var uriFilters = $location.search().filter;
+
+  $scope.filters = [];
+
+  if (uriFilters.indexOf('BASE64') > -1){
+    var filters =Base64.decode( uriFilters.split(':').pop() );
+
+    try {
+      $scope.filters = JSON.parse(filters);
+    } catch (e) {
+      console.error('Could not parse string', filters);
+    }
+  }
+
 
   var _i = $location.search().index;
 
-  $scope.index = parseInt(_i);
+  $scope.index = int(_i);
   $scope.offset = 0;
   $scope.limit = 30;
+  $scope.total = 0;
 
   $scope.currenDoc = false;
 
@@ -56,20 +69,27 @@ function controllerDisplayArchive($scope, elasticsearch, $location, $timeout, $r
       limit = 0;
     }
 
-    var query = bodybuilder()
-            .filter('term', 'ReferenceNumber.raw', $scope.archive)
-            .filter('term', 'UserDefined12.raw', $scope.filter)
-            .sort('filename', 'asc')
-            .build();
+
+    var query = bodybuilder();
+
+    $scope.filters.forEach(function (filter){
+      query.filter(filter.type, filter.field, filter.value);
+    });
+
+    query.sort('filename', 'asc');
+
+
 
     elasticsearch.search({
       index : config.archive.index,
       type : config.archive.type,
       size : limit,
       from : $scope.offset,
-      body : query
+      body : query.build()
     }, function (err, res){
       if (err) return console.log(err);
+
+      $scope.total = res.hits.total;
 
       res.hits.hits.forEach(function (item){
         $scope.images.push(item);
@@ -117,6 +137,7 @@ function controllerDisplayArchive($scope, elasticsearch, $location, $timeout, $r
       }
     });
 
+    $scope.index = index;
     return index;
   }
 
@@ -129,12 +150,4 @@ function controllerDisplayArchive($scope, elasticsearch, $location, $timeout, $r
       $scope.images[$scope.index].__active = true;
     }
   });
-
-  $rootScope.$on('historyBack', function (ev, data){
-
-    console.log(data);
-  });
-
-
-
 }

@@ -1,4 +1,4 @@
-
+/** DEPRECATED **/
 .random-image-carousel .carousel-caption {
   background-color: rgba(0, 0, 0, 0.4);
 	right: 0;
@@ -6,6 +6,19 @@
 }
 
 .archives-random-image {
+	max-height: 240px;
+	margin-right: auto;
+	margin-left: auto;
+}
+/** -- DEP -- **/
+
+.es-selected-image-carousel .carousel-caption {
+  background-color: rgba(0, 0, 0, 0.4);
+	right: 0;
+	left: 0;
+}
+
+.es-selected-image {
 	max-height: 240px;
 	margin-right: auto;
 	margin-left: auto;
@@ -180,10 +193,10 @@ span.twitter-typeahead {
 .modal h1, h2, h3, h4, h5, h6 {
     text-transform: none;
 }
-
+/*
 .intro.intro-back {
   margin-top:40px;
-}
+}*/
 .nav-lowercase {
 	text-transform: none;
 }

@@ -47,28 +47,34 @@
 
 <body id="page-top" data-spy="scroll" data-target=".navbar-fixed-top" ng-controller="archiveListing">
   <div ng-include="'views/templates/navbar.html'"></div>
-  <div class="all-archives-content padding-top-70px container">
-    <ol class="breadcrumb">
-      <li ng-repeat="(index, folder) in dir">
-        <a href="#" ng-click="setIndex(index, folder)" ng-show="folder.filter" >{{folder.filter.value}}</a>
-      </li>
-    </ol>
-    <div class="row col-md-10">
-
-      <div ng-repeat="( oIndex, ord) in order" ng-show="ord.active">
-        <div class="list-group">
-          <button
-            type="button"
-            ng-click="next(item.key, ord, oIndex)"
-            ng-repeat="(index, item) in items"
-            class="list-group-item">
-            {{item.key}}
-            </button>
+  <header class="intro intro-back">
+    <div class="container padding-top-60px">
+      <ol class="breadcrumb">
+        <li >
+          <a href="#" ng-click="goToStart()" >Miðlun</a>
+        </li>
+        <li ng-repeat="(index, value) in selectedValues" ng-class="($last) ? 'active' : ''">
+          <a href="#" ng-click="linkSelect(value, index)" ng-disabled="($last)" >{{value.key}}</a>
+        </li>
+      </ol>
+      <div class="row">
+        <div ng-repeat="(key, item) in items">
+          <div class="col-lg-3 col-md-3 col-sm-6 random-archive-images-container">
+            <a href="#" ng-click="select(item)" class="thumbnail">
+              <archive-image
+                query="{{item._query}}"
+                index="{{index}}"
+                type="{{type}}"
+                select="random"
+                title="{{item._name}}">
+              </archive-image>
+            </a>
+          </div>
         </div>
       </div>
-
     </div>
-  </div>
+  </header>
+
 
   <notify-development></notify-development>
 

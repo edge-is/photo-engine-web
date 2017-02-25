@@ -57,33 +57,37 @@
   <div ng-include="'views/templates/navbar.html'"></div>
   <div class="all-archives-content padding-top-60px container-fluid">
     <ol class="breadcrumb">
+      <li >
+        <a href="/webarchive.html" target="_self">Miðlun</a>
+      </li>
       <li ng-repeat="(index, name) in dir" >
-        <a href="#">{{name}}</a>
+        <a href="/webarchive.html" target="_self">{{name}}</a>
       </li>
     </ol>
     <div class="row">
-      <div class="col-md-9">
+      <div class="col-md-8">
         <div id="mycarousel" class="carousel slide" data-ride="carousel" data-interval="false">
           <div uib-carousel active="active" interval="myInterval" no-wrap="noWrapSlides">
            <div uib-slide ng-repeat="(index, image) in images track by index" index="id" active="image.__active">
-             <fullscreen-image image="image">
+             <!--<fullscreen-image image="image">-->
+
+             <cdn-image image="image" size="xx-large">
 
            </div>
           </div>
         </div>
       </div>
-      <div class="col-md-3">
-        <dl class="dl-horizontal">
-          <dt>ObjectName</dt>
-          <dd>{{currenDoc._source.ObjectName}}</dd>
-          <dt>ReferenceNumber</dt>
-          <dd>{{currenDoc._source.ReferenceNumber}}</dd>
-          <dt>UserDefined4</dt>
-          <dd>{{currenDoc._source.UserDefined4}}</dd>
-          <dt>UserDefined12</dt>
-          <dd>{{currenDoc._source.UserDefined12}}</dd>
-        
+      <div class="col-md-4">
+        <h4>Skráning</h4>
+        <dl>
+          <dt>{{currenDoc._source.UserDefined4}}</dt>
+          <dt>{{currenDoc._source.UserDefined12}}</dt>
+          <dt>{{currenDoc._source.UserDefined14}}</dt>
+          <dt>{{index + 1}} / {{total}}</dt>
+          <dd>Síðast uppfært</dd>
+          <dt>{{currenDoc._source.indexed_epoch | date:'dd.MM.yyyy HH:mm' }}</dt>
         </dl>
+
       </div>
     </div>
 

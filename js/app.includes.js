@@ -21,6 +21,10 @@ search.directive('backgroundImage', [directiveBackgroundImage]);
 search.directive('lazyimg', ['$timeout', directiveLazyImage]);
 search.directive('fullscreenImage', ['$timeout', directiveFullscreenImage]);
 
+search.directive('archiveImage', ['elasticsearch', directiveArchiveImage]);
+
+search.directive('cdnImage', [cdnImage]);
+
 search.controller('displayArchive', ['$scope', 'elasticsearch', '$location', '$timeout','$rootScope', controllerDisplayArchive]);
 
 search.service('elasticsearch', ['$http', serviceElasticsearch]);

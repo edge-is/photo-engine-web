@@ -25,7 +25,8 @@ module.exports = function (grunt) {
             "lib/js/angular-sanitize.min.js",
             "lib/js/angular-cookies.min.js",
             "lib/js/ng-notify.min.js",
-            "lib/js/bodybuilder.min.js"
+            "lib/js/bodybuilder.min.js",
+            "lib/js/base64.min.js"
           ],
           dest : 'dist/js/libs.js'
         }
@@ -159,7 +160,9 @@ module.exports = function (grunt) {
 
             {expand: true, flatten:true, src: ['bower_components/angular-cookies/angular-cookies.min.js'], dest: 'lib/js/', filter: 'isFile'},
 
-            {expand: true, flatten:true, src: ['node_modules/bodybuilder/browser/bodybuilder.min.js'], dest: 'lib/js/', filter: 'isFile'}
+            {expand: true, flatten:true, src: ['node_modules/bodybuilder/browser/bodybuilder.min.js'], dest: 'lib/js/', filter: 'isFile'},
+
+            {expand: true, flatten:true, src: ['bower_components/js-base64/base64.min.js'], dest: 'lib/js/', filter: 'isFile'}
 
 
             // Angular Webstorage
