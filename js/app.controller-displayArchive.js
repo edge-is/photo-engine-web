@@ -8,14 +8,26 @@ function controllerDisplayArchive($scope, elasticsearch, $location, $timeout, $r
   $scope.filters = [];
 
   if (uriFilters.indexOf('BASE64') > -1){
-    var filters =Base64.decode( uriFilters.split(':').pop() );
+    $scope.filters = decodeURIfilter(uriFilters);
+  }
 
+  function decodeURIfilter(string){
+    var decoded =  Base64.decode(
+      string.split(':').pop()
+    );
     try {
-      $scope.filters = JSON.parse(filters);
+      return JSON.parse(decoded);
     } catch (e) {
-      console.error('Could not parse string', filters);
+      return decoded;
     }
   }
+
+
+  function createURIfilter(arr){
+    return {
+      filter : ['BASE64', Base64.encodeURI(angular.toJson(arr))].join(':')
+    };
+  };
 
 
   var _i = $location.search().index;
@@ -40,7 +52,7 @@ function controllerDisplayArchive($scope, elasticsearch, $location, $timeout, $r
 
     return _int;
   }
-
+  console.log('FF', $scope.filters);
 
   $scope.getDir = function (){
     var image = $scope.images[0];
@@ -49,9 +61,15 @@ function controllerDisplayArchive($scope, elasticsearch, $location, $timeout, $r
 
     var ObjectName = $scope.currenDoc._source.ObjectName;
     $scope.dir = [ src.Source, src.UserDefined4, src.UserDefined12, ObjectName ];
-
-    console.log($scope.dir);
   };
+
+  $scope.back = function (index){
+
+    var arr = $scope.filters.slice(0, index + 1);
+
+    var uri = createURIfilter(arr);
+    return window.location = '/webarchive.html?filter=' +uri.filter;
+  }
 
 
 
@@ -78,14 +96,12 @@ function controllerDisplayArchive($scope, elasticsearch, $location, $timeout, $r
 
     query.sort('filename', 'asc');
 
-
-
     elasticsearch.search({
       index : config.archive.index,
       type : config.archive.type,
       size : limit,
       from : $scope.offset,
-      body : query.build()
+      body : query
     }, function (err, res){
       if (err) return console.log(err);
 

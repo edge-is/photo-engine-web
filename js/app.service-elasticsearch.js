@@ -52,6 +52,21 @@ function serviceElasticsearch($http){
       requestParams.url = buildURI(options.index, options.type, '_search', queryParams);
       requestParams.method = (options.body) ? 'POST' : 'GET';
 
+      if (typeof options.body.build === 'function'){
+
+        if (config.archive.filter){
+          options.body.filter(
+            config.archive.filter.type,
+            config.archive.filter.field,
+            config.archive.filter.value
+          );
+        }
+
+        options.body = options.body.build();
+      }
+
+
+
       if (options.body){
         requestParams.data = options.body;
       }

@@ -33,7 +33,6 @@
     "angular-endless-scroll": "angular-infinite-scroll-xs#*",
     "ng-notify": "~0.8.0",
     "angular-cookies": "~1.5.8",
-    "turn.js": "*",
     "js-base64": "^2.1.9"
   }
 }

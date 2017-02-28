@@ -57,11 +57,11 @@
   <div ng-include="'views/templates/navbar.html'"></div>
   <div class="all-archives-content padding-top-60px container-fluid">
     <ol class="breadcrumb">
-      <li >
-        <a href="/webarchive.html" target="_self">Miðlun</a>
+      <li ng-repeat="(index, filter) in filters" >
+        <a href="#" ng-click="back(index, filter)">{{filter.value}}</a>
       </li>
-      <li ng-repeat="(index, name) in dir" >
-        <a href="/webarchive.html" target="_self">{{name}}</a>
+      <li>
+        <a href="#" >{{currenDoc._source.Title}}</a>
       </li>
     </ol>
     <div class="row">
@@ -80,12 +80,14 @@
       <div class="col-md-4">
         <h4>Skráning</h4>
         <dl>
-          <dt>{{currenDoc._source.UserDefined4}}</dt>
-          <dt>{{currenDoc._source.UserDefined12}}</dt>
-          <dt>{{currenDoc._source.UserDefined14}}</dt>
-          <dt>{{index + 1}} / {{total}}</dt>
-          <dd>Síðast uppfært</dd>
-          <dt>{{currenDoc._source.indexed_epoch | date:'dd.MM.yyyy HH:mm' }}</dt>
+          <dt>Upplýsingar</dt>
+          <dd>{{currenDoc._source.UserDefined4}}</dd>
+          <dd>{{currenDoc._source.UserDefined12}}</dd>
+          <dd>{{currenDoc._source.UserDefined14}}</dd>
+          <dt>Blaðsíða</dt>
+          <dd>{{index + 1}} / {{total}}</dd>
+          <dt>Síðast uppfært</dt>
+          <dd>{{currenDoc._source.indexed_epoch | date:'dd.MM.yyyy HH:mm' }}</dd>
         </dl>
 
       </div>
