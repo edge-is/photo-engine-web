@@ -87,7 +87,7 @@ function archiveListingController($scope, elasticsearch, $rootScope, $location){
     index : config.archive.index,
     type : config.archive.type,
     size : 1,
-    body : query.build()
+    body : query
   }, function (err, res){
     //console.log(err, res.hits.hits);
     //console.log(res);
@@ -211,7 +211,7 @@ function archiveListingController($scope, elasticsearch, $rootScope, $location){
     elasticsearch.search({
       index : config.archive.index,
       type  : config.archive.type,
-      body  : query.build()
+      body  : query
     }, function (err, res){
       //console.log(query.build(), res);
       var object = {};

@@ -54,18 +54,18 @@ function serviceElasticsearch($http){
 
       if (typeof options.body.build === 'function'){
 
-        if (config.archive.filter){
-          options.body.filter(
-            config.archive.filter.type,
-            config.archive.filter.field,
-            config.archive.filter.value
-          );
+        if (config.archive.filters){
+          config.archive.filters.forEach(function (filter){
+            if (filter.not){
+              options.body.notFilter(filter.type, filter.field, filter.value);
+            }else{
+              options.body.filter(filter.type, filter.field, filter.value);
+            }
+          });
         }
 
         options.body = options.body.build();
       }
-
-
 
       if (options.body){
         requestParams.data = options.body;
