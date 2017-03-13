@@ -44,6 +44,8 @@
     return diff;
   }
 
+
+
   $rootScope.$on('$locationChangeSuccess', function(e, data) {
     var newPath = $location.$$path;
 

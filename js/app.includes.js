@@ -20,6 +20,7 @@ search.directive('inView', ['$window', directiveInView]);
 search.directive('backgroundImage', [directiveBackgroundImage]);
 search.directive('lazyimg', ['$timeout', directiveLazyImage]);
 search.directive('fullscreenImage', ['$timeout', directiveFullscreenImage]);
+search.directive('poeTarget', [directiveTarget]);
 
 search.directive('archiveImage', ['elasticsearch', directiveArchiveImage]);
 

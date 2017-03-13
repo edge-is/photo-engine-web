@@ -52,7 +52,6 @@ function controllerDisplayArchive($scope, elasticsearch, $location, $timeout, $r
 
     return _int;
   }
-  console.log('FF', $scope.filters);
 
   $scope.getDir = function (){
     var image = $scope.images[0];
@@ -70,8 +69,6 @@ function controllerDisplayArchive($scope, elasticsearch, $location, $timeout, $r
     var uri = createURIfilter(arr);
     return window.location = '/webarchive.html?filter=' +uri.filter;
   }
-
-
 
 
   $scope.getImages = function (callback){

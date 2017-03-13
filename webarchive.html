@@ -53,14 +53,15 @@
         <li >
           <a href="#" ng-click="goToStart()" >Miðlun</a>
         </li>
-        <li ng-repeat="(index, value) in selectedValues" ng-class="($last) ? 'active' : ''">
-          <a href="#" ng-click="linkSelect(value, index)" ng-disabled="($last)" >{{value.key}}</a>
+        <li ng-repeat="(index, item) in selectedValues" ng-class="($last) ? 'active' : ''">
+          <a ng-href="{{ getHistoryURI(item, index)}}" ng-disabled="($last)" >{{item.value}}</a>
         </li>
       </ol>
+
       <div class="row">
         <div ng-repeat="(key, item) in items">
           <div class="col-lg-3 col-md-3 col-sm-6 random-archive-images-container">
-            <a href="#" ng-click="select(item)" class="thumbnail">
+            <a ng-href="{{getUri(item)}}" poe-target="{{item._target}}" class="thumbnail">
               <archive-image
                 query="{{item._query}}"
                 index="{{index}}"
