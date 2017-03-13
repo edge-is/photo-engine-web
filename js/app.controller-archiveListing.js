@@ -15,7 +15,7 @@ function archiveListingController($scope, elasticsearch, $rootScope, $location){
   $scope.query = "";
   $scope.queryObject = {};
 
-  $scope.openInNewWindow = true;
+  $scope.openInNewWindow = false;
 
   $scope.selectedValues = [];
 
@@ -131,6 +131,9 @@ function archiveListingController($scope, elasticsearch, $rootScope, $location){
        }
        if (!next && $scope.openInNewWindow){
          item._target = '_blank';
+       }else{
+         item._target = '_self';
+
        }
 
        item._parents = parentArray.slice();
