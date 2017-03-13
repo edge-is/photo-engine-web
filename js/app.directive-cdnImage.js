@@ -11,8 +11,6 @@ function cdnImage(){
     link : function ($scope, element, attr){
       var size = attr.size || 'x-small';
 
-      console.log('CDN IMAGE');
-
       $scope.selectedImage = selectImage($scope.image);
 
       function selectImage(image){

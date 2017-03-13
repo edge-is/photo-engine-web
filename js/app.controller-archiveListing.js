@@ -39,14 +39,29 @@ function archiveListingController($scope, elasticsearch, $rootScope, $location){
    var _order = [
      'Source.raw',
      'UserDefined4.raw',
-     'UserDefined12.raw',
-     'UserDefined14.raw'
+     ['UserDefined12.raw', 'UserDefined14.raw']
    ];
 
    function getAgg(field, filters, callback){
      var query = bodybuilder();
 
-    query.agg('terms', field, {size : 100 });
+     var queryField = field;
+
+
+     if (Array.isArray(field)){
+       queryField = field[0];
+     }
+
+
+    // Create the query
+    if (!Array.isArray(field)){
+      query.agg('terms', queryField, {size : 100 });
+    }else{
+      query.agg('terms', queryField, {size : 100 }, function (q){
+        return q.agg('terms', field[1], {size : 100 });
+      });
+    }
+
     if (filters){
       filters.forEach(function (filter){
 
@@ -64,6 +79,7 @@ function archiveListingController($scope, elasticsearch, $rootScope, $location){
        size : 1,
        body : query
      }, function (err, res){
+
        return callback(err, res);
      });
    }
@@ -117,23 +133,43 @@ function archiveListingController($scope, elasticsearch, $rootScope, $location){
      var aggField = getField(agg);
 
      var buckets = agg[aggField].buckets;
-     return buckets.map(function (item){
-       var field = getFieldName(aggField);
+
+     var allBuckets = [];
+
+     var subBuckets = [];
+
+     function bucketParser(item, field){
        var index = _order.indexOf(field);
+
+       var subAggregationFieldRaw = hasAgg(item);
+
+       if (subAggregationFieldRaw){
+         var b = item[subAggregationFieldRaw].buckets;
+
+         var subAggregationField = getFieldName(subAggregationFieldRaw);
+
+         b.forEach(function (_item){
+           subBuckets.push(
+             bucketParser(_item, subAggregationField)
+           );
+         });
+       }
 
        var next = index + 1;
 
-       if (next >= _order.length){
+       if (index === -1){
          next = false
        }else{
          next = _order[next];
-
        }
-       if (!next && $scope.openInNewWindow){
-         item._target = '_blank';
-       }else{
-         item._target = '_self';
 
+
+       if (!next){
+         if ( $scope.openInNewWindow){
+           item._target = '_blank';
+         } else{
+           item._target = '_self';
+          }
        }
 
        item._parents = parentArray.slice();
@@ -144,8 +180,58 @@ function archiveListingController($scope, elasticsearch, $rootScope, $location){
        item._next = next;
 
        return item;
+     }
+
+
+     var firstBuckets = [];
+
+      buckets.forEach(function (item){
+        firstBuckets.push(
+          bucketParser(item,
+            getFieldName(aggField)
+          )
+        );
+
+      });
+
+
+      if (subBuckets.length > 0){
+
+        return joinBuckets(firstBuckets,subBuckets);
+        // Join buckets and create one...
+      }
+     return firstBuckets;
+   }
+
+   function joinBuckets(bucketsA, bucketsB){
+     var buckets = [];
+
+     bucketsA.forEach(function (bA){
+
+       bucketsB.forEach(function (bB){
+         var obj = angular.copy(bA);
+
+         obj._parents.push(bA._query);
+
+         obj._index = false;
+         obj._next = false;
+         obj._name = [bA._name, bB._name].join(' ');
+
+         buckets.push(obj);
+       });
      });
 
+     return buckets;
+   }
+
+   function hasAgg(obj){
+     for (var key in obj){
+       if (key.indexOf('agg_') > -1){
+         return key;
+       }
+
+     }
+     return false;
    }
 
    $scope.getUri = function (item){
@@ -174,7 +260,6 @@ function archiveListingController($scope, elasticsearch, $rootScope, $location){
        string.split(':').pop()
      );
      try {
-       console.log(decoded);
        return JSON.parse(decoded);
      } catch (e) {
        return decoded;
