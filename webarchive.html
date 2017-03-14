@@ -45,7 +45,7 @@
 
 </head>
 
-<body id="page-top" data-spy="scroll" data-target=".navbar-fixed-top" ng-controller="archiveListing">
+<body id="page-top" data-spy="scroll" data-target=".navbar-fixed-top" ng-controller="archiveListing" style="background-color: black;">
   <div ng-include="'views/templates/navbar.html'"></div>
   <header class="intro intro-back" style="background-image: url('/img/midlun-background.jpg')" >
     <div class="container padding-top-60px">
@@ -74,9 +74,18 @@
           </div>
         </div>
       </div>
+
     </div>
   </header>
+  <section id="about" class="container description-section text-center">
+      <div class="row">
+          <div class="col-lg-8 col-lg-offset-2">
+            <div ng-include="description" ng-show="showDescription">
 
+            </div>
+          </div>
+      </div>
+  </section>
 
   <notify-development></notify-development>
 

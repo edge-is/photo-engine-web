@@ -22,6 +22,11 @@ function archiveListingController($scope, elasticsearch, $rootScope, $location){
   $scope.index = config.archive.index;
   $scope.type = config.archive.type;
 
+
+  $scope.description = config.archive.decription.path;
+
+  $scope.showDescription = true;
+
   var fields = {
      'Source.raw'        : 'UserDefined4.raw',
      'UserDefined4.raw'  : false,
@@ -134,9 +139,8 @@ function archiveListingController($scope, elasticsearch, $rootScope, $location){
 
      var buckets = agg[aggField].buckets;
 
-     var allBuckets = [];
 
-     var subBuckets = [];
+     var areSubBuckets = false;
 
      function bucketParser(item, field){
        var index = _order.indexOf(field);
@@ -144,12 +148,18 @@ function archiveListingController($scope, elasticsearch, $rootScope, $location){
        var subAggregationFieldRaw = hasAgg(item);
 
        if (subAggregationFieldRaw){
+         areSubBuckets = true;
+
          var b = item[subAggregationFieldRaw].buckets;
+
+         if (!item._subBuckets){
+           item._subBuckets = [];
+         }
 
          var subAggregationField = getFieldName(subAggregationFieldRaw);
 
          b.forEach(function (_item){
-           subBuckets.push(
+           item._subBuckets.push(
              bucketParser(_item, subAggregationField)
            );
          });
@@ -178,15 +188,16 @@ function archiveListingController($scope, elasticsearch, $rootScope, $location){
        item._query = { type : 'term', field : field, value : item.key };
        item._name = item.key;
        item._next = next;
+       item._rawName = [item.key];
 
        return item;
      }
 
 
-     var firstBuckets = [];
+     var bucketContent = [];
 
       buckets.forEach(function (item){
-        firstBuckets.push(
+        bucketContent.push(
           bucketParser(item,
             getFieldName(aggField)
           )
@@ -195,33 +206,41 @@ function archiveListingController($scope, elasticsearch, $rootScope, $location){
       });
 
 
-      if (subBuckets.length > 0){
+      if (areSubBuckets){
 
-        return joinBuckets(firstBuckets,subBuckets);
+        return joinBuckets(bucketContent);
         // Join buckets and create one...
       }
-     return firstBuckets;
+     return bucketContent;
    }
 
-   function joinBuckets(bucketsA, bucketsB){
-     var buckets = [];
+   function joinBuckets(buckets){
 
-     bucketsA.forEach(function (bA){
+     var arr = [];
 
-       bucketsB.forEach(function (bB){
-         var obj = angular.copy(bA);
+     buckets.forEach(function (bucketItem){
+       var b = bucketItem._subBuckets;
+       b.forEach(function (subBucketItem){
+         var obj = angular.copy(bucketItem);
 
-         obj._parents.push(bA._query);
-
+         obj._name =  [bucketItem._name, subBucketItem._name].join(' ');
          obj._index = false;
          obj._next = false;
-         obj._name = [bA._name, bB._name].join(' ');
 
-         buckets.push(obj);
+         obj._rawName.push(
+           subBucketItem._key
+         );
+
+         obj._parents.push(bucketItem._query);
+
+         obj._query = subBucketItem._query;
+
+         arr.push(obj);
        });
+
      });
 
-     return buckets;
+     return arr;
    }
 
    function hasAgg(obj){
