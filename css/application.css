@@ -418,3 +418,18 @@ section.container{
   margin-top: 40px;
   margin-bottom : 40px;
 }
+#archive_carousel .carousel-control.right {
+  background-image: none;
+}
+
+#archive_carousel .carousel-control.left {
+  background-image: none;
+}
+#archive_carousel .carousel-indicators {
+  display: none;
+}
+
+.cdn-image-size-small {
+  min-height:200px;
+  height:200px;
+}

@@ -12,7 +12,6 @@ function cdnImage(){
       var size = attr.size || 'x-small';
 
       $scope.selectedImage = selectImage($scope.image);
-
       function selectImage(image){
         var cdnImage = image._source._thumbnails[size].name;
         return [config.cdn, '/thumbnails/', cdnImage].join('');
