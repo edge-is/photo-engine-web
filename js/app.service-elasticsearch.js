@@ -1,6 +1,6 @@
 function serviceElasticsearch($http){
 
-  var base = [config.api, '/es/'].join('');
+  var base = [config.api, '/es'].join('');
 
   function buildURI(index, type, action, queryParams){
     var arr = [];
