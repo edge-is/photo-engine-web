@@ -8,6 +8,8 @@ function archiveListingController($scope, elasticsearch, $rootScope, $location){
 
   $scope.images = [];
 
+  var rawField = config.rawField || '.keyword';
+
   $scope.onTypeaheadSubmit = function submitOnSearch(query){
     window.location = '/search.html?query=' + query;
   };
@@ -28,23 +30,23 @@ function archiveListingController($scope, elasticsearch, $rootScope, $location){
   $scope.showDescription = true;
 
   var fields = {
-     'Source.raw'        : 'UserDefined4.raw',
-     'UserDefined4.raw'  : false,
-     'UserDefined12.raw' : false,
-     'UserDefined14.raw' : false
+     'Source' + rawField        : 'UserDefined4' + rawField,
+     'UserDefined4' + rawField  : false,
+     'UserDefined12' + rawField : false,
+     'UserDefined14' + rawField : false
    };
 
    var order =  {
-     'Source.raw'        : 'UserDefined4.raw',
-     'UserDefined4.raw'  : 'UserDefined12.raw',
-     'UserDefined12.raw' : 'UserDefined14.raw',
-     'UserDefined14.raw' : false
+     'Source' + rawField        : 'UserDefined4' + rawField,
+     'UserDefined4' + rawField  : 'UserDefined12' + rawField,
+     'UserDefined12' + rawField : 'UserDefined14' + rawField,
+     'UserDefined14' + rawField : false
    };
 
    var _order = [
-     'Source.raw',
-     'UserDefined4.raw',
-     ['UserDefined12.raw', 'UserDefined14.raw']
+     'Source' + rawField,
+     'UserDefined4' + rawField,
+     ['UserDefined12' + rawField, 'UserDefined14' + rawField]
    ];
 
    function getAgg(field, filters, callback){
@@ -92,7 +94,7 @@ function archiveListingController($scope, elasticsearch, $rootScope, $location){
 
    function init(getFilters){
      var query = bodybuilder();
-     var field = 'Source.raw';
+     var field = 'Source' + rawField;
      var filter = getURIFilter();
      if (getFilters){
 
