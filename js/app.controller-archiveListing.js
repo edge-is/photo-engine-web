@@ -93,7 +93,7 @@ function archiveListingController($scope, elasticsearch, $rootScope, $location){
 
 
    function init(getFilters){
-     var query = bodybuilder();
+     var query = bodybuilder(config.elasticsearch.version || 'v5');
      var field = 'Source.keyword';
      var filter = getURIFilter();
      if (getFilters){
