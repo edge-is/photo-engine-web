@@ -30,23 +30,23 @@ function archiveListingController($scope, elasticsearch, $rootScope, $location){
   $scope.showDescription = true;
 
   var fields = {
-     'Source' + rawField        : 'UserDefined4' + rawField,
-     'UserDefined4' + rawField  : false,
-     'UserDefined12' + rawField : false,
-     'UserDefined14' + rawField : false
+     'Source.keyword'        : 'UserDefined4.keyword',
+     'UserDefined4.keyword'  : false,
+     'UserDefined12.keyword' : false,
+     'UserDefined14.keyword' : false
    };
 
    var order =  {
-     'Source' + rawField        : 'UserDefined4' + rawField,
-     'UserDefined4' + rawField  : 'UserDefined12' + rawField,
-     'UserDefined12' + rawField : 'UserDefined14' + rawField,
-     'UserDefined14' + rawField : false
+     'Source.keyword'        : 'UserDefined4.keyword',
+     'UserDefined4.keyword'  : 'UserDefined12.keyword',
+     'UserDefined12.keyword' : 'UserDefined14.keyword',
+     'UserDefined14.keyword' : false
    };
 
    var _order = [
-     'Source' + rawField,
-     'UserDefined4' + rawField,
-     ['UserDefined12' + rawField, 'UserDefined14' + rawField]
+     'Source.keyword',
+     'UserDefined4.keyword',
+     ['UserDefined12.keyword', 'UserDefined14.keyword']
    ];
 
    function getAgg(field, filters, callback){
@@ -94,7 +94,7 @@ function archiveListingController($scope, elasticsearch, $rootScope, $location){
 
    function init(getFilters){
      var query = bodybuilder();
-     var field = 'Source' + rawField;
+     var field = 'Source.keyword';
      var filter = getURIFilter();
      if (getFilters){
 
