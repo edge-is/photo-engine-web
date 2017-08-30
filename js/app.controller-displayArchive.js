@@ -217,7 +217,7 @@ function controllerDisplayArchive($scope, elasticsearch, $location, $timeout, $r
     $scope.filters.forEach(function (filter){
       query.filter(filter.type, filter.field, filter.value);
     });
-    query.sort('filename', 'asc');
+    query.sort('UserDefined6', 'asc');
     return query;
   }
 
