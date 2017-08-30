@@ -21,9 +21,8 @@ function archiveListingController($scope, elasticsearch, $rootScope, $location){
 
   $scope.selectedValues = [];
 
-  $scope.index = config.archive.index;
-  $scope.type = config.archive.type;
-
+  $scope.index = $rootScope.currentIndex.index.index;
+  $scope.type = $rootScope.currentIndex.index.type;
 
   $scope.description = config.archive.decription.path;
 
@@ -93,11 +92,9 @@ function archiveListingController($scope, elasticsearch, $rootScope, $location){
 
 
    function init(getFilters){
-     var query = bodybuilder(config.elasticsearch.version || 'v5');
      var field = 'Source.keyword';
      var filter = getURIFilter();
      if (getFilters){
-
        if (filter){
          var f = filter[filter.length -1 ];
          var _i = _order.indexOf(f.field);
@@ -140,8 +137,6 @@ function archiveListingController($scope, elasticsearch, $rootScope, $location){
      var aggField = getField(agg);
 
      var buckets = agg[aggField].buckets;
-
-
      var areSubBuckets = false;
 
      function bucketParser(item, field){
@@ -299,7 +294,10 @@ function archiveListingController($scope, elasticsearch, $rootScope, $location){
 
        location = $location.$$path;
      }
-     var arr = [];
+
+     var index_id = [ 'index_id' , $rootScope.currentIndexID].join('=');
+
+     var arr = [ index_id ];
 
      for (var key in object){
        var value = object[key];

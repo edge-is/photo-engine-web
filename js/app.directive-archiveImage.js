@@ -44,9 +44,11 @@ function directiveArchiveImage(elasticsearch){
 
 
       var query = bodybuilder()
-                  .query(_query.type, _query.field, _query.value ).build();
+                  .query(_query.type, _query.field, _query.value )
+                  .filter('term', _query.field, _query.value);
 
-      if (attrs.select === 'random'){
+
+      /*if (attrs.select === 'random'){
 
         var seed =  Math.floor(Math.random() * 100);
 
@@ -71,9 +73,8 @@ function directiveArchiveImage(elasticsearch){
               "term" : filter
             }
         };
-      };
+      };*/
 
-      // FIXME: Select index from attrs
       elasticsearch.search({
         index : index,
         type : type,
@@ -81,6 +82,7 @@ function directiveArchiveImage(elasticsearch){
       }, function (err, res){
         if (err) return console.error('Error selecting image', err);
 
+        if (!res.hits) return console.error('No hits in body');
         var hit = res.hits.hits.pop();
 
         var thumb = hit._source._thumbnails[size];

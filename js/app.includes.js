@@ -5,6 +5,7 @@ search.service('photoApi',[ '$http','$q', 'utils', '$log', photoApiService]);
 search.service('osm', ['map', serviceOSM]);
 search.service('elasticsearch', ['$http', serviceElasticsearch]);
 search.factory('cacheFactory', ['$cacheFactory', cacheFactory]);
+search.service('utils', serviceUtils);
 search.controller('image', [ '$scope', '$location', 'photoApi', 'cacheFactory', '$rootScope', 'osm','$window', imageController]);
 search.controller('mainSearch', ['$scope','photoApi', '$location', '$anchorScroll', '$uibModal', '$rootScope', 'utils', '$timeout', '$log', mainSearchController]);
 search.controller('archives', ['$scope', '$http',  archiveController]);
@@ -14,8 +15,9 @@ search.controller('tmpCarousel', ['$scope', '$http',  archiveImageCarousel]);
 
 search.controller('imageModalController', [ '$scope','$location','$modalInstance','data','hotkeys','$rootScope','osm', imageModalController ]);
 search.controller('index', ['$scope','$window', indexController]);
-search.controller('displayArchive', ['$scope', 'elasticsearch', '$location', '$timeout','$rootScope', '$uibModal', controllerDisplayArchive]);
+search.controller('displayArchive', ['$scope', 'elasticsearch', '$location', '$timeout','$rootScope', '$uibModal', 'utils', controllerDisplayArchive]);
 search.controller('thumbnailsModal', ['$scope', '$modalInstance','data', controllerThumbnailsModal]);
+search.controller('navbar', ['$scope',  controllerNavbar]);
 
 search.directive('notifyDevelopment', ['$log',  '$cookies', 'ngNotify', developmentDirective]);
 search.directive('typeaheadSearch', ['photoApi', '$rootScope', typeaheadDirective]);

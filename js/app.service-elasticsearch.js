@@ -64,7 +64,7 @@ function serviceElasticsearch($http){
           });
         }
 
-        options.body = options.body.build();
+        options.body = options.body.build(config.elasticsearch.version || 'v5');
       }
 
       if (options.body){

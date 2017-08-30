@@ -1,6 +1,6 @@
 
 
-function controllerDisplayArchive($scope, elasticsearch, $location, $timeout, $rootScope, $uibModal){
+function controllerDisplayArchive($scope, elasticsearch, $location, $timeout, $rootScope, $uibModal, utils){
 
   $scope.images = [];
   $scope.thumbnails = [];
@@ -68,9 +68,12 @@ function controllerDisplayArchive($scope, elasticsearch, $location, $timeout, $r
   $scope.back = function (index){
 
     var arr = $scope.filters.slice(0, index + 1);
-
     var uri = createURIfilter(arr);
-    return window.location = '/webarchive.html?filter=' + uri.filter;
+
+    return window.location =  utils.createURI('/webarchive.html', {
+        index_id : $rootScope.currentIndexID,
+        filter : uri.filter
+    })
   };
 
   $scope.thumbnails = [];
@@ -143,8 +146,9 @@ function controllerDisplayArchive($scope, elasticsearch, $location, $timeout, $r
     });
 
   };
-  function tmpFunction(arr){
+  /*function tmpFunction(arr){
     var q = $scope.createQuery();
+    console.log('TEMP FUNCTION :FIXMEEEE::')
     $scope.fetch(q, 0, 1000, function (err, res){
       var x = q.build();
       var j = JSON.stringify(x, null, 2)
@@ -155,7 +159,7 @@ function controllerDisplayArchive($scope, elasticsearch, $location, $timeout, $r
     });
 
   }
-  setTimeout(tmpFunction, 100)
+  setTimeout(tmpFunction, 100)*/
 
 
 
@@ -219,8 +223,8 @@ function controllerDisplayArchive($scope, elasticsearch, $location, $timeout, $r
 
   $scope.fetch = function (query, offset, limit, callback){
     elasticsearch.search({
-      index : config.archive.index,
-      type : config.archive.type,
+      index : $rootScope.currentIndex.index.index,
+      type : $rootScope.currentIndex.index.type,
       size : limit,
       from : offset,
       body : query
@@ -239,8 +243,6 @@ function controllerDisplayArchive($scope, elasticsearch, $location, $timeout, $r
     $scope.currenDoc = $scope.images[i];
 
     $scope.getDir();
-
-
     if ( ( i + 5 ) > $scope.images.length ){
       $scope.getImages();
 

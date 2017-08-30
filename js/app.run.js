@@ -5,7 +5,12 @@
   $rootScope.history = [];
 
   $rootScope.oldPath = $location.$$path;
+
+  $rootScope.config = config;
+  setCurrentIndex();
+
   $rootScope.$on('$locationChangeStart', function (event, data){
+    setCurrentIndex();
     $rootScope.oldPath = $location.$$path;
     $log.debug('RUN::$locationChangeStart', data, $rootScope.history);
   });
@@ -44,11 +49,29 @@
     return diff;
   }
 
+  function number(num){
+    var int = parseInt(num);
+
+    return (isNaN(int)) ? false : int;
+  }
+
+  function setCurrentIndex(){
+    var indexID = number($location.search().index_id);
+
+    if (indexID === false) {
+      indexID = 0;
+    }
+    $rootScope.currentIndex = config.indices[indexID];
+
+    $rootScope.currentIndexID = indexID;
+  }
+
 
 
   $rootScope.$on('$locationChangeSuccess', function(e, data) {
     var newPath = $location.$$path;
 
+    setCurrentIndex();
 
     var back = fromHistory(data);
     if (back){

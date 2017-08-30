@@ -1,4 +1,4 @@
-search.service('utils', serviceUtils);
+
 
 function serviceUtils(){
   return {
