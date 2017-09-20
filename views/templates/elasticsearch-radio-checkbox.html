@@ -1,0 +1,15 @@
+<div class="">
+  <h4>{{title}}</h4>
+  <div class="{{esType}}" ng-repeat="item in items">
+    <label>
+      <input
+        ng-click="toggle(field, item, esType)"
+        type="{{esType}}"
+        name="{{field}}"
+        value="{{item.key}}"
+        id="check_{{item.key}}"
+        ng-checked="checkCache[item.id]">
+      {{item.key}} : {{item.doc_count}}
+    </label>
+  </div>
+</div>

@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="search">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Photo Engine</title>
+
+    <!-- Bootstrap Core CSS -->
+    <link href="lib/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Notify CSS -->
+    <link href="lib/css/ng-notify.min.css" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link href="dist/css/grayscale.min.css" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link href="dist/css/sidebar.min.css" rel="stylesheet">
+
+
+    <link href="lib/css/leaflet.css" rel="stylesheet">
+    <link href="lib/css/select.min.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="dist/css/application.min.css" media="screen" title="no title" charset="utf-8">
+
+    <!-- Custom Fonts -->
+    <link href="lib/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href="//fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic" rel="stylesheet" type="text/css">
+    <link href="//fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet" type="text/css">
+
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+
+
+</head>
+
+<body id="page-top" data-spy="scroll" data-target=".navbar-fixed-top" ng-controller="searchImages">
+
+  <div ng-include="'views/templates/navbar.html'"></div>
+  <div class="container-fluid padding-top-70px">
+
+    <div class="col-md-12">
+      <small ng-show="result.length > 0">c.a {{resultCount}} niðurstður á {{resultTime}} ms</small>
+    </div>
+    <div class="row">
+      <!--<div class="col-md-3">
+        ><elasticsearch
+          on-toggle="onToggle"
+          es-type="checkbox"
+          title="Tegund"
+          aggregate="Category"
+          top="10"
+          last-query="lastQuery"
+          index="{{index}}"
+          type="{{type}}">
+        </elasticsearch>
+        <elasticsearch
+          on-toggle="onToggle"
+          es-type="checkbox"
+          title="Sýsla"
+          aggregate="Keywords"
+          top="10"
+          raw="false"
+          last-query="lastQuery"
+          index="{{index}}"
+          type="{{type}}">
+        </elasticsearch>
+
+      </div>-->
+      <div class="col-md-12">
+        <div class="">
+          <form class="" ng-submit="queryStringSearch()">
+          <div class="input-group">
+            <span class="input-group-addon" ><a href="#"><i class="fa fa-info"></i></a></span>
+            <span class="input-group-addon" id="basic-addon3">Leit<span ng-show="current_credit"> í {{current_credit}}</span></span>
+            <input type="text" ng-model="queryStringQuery" class="form-control" id="basic-url" aria-describedby="basic-addon3" placeholder="Leitaðu .. ">
+            <span class="input-group-addon" ><a href="#" ng-click="toggleAdvancedSearch()">Ítarleit <i class="fa fa-wrench"></i></a></span>
+
+          </div>
+          </form>
+        </div>
+        <div class="col-md-12">
+          <div uib-collapse="hideAdvanceSearch">
+            <div class="well">
+              <p>Ítarleit</p>
+              <form>
+                <div class="form-group" ng-repeat="(i, a) in advancedSearchFields">
+                  <div class="row">
+                  <div class="col-md-1 col-sm-1">
+                    <select class="form-control" ng-model="a.orAnd" ng-show="i > 0">
+                      <option value="AND" selected>Og</option>
+                      <option value="OR">Eða</option>
+                    </select>
+                  </div>
+                  <div class="col-md-3 col-sm-3">
+                    <select class="form-control" ng-model="a.field">
+                      <option ng-repeat="field in searchableFields"  value="{{field.key}}">{{field.name}}</option>
+                    </select>
+                  </div>
+                  <div class="col-md-3 col-sm-3">
+                    <select class="form-control" ng-model="a.op">
+                      <option value="is" selected>inniheldur</option>
+                      <option value="not">inniheldur ekki</option>
+                    </select>
+                  </div>
+                  <div class="col-md-4 col-sm-4">
+                    <input class='form-control'  type="text" placeholder="Search query"  ng-model="a.value">
+                  </div>
+                  <a class="btn btn-danger btn-sm" ng-click="advanced_search_remove(i)"><i class="fa fa-minus"></i></a>
+                  </div>
+                </div>
+                <a href="# "type="button" class="btn btn-default" ng-click="advAdd()">Bæta við leitarreit <i class="fa fa-plus"></i></a>
+                <button href="# "type="submit" class="btn btn-primary" ng-click="advSearch()">Leita</button>
+              </form>
+            </div>
+          </div>
+
+        </div>
+        <div class="">
+          <div ng-repeat="(key, image) in result">
+            <div class="col-xs-6 col-md-4 col-lg-3 thumbnail">
+              <a href="/image.html?index_id={{index_id}}&image={{image._id}}"  ng-click="displayImage(key, image, result)" >
+                <cdn-image
+                  cache="{{cahcePhoto}}"
+                  image="image"
+                  size="xx-small"
+                  uib-tooltip-placement="bottom"
+                  uib-tooltip-template="imageDescriptionTooltip">
+                </cdn-image>
+              </a>
+            </div>
+          </div>
+          <div class="col-md-12" style="margin-bottom:100px">
+            <button
+              ng-cloak
+              ng-hide="noMoreResults"
+              class="btn btn-primary btn-lg btn-block"
+              type="button"
+              name="button"
+              ng-disabled="loadingMoreResults"
+              ng-click=loadMoreResults()>
+              Sækja fleiri niðurstöður <i ng-show="loadingMoreResults" class="fa fa-spinner fa-spin"></i>
+            </button>
+              <div class="alert alert-info text-center" ng-cloak ng-show="noMoreResults">
+                <h4><i class="fa fa-search"> Ekki fleiri niðurstöður fundust</i></h4>
+              </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+ <notify-development></notify-development>
+  <script src="config.js"></script>
+  <script src="dist/js/libs.js"></script>
+  <script src="dist/js/is_IS.min.js"></script>
+  <script src="dist/js/application.min.js"></script>
+</body>
+
+</html>
