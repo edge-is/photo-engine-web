@@ -1,15 +1,23 @@
 
 
-search.run( ['$rootScope', '$location', '$log', applicationRun]);
+search.run( ['$rootScope', '$location', '$log', 'utils', applicationRun]);
 search.service('photoApi',[ '$http','$q', 'utils', '$log', photoApiService]);
 search.service('osm', ['map', serviceOSM]);
-search.service('elasticsearch', ['$http', serviceElasticsearch]);
+search.service('elasticsearch', ['$http', '$rootScope', serviceElasticsearch]);
+
+search.service('loadElasticQuery', [serviceLoadElasticQuery]);
+
 search.factory('cacheFactory', ['$cacheFactory', cacheFactory]);
 search.service('utils', serviceUtils);
+
+search.service('cdn', serviceCDN);
+
 search.controller('image', [ '$scope', '$location', 'photoApi', 'cacheFactory', '$rootScope', 'osm','$window', imageController]);
 search.controller('mainSearch', ['$scope','photoApi', '$location', '$anchorScroll', '$uibModal', '$rootScope', 'utils', '$timeout', '$log', mainSearchController]);
-search.controller('archives', ['$scope', '$http',  archiveController]);
+search.controller('archivesGroupping', ['$scope', 'elasticsearch','$rootScope','utils', archiveGrouppingController]);
 search.controller('archiveListing', ['$scope', 'elasticsearch', '$rootScope','$location',  archiveListingController]);
+
+search.controller('searchImages', ['$scope', 'elasticsearch', '$rootScope', '$log', 'cdn', 'utils', '$location','$uibModal', '$window', 'loadElasticQuery', controllerSearchImages])
 
 search.controller('tmpCarousel', ['$scope', '$http',  archiveImageCarousel]);
 
@@ -20,13 +28,15 @@ search.controller('thumbnailsModal', ['$scope', '$modalInstance','data', control
 search.controller('navbar', ['$scope',  controllerNavbar]);
 
 search.directive('notifyDevelopment', ['$log',  '$cookies', 'ngNotify', developmentDirective]);
-search.directive('typeaheadSearch', ['photoApi', '$rootScope', typeaheadDirective]);
+search.directive('typeaheadSearch', ['elasticsearch', '$rootScope', 'utils', typeaheadDirective]);
 search.directive('randomArchiveImage', ['$http','$compile',  directiveRandomArchiveImage] );
 search.directive('aggrigate', ['$http', 'utils', '$rootScope', 'photoApi', '$log','$location','$timeout', directiveAggrigates]);
 search.directive('inView', ['$window', directiveInView]);
-search.directive('backgroundImage', [directiveBackgroundImage]);
-search.directive('lazyimg', ['$timeout', directiveLazyImage]);
+//search.directive('backgroundImage', ['cdn', directiveBackgroundImage]);
+search.directive('lazyimg', ['$timeout', 'cdn', directiveLazyImage]);
 search.directive('fullscreenImage', ['$timeout', directiveFullscreenImage]);
 search.directive('poeTarget', [directiveTarget]);
-search.directive('archiveImage', ['elasticsearch', directiveArchiveImage]);
-search.directive('cdnImage', [cdnImage]);
+search.directive('archiveImage', ['elasticsearch', 'cdn', directiveArchiveImage]);
+search.directive('cdnImage', ['cdn', cdnImage]);
+
+search.directive('elasticsearch', ['elasticsearch', '$rootScope', directiveElasticsearch]);

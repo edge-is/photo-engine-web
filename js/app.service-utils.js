@@ -18,6 +18,23 @@ function serviceUtils(){
         }
       }
     },
+    base64encode : function (input){
+
+      if (typeof input === 'object'){
+        input = JSON.stringify(input);
+      }
+
+      return Base64.encodeURI(input);
+    },
+    base64decode : function (input){
+      var self = this;
+      var decoded = Base64.decode(input);
+
+      var obj = self.JSON.parse(decoded);
+
+      if (obj) return obj;
+      return decoded;
+    },
     createURI : function (url, query){
 
       var queryParams = angular.copy(query);

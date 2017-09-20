@@ -1,6 +1,6 @@
 
 
-function typeaheadDirective(photoApi, $rootScope){
+function typeaheadDirective(elasticsearch, $rootScope, utils){
   return {
     restrict : 'ACE',
     replace : true,
@@ -18,26 +18,21 @@ function typeaheadDirective(photoApi, $rootScope){
 
       $scope.filter = $scope.filter || false;
 
-      console.log($scope);
       $scope.query = $scope.query || "";
+
+      $scope.index = $rootScope.currentIndex.index.index;
+      $scope.type = $rootScope.currentIndex.index.type;
 
       var form = $(element).closest('form');
 
-      var fallbackSubmit = function (query){
-        window.location = '/search.html?query=' + query;
+      $scope.submit = function (queryString){
+        var query = bodybuilder().query('query_string', 'query', queryString).build();
+
+        var base64Query = utils.base64encode(query);
+
+        window.location = '/search_index.html?query=' + base64Query;
+
       }
-
-
-      var submit = (typeof $scope['onTypeaheadSubmit'] === 'function') ? $scope['onTypeaheadSubmit'] : fallbackSubmit;
-
-      setTimeout(function (){
-        console.log('typeaheadDirective', $scope);
-      }, 1000);
-      $(form).on('submit', function (e){
-        e.preventDefault();
-        submit($scope.query);
-        return false;
-      });
 
       $scope.$watch('query', function (_new, _old){
         console.log('WATH QUERY')
@@ -45,7 +40,7 @@ function typeaheadDirective(photoApi, $rootScope){
       })
 
       function updateScope (object, suggestion, dataset) {
-        submit(suggestion);
+        $scope.submit(suggestion);
       }
 
       function removeDupes(hits, key){
@@ -57,12 +52,8 @@ function typeaheadDirective(photoApi, $rootScope){
             return false;
           }
           cache[hit] = true;
-
           return true;
-
         });
-
-
       }
 
       function orderBy(key){
@@ -77,6 +68,14 @@ function typeaheadDirective(photoApi, $rootScope){
 
         }
       }
+
+      var availableFields = [
+         {field : 'Description' , min_word_length: 1, suggest_mode: 'popular', confidence:0.9 },
+         {field : 'UserDefined3', min_word_length: 1, suggest_mode: 'popular', confidence:0.5 },
+         {field : 'Credit'      , min_word_length: 1, suggest_mode: 'popular', confidence:0.4 },
+         {field : 'LocalCaption', min_word_length: 1, suggest_mode: 'popular', confidence:0.4 },
+         {field : 'Category'    , min_word_length: 1, suggest_mode: 'popular', confidence:0.3 },
+       ];
 
 
       function hitMe(response){
@@ -94,30 +93,75 @@ function typeaheadDirective(photoApi, $rootScope){
         return removeDupes(ordered, 'text');
       }
       function elasticsearchSuggester(){
-        return function (query, syncCallback, asyncCallback){
-          /** FIXME: Need to add filter here!!! **/
-          photoApi.suggest({ query : query }).then(function(response){
-            var h = hitMe(response.data.data);
+        return function (queryString, syncCallback, asyncCallback){
 
-            var parsedHits = h.map(function (item){
+          var query = bodybuilder();
+
+          var suggest = {};
+
+          availableFields.forEach(function (item){
+            suggest[item.field] = {
+              phrase: {
+                field: item.field,
+                gram_size: 10,
+                direct_generator : [ {
+                   field :            item.field,
+                   suggest_mode :     item.suggest_mode,
+                   min_word_length :  item.min_word_length
+                 } ],
+              }
+            }
+
+          });
+          suggest.text = queryString;
+
+          query.rawOption('suggest', suggest);
+
+          query.size(0);
+
+          elasticsearch.search({
+            index : $scope.index,
+            type : $scope.type,
+            body : query
+          }, function (err, res){
+            console.log(err, res);
+
+            if (!res.suggest) {
+              asyncCallback([]);
+              return console.log('Could not suggest');
+            }
+
+            var hits = getAllSuggestHits(res);
+            var arr = hits.map(function (item){
               return item.text;
             });
-
-            asyncCallback(parsedHits);
-          }, function (){
-            asyncCallback([]);
+            asyncCallback(arr);
           });
-
         };
       }
 
+      function getAllSuggestHits(res){
+        var querys = Object.keys(res.suggest);
 
+        var hits = [];
 
+        querys.forEach(function (key){
+
+          var first = res.suggest[key].pop();
+
+          first.options.forEach(function (hit){
+            hits.push(hit);
+          });
+
+        });
+        var ordered = hits.sort(orderBy('score')).reverse();
+        return removeDupes(ordered, 'text');
+      }
 
       $(element).typeahead({
         hint: true,
         highlight: false,
-        minLength: 1,
+        minLength: 3,
         async : true,
       },
       {

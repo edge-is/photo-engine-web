@@ -1,4 +1,4 @@
-function directiveArchiveImage(elasticsearch){
+function directiveArchiveImage(elasticsearch, cdn){
   return {
     restrict : 'ACE',
     template : function (elem, attrs){
@@ -16,9 +16,6 @@ function directiveArchiveImage(elasticsearch){
     replace : true,
     link : function ($scope, element, attrs){
 
-      // index: [ 'random', 'index:number'];
-      //console.log('X', $scope, element, attrs);
-
       var index = attrs.index;
       var type = attrs.type;
 
@@ -28,65 +25,33 @@ function directiveArchiveImage(elasticsearch){
 
       var size = attrs.size || 'x-small';
 
-      var _query = "";
-
+      var query = "";
       try {
-        _query = JSON.parse(attrs.query);
+        query = JSON.parse(attrs.query);
       } catch (e) {
-        _query = {
-          type : 'match'
-
-        };
-        _query = attrs.query;
-
-        console.error('---- NEED TO FIX THIS....');
+        return console.error('Could not parse query', e);
       }
 
+      if (attrs.querytype !== "elasticsearch"){
+        query = bodybuilder()
+          .filter('term', query.field, query.value);
+      }
 
-      var query = bodybuilder()
-                  .query(_query.type, _query.field, _query.value )
-                  .filter('term', _query.field, _query.value);
-
-
-      /*if (attrs.select === 'random'){
-
-        var seed =  Math.floor(Math.random() * 100);
-
-        var filter = {}
-        filter[_query.field] = _query.value;
-
-        query = {
-            "size":1,
-            "query": {
-                "function_score": {
-                    "functions": [
-                        {
-                            "random_score":  {
-                                "seed": seed
-                            }
-                        }
-                    ],
-                    "score_mode": "sum",
-                }
-            },
-            "filter" : {
-              "term" : filter
-            }
-        };
-      };*/
-
-      elasticsearch.search({
+      var elasticsearchQuery = {
         index : index,
         type : type,
         body : query,
-      }, function (err, res){
+      };
+
+      elasticsearch.search(elasticsearchQuery, function (err, res){
         if (err) return console.error('Error selecting image', err);
+
 
         if (!res.hits) return console.error('No hits in body');
         var hit = res.hits.hits.pop();
 
-        var thumb = hit._source._thumbnails[size];
-        $scope.selectedImage = [config.cdn, 'thumbnails', thumb.name].join('/');
+        $scope.selectedImage = cdn.thumbnail(hit._source, size);
+
       });
     }
   };

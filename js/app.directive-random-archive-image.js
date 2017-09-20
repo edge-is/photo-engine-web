@@ -7,7 +7,7 @@ function directiveRandomArchiveImage($http, $compile){
     },
     replace : true,
     link : function ($scope, element, attrs){
-      $scope.availableImages=[];
+      /*$scope.availableImages=[];
       $scope.archive_name = attrs.archiveName;
       $scope.image_name = "";
       var url = [config.api, '/random/archives?archive_id=', attrs.archive  ].join('')
@@ -23,7 +23,9 @@ function directiveRandomArchiveImage($http, $compile){
         $scope.selectedArchiveImage = selected._source.cdn1.small;
         $scope.selectedImage = $scope.selectedArchiveImage;
         $compile(element)($scope);
-      });
+      });*/
+
+      console.log($scope, element, attrs)
     },
   }
 }

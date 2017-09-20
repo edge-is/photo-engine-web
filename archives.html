@@ -41,29 +41,33 @@
         <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
         <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
     <![endif]-->
-
-
-
 </head>
 
-<body id="page-top" data-spy="scroll" data-target=".navbar-fixed-top" ng-controller="archives">
+<body id="page-top" data-spy="scroll" data-target=".navbar-fixed-top" ng-controller="archivesGroupping">
   <div ng-include="'views/templates/navbar.html'"></div>
   <div class="all-archives-content padding-top-70px container-fluid">
     <div class="row">
-      <div ng-repeat="(index, archive) in archives">
+      <div ng-repeat="(key, item) in archives">
         <div class="col-lg-2 col-md-2 col-sm-4 random-archive-images-container">
-          <a href="/search.html?filter={{archive.filterJSON}}" class="thumbnail" follow-link  target="_self">
-            <random-archive-image archive="{{archive.archive_id}}" archive-name="{{archive.name}}"></random-archive-image>
+          <a class="thumbnail"
+            href="/search_index.html?index_id={{index_id}}&query={{item.base64Query}}&filter={{item.key}}"
+            follow-link  target="_self">
+            <archive-image
+              query="{{item.query}}"
+              index="{{index}}"
+              type="{{type}}"
+              select="random"
+              size="xx-small"
+              title="{{item.key}}"
+              queryType="elasticsearch"
+              tooltip="Fjöldi ljósmynda {{item.doc_count}}">
+            </archive-image>
           </a>
         </div>
       </div>
     </div>
   </div>
   <notify-development></notify-development>
-
-
-
-
 
   <script src="config.js"></script>
   <script src="dist/js/libs.js"></script>

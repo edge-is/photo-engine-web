@@ -2,7 +2,7 @@
  * Directive to lazy load images, creates trigger that fires when image is ready and then replaces;
  */
 
-function directiveLazyImage($timeout, $window){
+function directiveLazyImage($timeout, cdn){
   return {
     restrict: 'ACE',
     scope : {
@@ -20,12 +20,12 @@ function directiveLazyImage($timeout, $window){
       // FIXME: Dynamic image selection
       $scope.$watch('image', function (_new){
         if (!_new) return;
-        $scope.lowres = $scope.image['xx-small'];
-        $scope.highres = $scope.image['x-large'];
+
+        $scope.lowres = cdn.thumbnail($scope.image._source, attr.lowres);
+        $scope.highres = cdn.thumbnail($scope.image._source, attr.highres);
       })
 
       $('.high-resolution-image').bind('load', function (){
-
         $('.low-resolution-image').addClass('hidden');
         $scope.$apply();
         $timeout(function (){
@@ -33,8 +33,6 @@ function directiveLazyImage($timeout, $window){
              .removeClass('hidden')
              .unbind('load');
         }, 10)
-
-
         $('.low-resolution-image').remove();
       });
     }

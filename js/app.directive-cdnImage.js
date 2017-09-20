@@ -1,4 +1,4 @@
-function cdnImage(){
+function cdnImage(cdn){
   return {
     restrict: 'ACE',
     scope : {
@@ -9,13 +9,9 @@ function cdnImage(){
       return '<img ng-src="{{selectedImage}}"/>';
     },
     link : function ($scope, element, attr){
-      var size = attr.size || 'x-small';
 
-      $scope.selectedImage = selectImage($scope.image);
-      function selectImage(image){
-        var cdnImage = image._source._thumbnails[size].name;
-        return [config.cdn, '/thumbnails/', cdnImage].join('');
-      }
+      var cache  = (attr.cache === 'false') ? false : true;
+      $scope.selectedImage = cdn.thumbnail($scope.image._source, attr.size, cache)
     }
   };
 }

@@ -1,16 +1,18 @@
 
- function applicationRun($rootScope, $location, $log) {
+ function applicationRun($rootScope, $location, $log, utils) {
   var allowModalsInControllers = ['imageLinked'];
 
   $rootScope.history = [];
 
   $rootScope.oldPath = $location.$$path;
+  $rootScope.currentUriQuery = false;
 
   $rootScope.config = config;
   setCurrentIndex();
 
   $rootScope.$on('$locationChangeStart', function (event, data){
     setCurrentIndex();
+    updateCurrentUriQuery();
     $rootScope.oldPath = $location.$$path;
     $log.debug('RUN::$locationChangeStart', data, $rootScope.history);
   });
@@ -29,6 +31,14 @@
 
     console.log('Running diff', diffToSend);
     $rootScope.$emit('locationDiff', diffToSend);
+  }
+
+  function updateCurrentUriQuery(){
+    var queryRaw = $location.search().query;
+    if (queryRaw){
+      $rootScope.currentUriQuery = utils.base64decode(queryRaw);
+      $rootScope.$emit('currentUriQueryChange', $rootScope.currentUriQuery);
+    }
   }
 
   function compareObject(newObject, oldObject){
@@ -56,11 +66,13 @@
   }
 
   function setCurrentIndex(){
+
     var indexID = number($location.search().index_id);
 
     if (indexID === false) {
       indexID = 0;
     }
+    $log.debug('Settting current index', indexID)
     $rootScope.currentIndex = config.indices[indexID];
 
     $rootScope.currentIndexID = indexID;

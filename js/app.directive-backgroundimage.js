@@ -2,7 +2,7 @@
  * Directive to create a background image
  */
 
-function directiveBackgroundImage(){
+function directiveBackgroundImage(cdn){
   return {
     restrict : 'ACE',
     link : function(scope, element, attrs){

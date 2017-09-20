@@ -10,10 +10,6 @@ function archiveListingController($scope, elasticsearch, $rootScope, $location){
 
   var rawField = config.rawField || '.keyword';
 
-  $scope.onTypeaheadSubmit = function submitOnSearch(query){
-    window.location = '/search.html?query=' + query;
-  };
-
   $scope.query = "";
   $scope.queryObject = {};
 
@@ -28,25 +24,40 @@ function archiveListingController($scope, elasticsearch, $rootScope, $location){
 
   $scope.showDescription = true;
 
-  var fields = {
-     'Source.keyword'        : 'UserDefined4.keyword',
-     'UserDefined4.keyword'  : false,
-     'UserDefined12.keyword' : false,
-     'UserDefined14.keyword' : false
-   };
+  var fields = setKeyword({
+     'Source{{KEYWORD}}'        : 'UserDefined4{{KEYWORD}}',
+     'UserDefined4{{KEYWORD}}'  : false,
+     'UserDefined12{{KEYWORD}}' : false,
+     'UserDefined14{{KEYWORD}}' : false
+   });
 
-   var order =  {
-     'Source.keyword'        : 'UserDefined4.keyword',
-     'UserDefined4.keyword'  : 'UserDefined12.keyword',
-     'UserDefined12.keyword' : 'UserDefined14.keyword',
-     'UserDefined14.keyword' : false
-   };
+   var order =  setKeyword({
+     'Source{{KEYWORD}}'        : 'UserDefined4{{KEYWORD}}',
+     'UserDefined4{{KEYWORD}}'  : 'UserDefined12{{KEYWORD}}',
+     'UserDefined12{{KEYWORD}}' : 'UserDefined14{{KEYWORD}}',
+     'UserDefined14{{KEYWORD}}' : false
+   });
 
-   var _order = [
-     'Source.keyword',
-     'UserDefined4.keyword',
-     ['UserDefined12.keyword', 'UserDefined14.keyword']
-   ];
+   var _order = setKeyword([
+     'Source{{KEYWORD}}',
+     'UserDefined4{{KEYWORD}}',
+     ['UserDefined12{{KEYWORD}}', 'UserDefined14{{KEYWORD}}']
+   ]);
+
+
+   function setKeyword(arr){
+     var keyWord = (config.elasticsearch.version === 'v5') ? '.keywords' : '.raw';
+     if (!Array.isArray(arr)) return arr;
+     return arr.map(function (value){
+       if (Array.isArray(value)) return setKeyword(value);
+
+       if (typeof value === 'string' && (value.indexOf('{{KEYWORD}}') > -1 )){
+
+         value = value.replace(/\{\{KEYWORD\}\}/, keyWord);
+       }
+       return value;
+     })
+   }
 
    function getAgg(field, filters, callback){
      var query = bodybuilder();
@@ -57,8 +68,6 @@ function archiveListingController($scope, elasticsearch, $rootScope, $location){
      if (Array.isArray(field)){
        queryField = field[0];
      }
-
-
     // Create the query
     if (!Array.isArray(field)){
       query.agg('terms', queryField, {size : 100 });
@@ -80,8 +89,8 @@ function archiveListingController($scope, elasticsearch, $rootScope, $location){
     }
 
      elasticsearch.search({
-       index : config.archive.index,
-       type : config.archive.type,
+       index : $scope.index,
+       type : $scope.type,
        size : 1,
        body : query
      }, function (err, res){
@@ -92,7 +101,8 @@ function archiveListingController($scope, elasticsearch, $rootScope, $location){
 
 
    function init(getFilters){
-     var field = 'Source.keyword';
+     var keywordField = (config.elasticsearch.version === 'v5') ? '.keyword' : '.raw';
+     var field = 'Source' + keywordField;
      var filter = getURIFilter();
      if (getFilters){
        if (filter){
@@ -108,6 +118,8 @@ function archiveListingController($scope, elasticsearch, $rootScope, $location){
      $scope.selectedValues = filter || [];
 
      getAgg(field, filter, function (err, res){
+       if (err) return console.error(err);
+
        $scope.items = parseAggBuckets(res.aggregations, $scope.selectedValues);
      });
    }
