@@ -28,7 +28,7 @@ search.controller('thumbnailsModal', ['$scope', '$modalInstance','data', control
 search.controller('navbar', ['$scope',  controllerNavbar]);
 
 search.directive('notifyDevelopment', ['$log',  '$cookies', 'ngNotify', developmentDirective]);
-search.directive('typeaheadSearch', ['elasticsearch', '$rootScope', 'utils', typeaheadDirective]);
+search.directive('navbarTypeaheadSearch', ['elasticsearch', '$rootScope', 'utils', navbarTypeaheadDirective]);
 search.directive('randomArchiveImage', ['$http','$compile',  directiveRandomArchiveImage] );
 search.directive('aggrigate', ['$http', 'utils', '$rootScope', 'photoApi', '$log','$location','$timeout', directiveAggrigates]);
 search.directive('inView', ['$window', directiveInView]);

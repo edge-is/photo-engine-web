@@ -20,8 +20,6 @@ function controllerSearchImages(
   $scope.noMoreResults = false;
 
   $scope.originalQuery = false;
-  $scope.loaded = false;
-
   $scope.loadingMoreResults = false;
 
   $scope.index = $rootScope.currentIndex.index.index;
@@ -53,14 +51,15 @@ function controllerSearchImages(
 
     var query = loadElasticQuery.parse(value);
 
+    console.log(
+      'Loaded query', query.build()
+    )
 
     $scope.queryStringQuery = loadElasticQuery.queryString(value);
     if (!$scope.originalQuery) $scope.originalQuery = angular.copy(query).build(config.elasticsearch.version || 'v5');
 
-    if (!$scope.loaded ){
-      search(query);
-    }
-    $scope.loaded = true;
+    search(query);
+
   });
 
   $scope.queryStringSearch = function (){

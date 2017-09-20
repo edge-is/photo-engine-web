@@ -106,6 +106,13 @@ function serviceLoadElasticQuery(){
           _filter = _filter.bool;
         }
 
+
+        if (_filter.must){
+          _filter = _filter.must;
+        }
+
+        console.log(queryObject.query.bool.filter)
+
         var filters = Object.keys(_filter);
 
         filters.forEach(function (key){
@@ -160,8 +167,8 @@ function serviceLoadElasticQuery(){
 
       if (o !== n){
         console.log('Could not parse query 100%');
-        console.log(o);
-        console.log(n);
+        console.log('Original',o);
+        console.log('Generated', n);
       }
 
       return query;

@@ -11,15 +11,8 @@
         <!-- Collect the nav links, forms, and other content for toggling -->
         <!-- /.navbar-collapse -->
         <div class="collapse navbar-collapse navbar-main-collapse" id="collapse">
-
-          <form class="navbar-form navbar-right" ng-submit="submit" ng-cloak ng-show="displaySearch">
-            <div class="form-group" >
-              <typeahead-search query="query" filter="queryObject.filter" on-typeahead-submit="onTypeaheadSubmit" input-placeholder="Leita..."></typeahead-search>
-              <button type="submit" class="btn btn-default"><i class="fa fa-search"></i></button>
+        <navbar-typeahead-search query="query" input-placeholder="Leita..."  ng-show="displaySearch" ng-cloak></navbar-typeahead-search>
               <!-- <a class="btn btn-info" href ng-click="showSidebar =!showSidebar"><i class="fa fa-wrench"></i></a> -->
-            </div>
-          </form>
-
           <ul class="nav navbar-nav navbar-right">
             <li ng-repeat="(key, index) in indices">
               <a class="page-scroll" href="{{getLink(index, key)}}" target="_self">{{index.name}}</a>

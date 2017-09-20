@@ -1,31 +1,35 @@
 
 
-function typeaheadDirective(elasticsearch, $rootScope, utils){
+function navbarTypeaheadDirective(elasticsearch, $rootScope, utils){
   return {
     restrict : 'ACE',
     replace : true,
     scope : {
       query : "=?",
-      onTypeaheadSubmit : "=?",
-      filter : "=?"
     },
     template : function (element, attrs){
-      return '<input type="text" ng-model="query" class="form-control" placeholder="{{placeholder}}">';
+      return '<form class="navbar-form navbar-right"  ng-cloak><div class="form-group" ><input type="text" ng-model="query" class="form-control typeahead-input" placeholder="{{placeholder}}"> <button ng-click="submit()" name="submit" type="submit" class="btn btn-default"><i class="fa fa-search"></i></button></div></form>';
     },
     link : function ($scope, element, attrs){
 
       $scope.placeholder = attrs.inputPlaceholder;
-
-      $scope.filter = $scope.filter || false;
 
       $scope.query = $scope.query || "";
 
       $scope.index = $rootScope.currentIndex.index.index;
       $scope.type = $rootScope.currentIndex.index.type;
 
-      var form = $(element).closest('form');
+      var element = $(element).find('.typeahead-input');
 
-      $scope.submit = function (queryString){
+      $scope.submit = function (q){
+        console.log('Q', $scope.query)
+
+        q = q || $scope.query;
+
+        $scope.search(q);
+      }
+
+      $scope.search = function (queryString){
         var query = bodybuilder().query('query_string', 'query', queryString).build();
 
         var base64Query = utils.base64encode(query);
@@ -33,11 +37,6 @@ function typeaheadDirective(elasticsearch, $rootScope, utils){
         window.location = '/search_index.html?query=' + base64Query;
 
       }
-
-      $scope.$watch('query', function (_new, _old){
-        console.log('WATH QUERY')
-        $rootScope.$emit('queryUpdate', _new, _old);
-      })
 
       function updateScope (object, suggestion, dataset) {
         $scope.submit(suggestion);
