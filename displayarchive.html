@@ -88,7 +88,15 @@
     <div class="row" id="printarea">
       <div class="col-md-8">
         <div id="archive_carousel" class="carousel slide" data-ride="carousel" data-interval="false">
-          <div uib-carousel active="active" no-wrap="noWrapSlides" template-url="views/templates/carousel.html">
+          <div
+            uib-carousel
+            active="active"
+            uib-tooltip="Færðu músina yfir myndina til þess að stækka"
+            tooltip-is-open="zooming"
+            tooltip-placement="bottom"
+            tooltip-trigger="none"
+            no-wrap="noWrapSlides"
+            template-url="views/templates/carousel.html">
            <div uib-slide ng-repeat="(index, image) in images track by index" class="zoom" index="id" active="image.__active">
              <!--<fullscreen-image image="image">-->
              <cdn-image image="image" size="xx-large">
@@ -115,9 +123,9 @@
             class="btn hidden-print"
             ng-class="(zooming) ? 'btn-danger' : 'btn-success'"
             ng-click="zoom()">
-            <span ng-hide="zooming">Stækka</span>
-            <span ng-show="zooming">Minnka</span>
-            <i class="fa fa-search" ></i>
+            <span ng-hide="zooming">Stækka <i class="fa fa-search-plus" ></i></span>
+            <span ng-show="zooming">Minnka <i class="fa fa-search-minus" ></i></span>
+
           </button>
         </div>
         <dl>
