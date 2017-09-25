@@ -426,7 +426,7 @@ section.container{
   background-image: none;
 }
 #archive_carousel .carousel-indicators {
-  display: none;
+  display: none !important;
 }
 
 .cdn-image-size-small {

@@ -1,0 +1,12 @@
+
+<div class="">
+  <div class="carousel-inner" ng-transclude></div>
+  <a role="button" ng-hide="zooming" href class="left carousel-control hidden-print" ng-click="prev()" ng-class="{ disabled: isPrevDisabled() }" ng-show="slides.length > 1">
+    <span aria-hidden="true" class="glyphicon glyphicon-chevron-left"></span>
+    <span class="sr-only">previous</span>
+  </a>
+  <a role="button" ng-hide="zooming" href class="right carousel-control hidden-print" ng-click="next()" ng-class="{ disabled: isNextDisabled() }" ng-show="slides.length > 1">
+    <span aria-hidden="true" class="glyphicon glyphicon-chevron-right"></span>
+    <span class="sr-only">next</span>
+  </a>
+</div>

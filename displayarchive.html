@@ -41,6 +41,29 @@
         background-position: center;
         background-repeat: no-repeat;
       }
+
+      @media print {
+         #content * {
+           visibility:hidden;
+           display: none !important;
+         }
+
+
+         .carousel-indicators {
+           display: none !important;
+         }
+
+         #printarea, #printarea * {
+           visibility:visible;
+         }
+
+      }
+
+      .zoomable {
+        cursor: zoom-in;
+      }
+
+
     </style>
 
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
@@ -51,22 +74,22 @@
     <![endif]-->
 </head>
 
-<body id="page-top" data-spy="scroll" data-target=".navbar-fixed-top" ng-controller="displayArchive">
+<body id="content" data-spy="scroll" data-target=".navbar-fixed-top" ng-controller="displayArchive">
   <div ng-include="'views/templates/navbar.html'"></div>
   <div class="all-archives-content padding-top-60px container-fluid">
-    <ol class="breadcrumb">
-      <li ng-repeat="(index, filter) in filters" >
+    <ol class="breadcrumb hidden-print">
+      <li ng-repeat="(index, filter) in getFilters()" >
         <a href="#" ng-click="back(index, filter)">{{filter.value}}</a>
       </li>
       <li>
         <a href="#" >{{currenDoc._source.Title}}</a>
       </li>
     </ol>
-    <div class="row">
+    <div class="row" id="printarea">
       <div class="col-md-8">
         <div id="archive_carousel" class="carousel slide" data-ride="carousel" data-interval="false">
-          <div uib-carousel active="active" no-wrap="noWrapSlides">
-           <div uib-slide ng-repeat="(index, image) in images track by index" index="id" active="image.__active">
+          <div uib-carousel active="active" no-wrap="noWrapSlides" template-url="views/templates/carousel.html">
+           <div uib-slide ng-repeat="(index, image) in images track by index" class="zoom" index="id" active="image.__active">
              <!--<fullscreen-image image="image">-->
              <cdn-image image="image" size="xx-large">
            </div>
@@ -74,12 +97,29 @@
         </div>
       </div>
       <div class="col-md-4">
-        <h4>Skráning</h4>
-        <button type="button" class="btn btn-default" ng-click="showThumbnails(images)">
-          Yfirlit
-          <i class="fa fa-list" ng-hide="loadingThumbnails"></i>
-          <i class="fa fa-spinner fa-pulse" ng-show="loadingThumbnails"></i>
-        </button>
+        <h4 class="hidden-print">Skráning</h4>
+        <div class="btn-group" role="group" >
+
+          <button type="button" class="btn btn-default hidden-print" ng-click="showThumbnails(images)">
+            Smámyndir
+            <i class="fa fa-list" ng-hide="loadingThumbnails"></i>
+            <i class="fa fa-spinner fa-pulse" ng-show="loadingThumbnails"></i>
+          </button>
+          <button type="button" class="btn btn-primary hidden-print" ng-click="print()">
+            Prenta
+            <i class="fa fa-print" ></i>
+          </button>
+          <button
+            type="button"
+            uib-tooltip="Smelltu hér til að virkja stækkun á mynd"
+            class="btn hidden-print"
+            ng-class="(zooming) ? 'btn-danger' : 'btn-success'"
+            ng-click="zoom()">
+            <span ng-hide="zooming">Stækka</span>
+            <span ng-show="zooming">Minnka</span>
+            <i class="fa fa-search" ></i>
+          </button>
+        </div>
         <dl>
           <dt>Upplýsingar</dt>
           <dd>{{currenDoc._source.UserDefined4}}</dd>
@@ -91,13 +131,13 @@
           <dd>{{index + 1}} / {{total}}</dd>
           <dt>Síðast uppfært</dt>
           <dd>{{currenDoc._source.indexed_epoch | date:'dd.MM.yyyy HH:mm' }}</dd>
+          <dt>Myndatexti</dt>
+          <dd>{{currenDoc._source.Description }}</dd>
+
         </dl>
       </div>
     </div>
   </div>
-
-  <notify-development></notify-development>
-
   <script src="config.js"></script>
   <script src="dist/js/libs.js"></script>
   <script src="dist/js/is_IS.min.js"></script>

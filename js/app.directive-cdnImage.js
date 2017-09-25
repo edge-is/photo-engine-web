@@ -11,7 +11,7 @@ function cdnImage(cdn){
     link : function ($scope, element, attr){
 
       var cache  = (attr.cache === 'false') ? false : true;
-      $scope.selectedImage = cdn.thumbnail($scope.image._source, attr.size, cache)
+      $scope.selectedImage = cdn.thumbnail($scope.image._source, attr.size, cache);
     }
   };
 }

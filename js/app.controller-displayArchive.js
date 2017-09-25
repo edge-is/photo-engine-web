@@ -10,28 +10,7 @@ function controllerDisplayArchive($scope, elasticsearch, $location, $timeout, $r
 
   $scope.filters = [];
 
-  if (uriFilters.indexOf('BASE64') > -1){
-    $scope.filters = decodeURIfilter(uriFilters);
-  }
-
-  function decodeURIfilter(string){
-    var decoded =  Base64.decode(
-      string.split(':').pop()
-    );
-    try {
-      return JSON.parse(decoded);
-    } catch (e) {
-      return decoded;
-    }
-  }
-
-
-  function createURIfilter(arr){
-    return {
-      filter : ['BASE64', Base64.encodeURI(angular.toJson(arr))].join(':')
-    };
-  };
-
+  $scope.filters = utils.base64decode(uriFilters);
 
   var _i = $location.search().index;
 
@@ -42,7 +21,6 @@ function controllerDisplayArchive($scope, elasticsearch, $location, $timeout, $r
 
   $scope.currenDoc = false;
 
-  $scope.dir = [];
 
   var init = true;
 
@@ -56,19 +34,30 @@ function controllerDisplayArchive($scope, elasticsearch, $location, $timeout, $r
     return _int;
   }
 
-  $scope.getDir = function (){
-    var image = $scope.images[0];
-    if (!image) return;
-    var src = image._source;
+  $scope.getFilters = function (){
+    var _order = [
+      'Source{{KEYWORD}}',
+      'UserDefined4{{KEYWORD}}',
+      ['UserDefined12{{KEYWORD}}', 'UserDefined14{{KEYWORD}}']
+    ];
 
-    var ObjectName = $scope.currenDoc._source.ObjectName;
-    $scope.dir = [ src.Source, src.UserDefined4, src.UserDefined12, ObjectName ];
-  };
+    //: FIXME: Þarf að laga þetta, hér vantar að joina filtera..
+
+
+
+    return $scope.filters;
+  }
+
+  $scope.print = function (){
+    return window.print();
+  }
 
   $scope.back = function (index){
 
     var arr = $scope.filters.slice(0, index + 1);
-    var uri = createURIfilter(arr);
+    var uri = {
+      filter : utils.base64encode(angular.toJson(arr))
+    };
 
     return window.location =  utils.createURI('/webarchive.html', {
         index_id : $rootScope.currentIndexID,
@@ -84,13 +73,6 @@ function controllerDisplayArchive($scope, elasticsearch, $location, $timeout, $r
 
     $scope.limit = 1000;
 
-    /*$scope.getImages(function (err, res){
-      $scope.limit = oldLimit;
-
-      callback();
-
-    })*/
-
     var query = $scope.createQuery();
 
     $scope.fetch(query, 0, 1000, callback)
@@ -102,7 +84,7 @@ function controllerDisplayArchive($scope, elasticsearch, $location, $timeout, $r
 
       var errorMessage = false;
       if (err) {
-        console.log('Error loading images', err);
+        console.error('Error loading images', err);
         errorMessage = {msg : 'Error loading images', err : err};
       }
       $scope.thumbnails = res.hits.hits;
@@ -146,22 +128,6 @@ function controllerDisplayArchive($scope, elasticsearch, $location, $timeout, $r
     });
 
   };
-  /*function tmpFunction(arr){
-    var q = $scope.createQuery();
-    console.log('TEMP FUNCTION :FIXMEEEE::')
-    $scope.fetch(q, 0, 1000, function (err, res){
-      var x = q.build();
-      var j = JSON.stringify(x, null, 2)
-      res.hits.hits.forEach(function (img){
-        console.log(img._id, img._source.UserDefined12);
-      });
-      console.log('QUERY', j, res.hits.hits[10]);
-    });
-
-  }
-  setTimeout(tmpFunction, 100)*/
-
-
 
   /**
    * Sets image based on image object active
@@ -177,6 +143,28 @@ function controllerDisplayArchive($scope, elasticsearch, $location, $timeout, $r
       return img;
     });
   };
+
+  $scope.zooming=false;
+
+  $scope.zoom = function (){
+    var element = $('.zoom.active');
+
+    var controls = $('.carousel-control')
+    if ($scope.zooming){
+      controls.removeClass('hidden');
+      element.removeClass('zoomable').trigger('zoom.destroy');
+      return $scope.zooming = false;
+    }
+
+    element.addClass('zoomable');
+    controls.addClass('hidden');
+
+    element.zoom();
+
+
+
+    $scope.zooming = true;
+  }
 
   $scope.getImages = function (callback){
     callback = callback || function (){};
@@ -202,14 +190,13 @@ function controllerDisplayArchive($scope, elasticsearch, $location, $timeout, $r
       if (init){
         $scope.currenDoc = $scope.images[0];
       }
-      $scope.getDir();
 
       $scope.offset += res.hits.hits.length;
 
       if (res.hits.total < $scope.offset) return console.log('STOP');
       init = false;
       callback(null, res);
-    })
+    });
   }
 
   $scope.createQuery = function (){
@@ -217,7 +204,10 @@ function controllerDisplayArchive($scope, elasticsearch, $location, $timeout, $r
     $scope.filters.forEach(function (filter){
       query.filter(filter.type, filter.field, filter.value);
     });
-    query.sort('UserDefined6', 'asc');
+
+    var field = $rootScope.currentIndex.sort.default.field || 'ObjectName';
+    var type = $rootScope.currentIndex.sort.default.type || 'asc';
+    query.sort(field, type);
     return query;
   }
 
@@ -242,7 +232,6 @@ function controllerDisplayArchive($scope, elasticsearch, $location, $timeout, $r
     if (!i) return;
     $scope.currenDoc = $scope.images[i];
 
-    $scope.getDir();
     if ( ( i + 5 ) > $scope.images.length ){
       $scope.getImages();
 

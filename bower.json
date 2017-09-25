@@ -33,6 +33,7 @@
     "angular-endless-scroll": "angular-infinite-scroll-xs#*",
     "ng-notify": "~0.8.0",
     "angular-cookies": "~1.5.8",
-    "js-base64": "^2.1.9"
+    "js-base64": "^2.1.9",
+    "jquery-zoom": "^1.7.20"
   }
 }

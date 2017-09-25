@@ -58,7 +58,7 @@ function controllerSearchImages(
     $scope.queryStringQuery = loadElasticQuery.queryString(value);
     if (!$scope.originalQuery) $scope.originalQuery = angular.copy(query).build(config.elasticsearch.version || 'v5');
 
-    search(query);
+    search({query: query, uriSearch:true });
 
   });
 
@@ -82,7 +82,7 @@ function controllerSearchImages(
     var query = loadElasticQuery.parse($scope.originalQuery);
     query.query('query_string', 'query', $scope.queryStringQuery);
 
-    search(query);
+    search({query : query});
     query = null;
   }
 
@@ -112,14 +112,18 @@ function controllerSearchImages(
     $scope.currentURI = $location.$$url;
   }
   $scope.onToggle = function (query){
-    search(query);
+    search({query : query});
   }
 
-  function search(query, append, callback){
-    console.log('Searching, es query:', query.build())
+  function search(queryOptions, callback){
     callback = callback || function (){};
 
-    append = append || false;
+    var query = queryOptions.query;
+
+    var append = queryOptions.append || false;
+
+    console.log('Searching, es query:', query.build())
+
     query.size($scope.size);
     var elasticsearchQuery = {
       index : $scope.index,
@@ -147,8 +151,10 @@ function controllerSearchImages(
         $scope.noMoreResults = true;
       }
 
-      var base64EncodedQuery = utils.base64encode(querySent.build($rootScope.config.elasticsearch.version || 'v5'));
-      $location.search('query',  base64EncodedQuery);
+      if (!queryOptions.uriSearch){
+        var base64EncodedQuery = utils.base64encode(querySent.build($rootScope.config.elasticsearch.version || 'v5'));
+        $location.search('query',  base64EncodedQuery);
+      }
 
       callback();
     });
@@ -194,7 +200,7 @@ function controllerSearchImages(
     query.from($scope.result.length);
     $scope.loadingMoreResults = true;
 
-    search(query, true, function done(){
+    search({query : query }, true, function done(){
       $scope.loadingMoreResults = false;
     });
 
@@ -223,7 +229,7 @@ function controllerSearchImages(
       return query.query('match', item.field, item.value );
 
     });
-    search(query);
+    search({query : query});
   }
 
 

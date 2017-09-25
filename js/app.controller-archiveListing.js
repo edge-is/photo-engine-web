@@ -2,10 +2,8 @@
  * Controller for Archive Listing
  */
 
-function archiveListingController($scope, elasticsearch, $rootScope, $location){
-  var url = [config.api, '/aggregates/archive'].join('');
+function archiveListingController($scope, elasticsearch, $rootScope, $location, utils){
   $scope.items = [];
-
   $scope.images = [];
 
   var rawField = config.rawField || '.keyword';
@@ -20,23 +18,12 @@ function archiveListingController($scope, elasticsearch, $rootScope, $location){
   $scope.index = $rootScope.currentIndex.index.index;
   $scope.type = $rootScope.currentIndex.index.type;
 
-  $scope.description = config.archive.decription.path;
+  $scope.description = $rootScope.currentIndex.description;
+
 
   $scope.showDescription = true;
 
-  var fields = setKeyword({
-     'Source{{KEYWORD}}'        : 'UserDefined4{{KEYWORD}}',
-     'UserDefined4{{KEYWORD}}'  : false,
-     'UserDefined12{{KEYWORD}}' : false,
-     'UserDefined14{{KEYWORD}}' : false
-   });
 
-   var order =  setKeyword({
-     'Source{{KEYWORD}}'        : 'UserDefined4{{KEYWORD}}',
-     'UserDefined4{{KEYWORD}}'  : 'UserDefined12{{KEYWORD}}',
-     'UserDefined12{{KEYWORD}}' : 'UserDefined14{{KEYWORD}}',
-     'UserDefined14{{KEYWORD}}' : false
-   });
 
    var _order = setKeyword([
      'Source{{KEYWORD}}',
@@ -70,10 +57,10 @@ function archiveListingController($scope, elasticsearch, $rootScope, $location){
      }
     // Create the query
     if (!Array.isArray(field)){
-      query.agg('terms', queryField, {size : 100 });
+      query.agg('terms', queryField, { size : 100 });
     }else{
-      query.agg('terms', queryField, {size : 100 }, function (q){
-        return q.agg('terms', field[1], {size : 100 });
+      query.agg('terms', queryField, { size : 100 }, function (q){
+        return q.agg('terms', field[1], { size : 100 });
       });
     }
 
@@ -99,6 +86,21 @@ function archiveListingController($scope, elasticsearch, $rootScope, $location){
      });
    }
 
+   function orderByName(arr){
+     return arr.sort(function(a, b) {
+        var aKey = a._name.toUpperCase(); // ignore upper and lowercase
+        var bKey = b._name.toUpperCase(); // ignore upper and lowercase
+
+        if (aKey < bKey) {
+          return -1;
+        }
+        if (aKey > bKey) {
+          return 1;
+        }
+        return 0;
+      });
+   }
+
 
    function init(getFilters){
      var keywordField = (config.elasticsearch.version === 'v5') ? '.keyword' : '.raw';
@@ -120,15 +122,20 @@ function archiveListingController($scope, elasticsearch, $rootScope, $location){
      getAgg(field, filter, function (err, res){
        if (err) return console.error(err);
 
-       $scope.items = parseAggBuckets(res.aggregations, $scope.selectedValues);
+       console.log('RES', res)
+
+       var arr =  parseAggBuckets(res.aggregations, $scope.selectedValues);
+
+       $scope.items = orderByName(arr);
+
+       console.log(arr);
      });
    }
-   function getField(agg){
 
+   function getField(agg){
      for (var key in agg){
        return key;
      }
-
    }
 
    $scope.goToStart = function (){
@@ -139,9 +146,10 @@ function archiveListingController($scope, elasticsearch, $rootScope, $location){
    $scope.getHistoryURI = function (item, index){
 
      var x = $scope.selectedValues.slice(0, index + 1 );
-     var filter = createURIfilter(x);
+     var filter = {
+       filter : utils.base64encode(angular.toJson(x))
+     };
      return buildURI(false, filter);
-     return "";
    }
 
    function parseAggBuckets(agg, parentArray){
@@ -266,7 +274,9 @@ function archiveListingController($scope, elasticsearch, $rootScope, $location){
      var filters = item._parents.slice();
      filters.push(item._query);
 
-     var filter = createURIfilter(filters);
+     var filter = {
+       filter : utils.base64encode(angular.toJson(filters))
+     };
      if (!item._next){
        return buildURI('/displayarchive.html', filter);
      }
@@ -277,28 +287,11 @@ function archiveListingController($scope, elasticsearch, $rootScope, $location){
    function getURIFilter(){
      var filterRaw = $location.search().filter;
      if (filterRaw){
-       return decodeURIfilter(filterRaw);
+       return utils.base64decode(filterRaw);
      }
      return false;
 
    }
-
-   function decodeURIfilter(string){
-     var decoded =  Base64.decode(
-       string.split(':').pop()
-     );
-     try {
-       return JSON.parse(decoded);
-     } catch (e) {
-       return decoded;
-     }
-   }
-
-   function createURIfilter(arr){
-     return {
-       filter : ['BASE64', Base64.encodeURI(angular.toJson(arr))].join(':')
-     };
-   };
 
    function buildURI(location, object){
 

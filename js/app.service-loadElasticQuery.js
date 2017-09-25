@@ -102,22 +102,15 @@ function serviceLoadElasticQuery(){
         // Add the filter first..
 
         var _filter = queryObject.query.bool.filter;
+
         if (_filter.bool){
           _filter = _filter.bool;
         }
 
-
-        if (_filter.must){
-          _filter = _filter.must;
-        }
-
-        console.log(queryObject.query.bool.filter)
-
         var filters = Object.keys(_filter);
 
-        filters.forEach(function (key){
+        filters.forEach(function (key, index){
           var arr = _filter[key];
-
           if (Array.isArray(arr)){
             arr.forEach(function (item){
               var o = parseObject(item);
@@ -131,9 +124,7 @@ function serviceLoadElasticQuery(){
             var o = parseObject(_filter);
             query.filter(o.type, o.field, o.value);
           }
-
         });
-
 
         if (queryObject.query.bool.must){
 
@@ -147,7 +138,6 @@ function serviceLoadElasticQuery(){
               var item = queryObject.query.bool.must;
               var o = parseObject(item);
               query.query(o.type, o.field, o.value);
-
             })();
           }
         }
@@ -175,3 +165,42 @@ function serviceLoadElasticQuery(){
     }
   }
 }
+
+
+var __xx = {
+  "size": 100,
+  "query": {
+    "bool": {
+      "filter": {
+        "bool": {
+          "must": [
+            {
+              "term": {
+                "UserDefined4.raw": "Tómas Jónsson (26.1.1933)"
+              }
+            },
+            {
+              "term": {
+                "SpecialInstructions": "myndasetur.is"
+              }
+            }
+          ]
+        }
+      },
+      "must": [
+        {
+          "query_string": {
+            "query": "Hestur"
+          }
+        },
+        {
+          "exists": {
+            "field": "_thumbnails"
+          }
+        }
+      ]
+    }
+  }
+};
+console.log('----------------')
+serviceLoadElasticQuery().parse(__xx)

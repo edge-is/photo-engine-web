@@ -84,9 +84,9 @@
           <form class="" ng-submit="queryStringSearch()">
           <div class="input-group">
             <span class="input-group-addon" ><a href="#"><i class="fa fa-info"></i></a></span>
-            <span class="input-group-addon" id="basic-addon3">Leit<span ng-show="current_credit"> í {{current_credit}}</span></span>
+            <span class="input-group-addon" id="basic-addon3">Leit<span ng-show="current_credit"> í {{current_credit}} <a href="#" uib-tooltip="Fjarlæga þennan filter" class="text-danger"><i class="fa fa-remove"></i></a></span></span>
             <input type="text" ng-model="queryStringQuery" class="form-control" id="basic-url" aria-describedby="basic-addon3" placeholder="Leitaðu .. ">
-            <span class="input-group-addon" ><a href="#" ng-click="toggleAdvancedSearch()">Ítarleit <i class="fa fa-wrench"></i></a></span>
+            <span class="input-group-addon" ><a href="#"  uib-tooltip="Ítarleit" ng-click="toggleAdvancedSearch()">Ítarleit <i class="fa fa-wrench"></i></a></span>
 
           </div>
           </form>
