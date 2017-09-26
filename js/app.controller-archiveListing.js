@@ -31,9 +31,11 @@ function archiveListingController($scope, elasticsearch, $rootScope, $location, 
      ['UserDefined12{{KEYWORD}}', 'UserDefined14{{KEYWORD}}']
    ]);
 
+   console.log('_ORDER', _order)
+
 
    function setKeyword(arr){
-     var keyWord = (config.elasticsearch.version === 'v5') ? '.keywords' : '.raw';
+     var keyWord = (config.elasticsearch.version === 'v5') ? '.keyword' : '.raw';
      if (!Array.isArray(arr)) return arr;
      return arr.map(function (value){
        if (Array.isArray(value)) return setKeyword(value);
