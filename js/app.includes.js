@@ -23,7 +23,7 @@ search.controller('tmpCarousel', ['$scope', '$http',  archiveImageCarousel]);
 
 search.controller('imageModalController', [ '$scope','$location','$modalInstance','data','hotkeys','$rootScope','osm', imageModalController ]);
 search.controller('index', ['$scope','$window', indexController]);
-search.controller('displayArchive', ['$scope', 'elasticsearch', '$location', '$timeout','$rootScope', '$uibModal', 'utils', controllerDisplayArchive]);
+search.controller('displayArchive', ['$scope', 'elasticsearch', '$location', '$timeout','$rootScope', '$uibModal', 'utils', 'cdn', controllerDisplayArchive]);
 search.controller('thumbnailsModal', ['$scope', '$modalInstance','data', controllerThumbnailsModal]);
 search.controller('navbar', ['$scope',  controllerNavbar]);
 

@@ -99,7 +99,7 @@
             template-url="views/templates/carousel.html">
            <div uib-slide ng-repeat="(index, image) in images track by index" class="zoom" index="id" active="image.__active">
              <!--<fullscreen-image image="image">-->
-             <cdn-image image="image" size="xx-large">
+             <cdn-image image="image" size="large">
            </div>
           </div>
         </div>
@@ -123,10 +123,19 @@
             class="btn hidden-print"
             ng-class="(zooming) ? 'btn-danger' : 'btn-success'"
             ng-click="zoom()">
-            <span ng-hide="zooming">Stækka <i class="fa fa-search-plus" ></i></span>
-            <span ng-show="zooming">Minnka <i class="fa fa-search-minus" ></i></span>
-
+            <span ng-show="loadingZoom" ng-cloak >Hleð mynd<i class="fa fa-spinner fa-pulse"></i></span>
+            <span ng-hide="loadingZoom">
+              <span ng-hide="zooming">Stækka <i class="fa fa-search-plus" ></i></span>
+              <span ng-show="zooming">Minnka <i class="fa fa-search-minus" ></i></span>
+            </span>
           </button>
+          <a type="button"
+            ng-href="{{getImage()}}"
+            uib-tooltip="Smelltu hér til að sækja myndina"
+            download="{{fileName}}"
+            class="btn hidden-print btn-info">
+            <span >Sækja <i class="fa fa-download" ></i></span>
+          </a>
         </div>
         <dl>
           <dt>Upplýsingar</dt>

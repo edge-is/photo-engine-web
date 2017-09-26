@@ -1,6 +1,6 @@
 
 
-function controllerDisplayArchive($scope, elasticsearch, $location, $timeout, $rootScope, $uibModal, utils){
+function controllerDisplayArchive($scope, elasticsearch, $location, $timeout, $rootScope, $uibModal, utils, cdn){
 
   $scope.images = [];
   $scope.thumbnails = [];
@@ -18,6 +18,10 @@ function controllerDisplayArchive($scope, elasticsearch, $location, $timeout, $r
   $scope.offset = 0;
   $scope.limit = 30;
   $scope.total = 0;
+
+  $scope.fileName = "image.jpg";
+
+  $scope.loadingZoom = false;
 
   $scope.currenDoc = false;
 
@@ -46,6 +50,15 @@ function controllerDisplayArchive($scope, elasticsearch, $location, $timeout, $r
 
 
     return $scope.filters;
+  }
+
+  $scope.getImage = function (){
+    var currentImage = getActiveImage();
+    if (!currentImage) return "#";
+
+
+    $scope.fileName = currentImage._source.ObjectName;
+    return cdn.thumbnail(currentImage._source, 'xx-large');
   }
 
   $scope.print = function (){
@@ -149,6 +162,7 @@ function controllerDisplayArchive($scope, elasticsearch, $location, $timeout, $r
   $scope.zoom = function (){
     var element = $('.zoom.active');
 
+
     var controls = $('.carousel-control')
     if ($scope.zooming){
       controls.removeClass('hidden');
@@ -156,12 +170,25 @@ function controllerDisplayArchive($scope, elasticsearch, $location, $timeout, $r
       return $scope.zooming = false;
     }
 
+    $scope.loadingZoom = true;
     element.addClass('zoomable');
     controls.addClass('hidden');
 
-    element.zoom();
+
+    var currentImage = getActiveImage();
+    var zoomSettings = {
+      callback : function (){
+        $scope.loadingZoom = false;
+        $scope.$apply();
+      }
+    };
 
 
+    if (currentImage._source){
+      zoomSettings.url = cdn.thumbnail(currentImage._source, 'xx-large');
+    }
+
+    element.zoom(zoomSettings);
 
     $scope.zooming = true;
   }
@@ -239,6 +266,12 @@ function controllerDisplayArchive($scope, elasticsearch, $location, $timeout, $r
 
   });
 
+
+  function getActiveImage(){
+    return $scope.images.filter(function (image, i){
+      return (image.__active)
+    }).pop();
+  }
 
   function findCurrentIndex(){
     var index = false;
