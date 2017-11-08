@@ -12,12 +12,14 @@ search.service('utils', serviceUtils);
 
 search.service('cdn', serviceCDN);
 
+search.service('createQuery', serviceCreateElasticQuery);
+
 search.controller('image', [ '$scope', '$location', 'photoApi', 'cacheFactory', '$rootScope', 'osm','$window', imageController]);
 search.controller('mainSearch', ['$scope','photoApi', '$location', '$anchorScroll', '$uibModal', '$rootScope', 'utils', '$timeout', '$log', mainSearchController]);
 search.controller('archivesGroupping', ['$scope', 'elasticsearch','$rootScope','utils', archiveGrouppingController]);
 search.controller('archiveListing', ['$scope', 'elasticsearch', '$rootScope','$location', 'utils',  archiveListingController]);
 
-search.controller('searchImages', ['$scope', 'elasticsearch', '$rootScope', '$log', 'cdn', 'utils', '$location','$uibModal', '$window', 'loadElasticQuery', controllerSearchImages])
+search.controller('searchImages', ['$scope', 'elasticsearch', '$rootScope', '$log', 'cdn', 'utils', '$location','$uibModal', '$window', 'createQuery', controllerSearchImages])
 
 search.controller('tmpCarousel', ['$scope', '$http',  archiveImageCarousel]);
 
@@ -36,7 +38,7 @@ search.directive('inView', ['$window', directiveInView]);
 search.directive('lazyimg', ['$timeout', 'cdn', directiveLazyImage]);
 search.directive('fullscreenImage', ['$timeout', directiveFullscreenImage]);
 search.directive('poeTarget', [directiveTarget]);
-search.directive('archiveImage', ['elasticsearch', 'cdn', directiveArchiveImage]);
+search.directive('archiveImage', ['elasticsearch', 'cdn', 'createQuery', directiveArchiveImage]);
 search.directive('cdnImage', ['cdn', cdnImage]);
 
 search.directive('elasticsearch', ['elasticsearch', '$rootScope', directiveElasticsearch]);

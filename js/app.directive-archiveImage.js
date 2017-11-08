@@ -1,4 +1,4 @@
-function directiveArchiveImage(elasticsearch, cdn){
+function directiveArchiveImage(elasticsearch, cdn, createQuery ){
   return {
     restrict : 'ACE',
     template : function (elem, attrs){
@@ -35,7 +35,12 @@ function directiveArchiveImage(elasticsearch, cdn){
       if (attrs.querytype !== "elasticsearch"){
         query = bodybuilder()
           .filter('term', query.field, query.value);
+      }else{
+        query = createQuery.create(query);
       }
+
+
+
 
       var elasticsearchQuery = {
         index : index,

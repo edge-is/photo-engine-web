@@ -35,17 +35,18 @@ function archiveGrouppingController($scope, elasticsearch, $rootScope, utils){
 
   function addQueryToBuckets(buckets){
     return buckets.map(function (bucket){
-      var q = {
-        type : 'term',
-        field : field,
-        value : bucket.key
+      var query = {
+        filter : [
+          {
+            type : 'term',
+            field : field,
+            value : bucket.key
+          }
+        ]
       };
 
-      var q = bodybuilder()
-          .filter('term', field, bucket.key)
-          .build($rootScope.config.elasticsearch.version || 'v5');
-      bucket.base64Query = utils.base64encode(q);
-      bucket.query = q;
+      bucket.base64Query = utils.base64encode(query);
+      bucket.query = query;
       return bucket;
     });
   }

@@ -30,7 +30,15 @@ function navbarTypeaheadDirective(elasticsearch, $rootScope, utils){
       }
 
       $scope.search = function (queryString){
-        var query = bodybuilder().query('query_string', 'query', queryString).build();
+        //var query = bodybuilder().query('query_string', 'query', queryString).build();
+
+
+        var query = {
+          query : [
+            { type : 'query_string', field: 'query', value : queryString }
+          ]
+        };
+
 
         var base64Query = utils.base64encode(query);
 

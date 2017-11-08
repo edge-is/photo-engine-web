@@ -8,7 +8,7 @@ function controllerSearchImages(
   $location,
   $uibModal,
   $window,
-  loadElasticQuery){
+  createQuery){
 
   $scope.result = [];
 
@@ -26,6 +26,9 @@ function controllerSearchImages(
   $scope.type = $rootScope.currentIndex.index.type;
   $scope.index_id = $rootScope.currentIndexID;
 
+  $scope.resultsLeft = false;
+
+  $scope.URISearchDisabled = false;
 
   $scope.cachePhoto = config.cdn.cache;
 
@@ -41,72 +44,93 @@ function controllerSearchImages(
   $scope.queryStringQuery = "";
   $scope.current_credit = $location.search().filter || false;
 
-  $scope.imageDescriptionTooltip = $rootScope.currentIndex.image.description;
+  $scope.URIQueryObject = false;
+
+  $scope.imageDescriptionTooltip = "views/userdefined/image-description-tooltip.html";
+
+  if ($rootScope.currentIndex.image && $rootScope.currentIndex.image.description){
+    $scope.imageDescriptionTooltip = $rootScope.currentIndex.image.description;
+  }
+
 
   $scope.toggleAdvancedSearch = function (){
     if ($scope.hideAdvanceSearch) return $scope.hideAdvanceSearch = false;
     $scope.hideAdvanceSearch = true;
   }
+
   $rootScope.$on('currentUriQueryChange', function (event, value){
 
-    var query = loadElasticQuery.parse(value);
+    if ($scope.URISearchDisabled) return;
 
-    console.log(
-      'Loaded query', query.build()
-    )
+    $scope.URIQueryObject = value;
 
-    $scope.queryStringQuery = loadElasticQuery.queryString(value);
-    if (!$scope.originalQuery) $scope.originalQuery = angular.copy(query).build(config.elasticsearch.version || 'v5');
+    var query = createQuery.create(value);
+
+    $scope.queryStringQuery = createQuery.queryString(query.build(config.elasticsearch.version || 'v5'));
+
+
+
+    if (!$scope.originalQuery) $scope.originalQuery = angular.copy(query);
 
     search({query: query, uriSearch:true });
 
   });
 
-  $scope.queryStringSearch = function (){
+  $scope.removeThisFilter = function (){
+    console.log('remove the main filter.. FACK!!')
 
-    // FIXME:: Dirty hack .. need to be able to clone the object.
+    var f = $location.search().filter;
 
-    // Remove the current query_string ..
-    if ($scope.originalQuery.query){
-      if ($scope.originalQuery.query.bool.must){
-        var arr = $scope.originalQuery.query.bool.must;
-        if (Array.isArray(arr)){
-          $scope.originalQuery.query.bool.must = arr.filter(function (item){
-            var key = Object.keys(item).pop();
-            return (key === 'query_string') ? false : true;
-          });
-        }
-      }
+    console.log($scope.URIQueryObject, f);
+    var index = $scope.URIQueryObject.filter.findIndex(function (item){
+
+      if (item.value === f) return item;
+    });
+    if (index > -1){
+      $scope.URIQueryObject.filter.splice(index, 1);
+      return search({query : createQuery.create($scope.URIQueryObject) }, function (){
+        var obj = angular.copy($scope.URIQueryObject);
+
+
+        var base64Query = utils.base64encode(obj);
+        $location.search('query', base64Query);
+
+        $location.search('filter', null);
+
+        $scope.current_credit = false;
+      });
     }
 
-    var query = loadElasticQuery.parse($scope.originalQuery);
-    query.query('query_string', 'query', $scope.queryStringQuery);
-
-    search({query : query});
-    query = null;
-  }
-
-  function first(obj){
-    for (var key in obj) return key;
-  }
-
-  function extractElasticsearchFilter(esQuery){
-    var field = first(esQuery);
-    var value = esQuery[field];
-    return {field : field, value : value};
-  }
-
-  function loadJsonQueryIntoBodybuilder(jsonObject){
-
-    if (!jsonObject.query) return bodybuilder();
-
-    if (jsonObject.query.bool.filter.term){
-
-      var obj = extractElasticsearchFilter(jsonObject.query.bool.filter.term);
-      return bodybuilder().filter('term', obj.field, obj.value);
-    }
 
   };
+
+  $scope.queryStringSearch = function (){
+
+    if ($scope.URIQueryObject.query){
+      var index = $scope.URIQueryObject.query.findIndex(function (item){
+
+        if (item.type === 'query_string') return item;
+      });
+      if (index > -1){
+        $scope.URIQueryObject.query.splice(index, 1);
+      }
+    }else{
+      $scope.URIQueryObject.query = [];
+    }
+
+
+
+
+    $scope.URIQueryObject.query.push({
+      type: 'query_string', field: 'query', value : $scope.queryStringQuery
+    });
+    return search({query : createQuery.create($scope.URIQueryObject) }, function (){
+      var obj = angular.copy($scope.URIQueryObject);
+
+      var base64Query = utils.base64encode(obj);
+      $location.search('query', base64Query);
+    });
+  }
 
   function setCurrentUri(){
     $scope.currentURI = $location.$$url;
@@ -118,11 +142,17 @@ function controllerSearchImages(
   function search(queryOptions, callback){
     callback = callback || function (){};
 
+
     var query = queryOptions.query;
 
     var append = queryOptions.append || false;
 
-    console.log('Searching, es query:', query.build())
+    var tmpQuery = queryOptions.query.build();
+    console.log('QUERY ON ITS WAY', tmpQuery)
+
+    if (tmpQuery.from){
+      $location.search('from', tmpQuery.from);
+    }
 
     query.size($scope.size);
     var elasticsearchQuery = {
@@ -131,8 +161,6 @@ function controllerSearchImages(
       body : query
     }
 
-    var querySent = angular.copy(query);
-
     elasticsearch.search(elasticsearchQuery, function result(err, res){
 
       if (err) return $log.error(err, elasticsearchQuery);
@@ -140,20 +168,23 @@ function controllerSearchImages(
       $scope.resultTime = res.took;
       $scope.lastResult = res;
 
+
       $scope.lastQuery = query;
 
       if (append){
-        $scope.result = $scope.result.concat(res.hits.hits);
+        //$scope.result = $scope.result.concat(res.hits.hits);
+        //
+        res.hits.hits.forEach(function (hit){
+          $scope.result.push(hit);
+        })
       }else{
         $scope.result = res.hits.hits;
       }
+
+      $scope.resultsLeft = (res.hits.total - $scope.result.length );
+
       if ($scope.result.length === res.hits.total){
         $scope.noMoreResults = true;
-      }
-
-      if (!queryOptions.uriSearch){
-        var base64EncodedQuery = utils.base64encode(querySent.build($rootScope.config.elasticsearch.version || 'v5'));
-        $location.search('query',  base64EncodedQuery);
       }
 
       callback();
@@ -200,11 +231,12 @@ function controllerSearchImages(
     query.from($scope.result.length);
     $scope.loadingMoreResults = true;
 
-    search({query : query }, true, function done(){
+    $scope.URISearchDisabled = true;
+
+    search({query : query, append : true }, function done(){
       $scope.loadingMoreResults = false;
+      $scope.URISearchDisabled = false;
     });
-
-
 
   }
 

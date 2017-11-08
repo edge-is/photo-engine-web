@@ -23,16 +23,11 @@ function archiveListingController($scope, elasticsearch, $rootScope, $location, 
 
   $scope.showDescription = true;
 
-
-
    var _order = setKeyword([
      'Source{{KEYWORD}}',
      'UserDefined4{{KEYWORD}}',
      ['UserDefined12{{KEYWORD}}', 'UserDefined14{{KEYWORD}}']
    ]);
-
-   console.log('_ORDER', _order)
-
 
    function setKeyword(arr){
      var keyWord = (config.elasticsearch.version === 'v5') ? '.keyword' : '.raw';
@@ -124,13 +119,9 @@ function archiveListingController($scope, elasticsearch, $rootScope, $location, 
      getAgg(field, filter, function (err, res){
        if (err) return console.error(err);
 
-       console.log('RES', res)
-
        var arr =  parseAggBuckets(res.aggregations, $scope.selectedValues);
 
        $scope.items = orderByName(arr);
-
-       console.log(arr);
      });
    }
 

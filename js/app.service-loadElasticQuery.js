@@ -127,7 +127,6 @@ function serviceLoadElasticQuery(){
         });
 
         if (queryObject.query.bool.must){
-
           if (Array.isArray(queryObject.query.bool.must)){
             queryObject.query.bool.must.forEach(function (item){
               var o = parseObject(item);
