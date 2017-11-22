@@ -65,6 +65,14 @@ function serviceElasticsearch($http, $rootScope){
   }
 
   return {
+    get: function (options, callback){
+      var requestParams = {};
+      requestParams.url = buildURI(options.index, options.type, options.id);
+      requestParams.method = 'GET';
+
+      return request(requestParams, callback);
+
+    },
     search : function (options, callback){
 
       options.index = options.index || "";

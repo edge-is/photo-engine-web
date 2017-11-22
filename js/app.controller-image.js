@@ -3,7 +3,7 @@
 /**
  * Controller for static linking to images
  */
-function imageController($scope, $location, photoApi, cacheFactory, $rootScope, osm, $window){
+function imageController($scope, $location, elasticsearch, cacheFactory, $rootScope, osm, $window ){
   var myLocation = $location.$$absUrl;
   $rootScope.$on('$locationChangeSuccess', function (event, newLocation){
     // console.log('i should go back now....', event, { DATA: newLocation, oldURI: myLocation}, $window);
@@ -26,7 +26,33 @@ function imageController($scope, $location, photoApi, cacheFactory, $rootScope, 
 
   $scope.image = {};
 
-  photoApi.getByID($scope.imageID).success(function ( response){
+
+
+
+  var queryBody = {
+    type : $rootScope.currentIndex.index.type,
+    index : $rootScope.currentIndex.index.index,
+    id : $scope.imageID
+  };
+
+  console.log('Image controller',
+    $rootScope.currentIndex,
+    queryBody
+  )
+
+
+  elasticsearch.get(queryBody, function (err, response){
+
+    console.log('image modal', err ,response)
+    response._source.Keywords = mustBeArray(response._source.Keywords);
+    response._source.Subject = mustBeArray(response._source.Subject);
+    $scope.image = response;
+
+
+    $scope.initMap();
+  })
+
+  /*photoApi.getByID($scope.imageID).success(function ( response){
 
     var img = response.data || {};
     img._source.Keywords = mustBeArray(img._source.Keywords);
@@ -35,7 +61,7 @@ function imageController($scope, $location, photoApi, cacheFactory, $rootScope, 
 
 
     $scope.initMap();
-  });
+  });*/
 
   function mustBeArray(arr){
     if (Array.isArray(arr)) return arr;
@@ -53,6 +79,9 @@ function imageController($scope, $location, photoApi, cacheFactory, $rootScope, 
       if (d.lenght === 0) return;
 
       var location = d.pop();
+
+      if (!location) return;
+
       $scope.MapLoaded = true;
       //angular.extend($scope, )
       $scope.center = {

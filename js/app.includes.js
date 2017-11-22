@@ -14,7 +14,7 @@ search.service('cdn', serviceCDN);
 
 search.service('createQuery', serviceCreateElasticQuery);
 
-search.controller('image', [ '$scope', '$location', 'photoApi', 'cacheFactory', '$rootScope', 'osm','$window', imageController]);
+search.controller('image', [ '$scope', '$location', 'elasticsearch', 'cacheFactory', '$rootScope', 'osm','$window', imageController]);
 search.controller('mainSearch', ['$scope','photoApi', '$location', '$anchorScroll', '$uibModal', '$rootScope', 'utils', '$timeout', '$log', mainSearchController]);
 search.controller('archivesGroupping', ['$scope', 'elasticsearch','$rootScope','utils', archiveGrouppingController]);
 search.controller('archiveListing', ['$scope', 'elasticsearch', '$rootScope','$location', 'utils',  archiveListingController]);
