@@ -35,20 +35,11 @@ function imageController($scope, $location, elasticsearch, cacheFactory, $rootSc
     id : $scope.imageID
   };
 
-  console.log('Image controller',
-    $rootScope.currentIndex,
-    queryBody
-  )
-
-
   elasticsearch.get(queryBody, function (err, response){
 
-    console.log('image modal', err ,response)
     response._source.Keywords = mustBeArray(response._source.Keywords);
     response._source.Subject = mustBeArray(response._source.Subject);
     $scope.image = response;
-
-
     $scope.initMap();
   })
 
