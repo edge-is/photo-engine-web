@@ -456,3 +456,8 @@ section.container{
     bottom: 0;
     margin: auto;
 }
+
+
+.thumbnail-max-height img {
+  max-height: 290px;
+}

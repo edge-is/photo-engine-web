@@ -7,7 +7,7 @@
     <div class="container-fluid">
       <div ng-repeat="(key, image) in images">
         <div class="col-xs-6 col-md-3">
-          <a href="#" ng-click="close(key, image)" class="thumbnail" uib-tooltip-append-to-body="true" uib-tooltip="{{getName(image)}}">
+          <a href="#" ng-click="close(key, image)" class="thumbnail thumbnail-max-height" uib-tooltip-append-to-body="true" uib-tooltip="{{getName(image)}}">
             <cdn-image image="image" size="xx-small" class="cdn-image-size-small">
           </a>
         </div>
