@@ -96,8 +96,8 @@
                 <td><a href='#?query=Bær:"{{image._source.City}}"'  ng-click="dismiss()"><span id="city">{{image._source.City}}</span></a></td>
             </tr>
             <tr>
-                <th>Uppfærðist á vef</th>
-                <td><span id="last_updated">{{image._source.indexed_epoch | date:'dd.MM.yyyy HH:mm' }}</span></td>
+                <th>Tekin</th>
+                <td><a href='#?query=Bær:"{{image._source.DateCreated_string}}"'  ng-click="dismiss()"><span id="DateCreated_string">{{image._source.DateCreated_string}}</span></a></td>
             </tr>
         </table>
         <leaflet center="center" ng-show="MapLoaded" markers="mapmarker" class="image-map"></leaflet>
@@ -123,6 +123,10 @@
             <tr>
                 <th>Heimild</th>
                 <td>{{image._source.UserDefined3}}</td>
+            </tr>
+            <tr>
+                <th>Uppfærðist á vef</th>
+                <td><span id="last_updated">{{image._source.indexed_epoch | date:'dd.MM.yyyy HH:mm' }}</span></td>
             </tr>
 
         </table>
