@@ -271,7 +271,7 @@ function archiveListingController($scope, elasticsearch, $rootScope, $location, 
        filter : utils.base64encode(angular.toJson(filters))
      };
      if (!item._next){
-       return buildURI('/displayarchive.html', filter);
+       return buildURI('displayarchive.html', filter);
      }
 
      return buildURI(false, filter);
