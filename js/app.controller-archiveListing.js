@@ -6,6 +6,9 @@ function archiveListingController($scope, elasticsearch, $rootScope, $location, 
   $scope.items = [];
   $scope.images = [];
 
+  $scope.showSearchBar = config.searchbar;
+
+
   var rawField = config.rawField || '.keyword';
 
   $scope.query = "";

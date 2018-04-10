@@ -2,6 +2,7 @@
 
 function controllerDisplayArchive($scope, elasticsearch, $location, $timeout, $rootScope, $uibModal, utils, cdn){
 
+  $scope.showSearchBar = config.searchbar;
   $scope.images = [];
   $scope.thumbnails = [];
 

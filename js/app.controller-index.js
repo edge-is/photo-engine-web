@@ -12,4 +12,6 @@ function indexController($scope, $window){
 
   $scope.queryObject = {};
 
+  $scope.showSearchBar = config.searchbar || true;
+
 }

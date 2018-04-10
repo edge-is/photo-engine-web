@@ -20,10 +20,7 @@ function navbarTypeaheadDirective(elasticsearch, $rootScope, utils){
       $scope.type = $rootScope.currentIndex.index.type;
 
       var element = $(element).find('.typeahead-input');
-
       $scope.submit = function (q){
-        console.log('Q', $scope.query)
-
         q = q || $scope.query;
 
         $scope.search(q);
@@ -38,11 +35,9 @@ function navbarTypeaheadDirective(elasticsearch, $rootScope, utils){
             { type : 'query_string', field: 'query', value : queryString }
           ]
         };
-
-
         var base64Query = utils.base64encode(query);
 
-        window.location = '/search_index.html?query=' + base64Query;
+        window.location = 'search_index.html?query=' + base64Query;
 
       }
 
