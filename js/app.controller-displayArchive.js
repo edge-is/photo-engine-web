@@ -71,11 +71,10 @@ function controllerDisplayArchive($scope, elasticsearch, $location, $timeout, $r
     var uri = {
       filter : utils.base64encode(angular.toJson(arr))
     };
-
-    return window.location =  utils.createURI('/webarchive.html', {
+    return window.location =  utils.createURI('webarchive.html', {
         index_id : $rootScope.currentIndexID,
         filter : uri.filter
-    })
+    });
   };
 
   $scope.thumbnails = [];
